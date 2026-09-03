@@ -1,0 +1,10 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": "nextjs",
+  "env": {
+    "X402_ENABLED": "true",
+    "X402_PAY_TO": "0xa0A3BB49eA4AC723Bcf4d2d1ecde2EE01BA03C82",
+    "X402_NETWORK": "eip155:84532",
+    "X402_FACILITATOR_URL": "https://facilitator.payai.network"
+  }
+}

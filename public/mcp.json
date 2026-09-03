@@ -1,0 +1,80 @@
+{
+  "name": "Israel Business Intelligence MCP",
+  "description": "Agent-native Verified Payee Firewall plus Israeli company verification and pre-payment vendor risk triage. Check legal entity, service domain, signed payee manifest, wallet destination, payment fingerprint, and buyer mandate before signing. Not Full Regulatory KYB.",
+  "transport": "streamable-http",
+  "production_url": "https://israel-counterparty-intelligence.vercel.app/mcp",
+  "testnet_url": "https://israel-counterparty-intelligence.vercel.app/mcp/testnet",
+  "instructions": "Before signing an x402 payment, call preview_agent_payment_trust for a free dry-run ALLOW, REVIEW, or DENY decision. Start with preview_israeli_company_free for company verification. Before a conventional vendor payment, use preview_israeli_vendor_payment_risk_free and then assess_israeli_vendor_payment_risk_paid.",
+  "buyer_bridge": "https://israel-counterparty-intelligence.vercel.app/israel-company-verify-buyer-0.3.0.tgz",
+  "buyer_bridge_github": "https://github.com/itzikhr18/israel-company-verify-buyer",
+  "source_repository": "https://github.com/itzikhr18/israel-counterparty-intelligence",
+  "tools": [
+    {
+      "name": "preview_agent_payment_trust",
+      "description": "Free dry-run payment firewall. Binds Israeli legal identity, service origin, a signed domain payee manifest, x402 destination and terms, and the buyer mandate into ALLOW, REVIEW, or DENY. It never signs or submits a payment.",
+      "paid": false
+    },
+    {
+      "name": "preview_israeli_company_free",
+      "description": "Recommended free first step for Israel company verification. Resolves identity and registry status, then returns exact reusable arguments for the paid report.",
+      "paid": false
+    },
+    {
+      "name": "verify_israeli_company_paid",
+      "description": "Recommended paid next step. Returns the complete field-level Israeli Companies Registry evidence report with source URLs, confidence, missing-data disclosure, and checked_at.",
+      "paid": true,
+      "price": "0.05 USDC",
+      "network": "Base Mainnet",
+      "protocol": "x402 v2"
+    },
+    {
+      "name": "preview_israeli_vendor_payment_risk_free",
+      "description": "Free preview that resolves the vendor and shows which invoice and payment-context signals will be assessed. It does not return risk findings or a decision.",
+      "paid": false
+    },
+    {
+      "name": "assess_israeli_vendor_payment_risk_paid",
+      "description": "Pre-payment triage using registry evidence, invoice identity consistency, contact-domain checks, and buyer-observed signals. Returns PROCEED, REVIEW, or BLOCK with reason codes and explicit exclusions.",
+      "paid": true,
+      "price": "0.10 USDC",
+      "network": "Base Mainnet",
+      "protocol": "x402 v2"
+    },
+    {
+      "name": "get_sample_verification_report",
+      "description": "Free static sample of the complete paid response shape. No live lookup and no payment.",
+      "paid": false
+    },
+    {
+      "name": "verify_company",
+      "description": "Compatibility name for verify_israeli_company_paid. Resolves an Israeli company and returns the complete field-level public-registry evidence result.",
+      "paid": true,
+      "price": "0.05 USDC",
+      "network": "Base Mainnet",
+      "protocol": "x402 v2"
+    },
+    {
+      "name": "preview_company",
+      "description": "Compatibility name for preview_israeli_company_free. Returns identity, company number, registry status, candidates, confidence, and an exact paid next action.",
+      "paid": false
+    },
+    { "name": "describe_service", "paid": false },
+    { "name": "get_schema", "paid": false }
+  ],
+  "keywords": [
+    "Israel company verification",
+    "Israeli company registry",
+    "verify Israeli company",
+    "Israeli supplier verification",
+    "Israel business intelligence",
+    "public-registry KYB evidence",
+    "Israeli company number",
+    "Israeli vendor payment risk",
+    "invoice fraud triage",
+    "supplier payment verification",
+    "agentic procurement guardrail",
+    "verified payee firewall",
+    "x402 pre-sign policy",
+    "agent wallet safety"
+  ]
+}

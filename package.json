@@ -1,0 +1,63 @@
+{
+  "name": "israel-counterparty-intelligence",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Paid-by-call public intelligence for Israeli business counterparties.",
+  "homepage": "https://israel-counterparty-intelligence.vercel.app",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/itzikhr18/israel-counterparty-intelligence.git"
+  },
+  "bugs": {
+    "url": "https://github.com/itzikhr18/israel-counterparty-intelligence/issues"
+  },
+  "engines": {
+    "node": "24.x"
+  },
+  "allowScripts": {
+    "unrs-resolver@1.12.2": true
+  },
+  "scripts": {
+    "dev": "next dev",
+    "prebuild": "npm run buyer:bridge:pack",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc --noEmit",
+    "check": "npm run format:check && npm run lint && npm run typecheck && npm test && npm run build",
+    "smoke": "node scripts/smoke.mjs",
+    "smoke:paid": "node scripts/internal-paid-smoke.mjs",
+    "smoke:mcp": "node scripts/mcp-smoke.mjs",
+    "smoke:mcp:paid": "node scripts/mcp-paid-smoke.mjs",
+    "buyer:bridge:help": "node buyer-bridge/bin/israel-company-verify-buyer.mjs --help",
+    "buyer:bridge:pack": "npm pack ./buyer-bridge --pack-destination public"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.30.0",
+    "@x402/core": "2.23.0",
+    "@x402/evm": "2.23.0",
+    "@x402/extensions": "2.23.0",
+    "@x402/mcp": "^2.23.0",
+    "@x402/next": "2.23.0",
+    "next": "16.3.3",
+    "react": "19.2.4",
+    "react-dom": "19.2.4",
+    "viem": "^2.56.0",
+    "zod": "4.4.3"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "eslint": "^9.0.0",
+    "eslint-config-next": "16.3.3",
+    "prettier": "^3.0.0",
+    "typescript": "6.0.3",
+    "vitest": "4.1.11"
+  }
+}

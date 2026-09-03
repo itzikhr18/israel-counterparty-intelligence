@@ -1,0 +1,46 @@
+# Israel Company Verify
+
+> Paid Israeli company verification by legal name or company number with field-level public-registry evidence. Free preview returns identity/status and an exact next action only. Not Full Regulatory KYB.
+
+- Status: PRODUCTION LIVE
+
+- Production endpoint: https://israel-counterparty-intelligence.vercel.app/v1/verify/mainnet
+- Method: POST
+- Price: $0.05 real USDC
+- Payment-risk endpoint: https://israel-counterparty-intelligence.vercel.app/v1/payment-risk/mainnet
+- Payment-risk price: $0.10 real USDC
+- Network: Base Mainnet (eip155:8453)
+- USDC contract: 0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913
+- Test endpoint: https://israel-counterparty-intelligence.vercel.app/v1/verify
+- Test price: $0.10 Test USDC on Base Sepolia (eip155:84532)
+- Protocol: x402 v2
+- Facilitator: https://facilitator.payai.network
+- PayAI resource ID: 6a91c9587356b8e8001ae3e5
+- x402 manifest: https://israel-counterparty-intelligence.vercel.app/.well-known/x402
+- OpenAPI: https://israel-counterparty-intelligence.vercel.app/openapi.json
+- README: https://israel-counterparty-intelligence.vercel.app/README.md
+- MCP production: https://israel-counterparty-intelligence.vercel.app/mcp
+- MCP testnet: https://israel-counterparty-intelligence.vercel.app/mcp/testnet
+- MCP metadata: https://israel-counterparty-intelligence.vercel.app/mcp.json
+- Free x402 pre-sign firewall: https://israel-counterparty-intelligence.vercel.app/v1/agent-payment-trust
+- Agent Payee Manifest schema: https://israel-counterparty-intelligence.vercel.app/.well-known/agent-payee-schema.json
+- One-command buyer bridge: https://israel-counterparty-intelligence.vercel.app/israel-company-verify-buyer-0.3.0.tgz
+- Public buyer bridge: https://github.com/itzikhr18/israel-company-verify-buyer
+- Public service source: https://github.com/itzikhr18/israel-counterparty-intelligence
+- Free preview command: npx --yes github:itzikhr18/israel-company-verify-buyer --company-number 514744887
+- MCP tools: preview_agent_payment_trust (free dry-run ALLOW, REVIEW, or DENY before signing); verify_israeli_company_paid (paid full registry evidence, 0.05 USDC); assess_israeli_vendor_payment_risk_paid (paid pre-payment decision, 0.10 USDC); preview_israeli_company_free and preview_israeli_vendor_payment_risk_free (free previews); get_sample_verification_report, describe_service, and get_schema (free)
+- Agent Tools: https://agent-tools.cloud/api/v1/services/israel-counterparty-intelligence-vercel-app-sub393
+- 402 Index: https://402index.io/service/fa0902ac-90a7-431a-8979-97da22a12911
+- x402scan resource ID: e9b83616-3c3e-483a-81a2-a93c2b85dd7e
+
+Search intents: verify Israeli company; Israel company verification; Israeli supplier due diligence;
+public-registry KYB evidence; Israeli business verification; Israel company registry; Israeli company number; Israel counterparty
+intelligence.
+
+Payment-risk intent: assess Israeli vendor before payment; compare invoice company identity with
+Israeli registry; return PROCEED, REVIEW, or BLOCK. It does not verify bank-account ownership,
+invoice authenticity, sanctions, PEPs, UBOs, adverse media, or creditworthiness.
+
+Agent-payment intent: inspect exact x402 terms before signing; verify the domain-hosted payee
+manifest and recipient wallet; enforce a buyer mandate; return ALLOW, REVIEW, or DENY. The dry-run
+does not sign, settle, or prove legal ownership of the wallet.

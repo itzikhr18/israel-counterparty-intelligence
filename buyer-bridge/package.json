@@ -1,0 +1,46 @@
+{
+  "name": "israel-company-verify-buyer",
+  "version": "0.3.0",
+  "description": "Payment-aware MCP buyer bridge with an agent pre-sign payment firewall",
+  "keywords": [
+    "mcp",
+    "x402",
+    "ai-agent",
+    "base",
+    "usdc",
+    "israel",
+    "company-verification",
+    "payment-risk"
+  ],
+  "homepage": "https://israel-counterparty-intelligence.vercel.app",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/itzikhr18/israel-company-verify-buyer.git"
+  },
+  "bugs": {
+    "url": "https://github.com/itzikhr18/israel-company-verify-buyer/issues"
+  },
+  "type": "module",
+  "bin": {
+    "israel-company-verify-buyer": "bin/israel-company-verify-buyer.mjs"
+  },
+  "files": [
+    "bin",
+    "lib",
+    "README.md"
+  ],
+  "exports": {
+    ".": "./lib/pre-sign-policy.mjs"
+  },
+  "engines": {
+    "node": ">=20.9"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "1.30.0",
+    "@x402/core": "2.23.0",
+    "@x402/evm": "2.23.0",
+    "@x402/mcp": "2.23.0",
+    "viem": "2.56.0"
+  },
+  "license": "MIT"
+}
