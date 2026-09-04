@@ -5,6 +5,8 @@ const usdPrice = z.string().regex(/^\$\d+(\.\d{1,6})?$/);
 const productionPaymentDefault =
   process.env.VERCEL_ENV === "production" ? "true" : "false";
 const defaultPayTo = "0xa0A3BB49eA4AC723Bcf4d2d1ecde2EE01BA03C82";
+export const CDP_FACILITATOR_URL =
+  "https://api.cdp.coinbase.com/platform/v2/x402";
 
 const envSchema = z.object({
   COMPANY_REGISTRY_BASE_URL: z
@@ -63,6 +65,11 @@ const envSchema = z.object({
   X402_MAINNET_FACILITATOR_URL: z
     .url()
     .default("https://facilitator.payai.network"),
+  X402_MAINNET_FACILITATOR_PROVIDER: z
+    .enum(["auto", "url", "cdp"])
+    .default("auto"),
+  CDP_API_KEY_ID: z.string().min(1).optional(),
+  CDP_API_KEY_SECRET: z.string().min(1).optional(),
   X402_MAINNET_VERIFY_PRICE: usdPrice.default("$0.05"),
   X402_MAINNET_PAYMENT_RISK_PRICE: usdPrice.default("$0.10"),
   X402_MAINNET_COMPANY_CHANGES_PRICE: usdPrice.default("$0.01"),
@@ -108,6 +115,20 @@ export const config = {
     parsedConfig.X402_MAINNET_PAY_TO ?? parsedConfig.X402_PAY_TO,
   PUBLIC_BASE_URL: resolvePublicBaseUrl(),
 };
+
+const cdpCredentialsConfigured = Boolean(
+  config.CDP_API_KEY_ID && config.CDP_API_KEY_SECRET,
+);
+const useCdpMainnetFacilitator =
+  config.X402_MAINNET_FACILITATOR_PROVIDER === "cdp" ||
+  (config.X402_MAINNET_FACILITATOR_PROVIDER === "auto" &&
+    cdpCredentialsConfigured);
+
+if (useCdpMainnetFacilitator && !cdpCredentialsConfigured) {
+  throw new Error(
+    "CDP_API_KEY_ID and CDP_API_KEY_SECRET are required when the Mainnet facilitator provider is cdp",
+  );
+}
 
 export type PaymentEnvironmentName = "testnet" | "mainnet";
 
@@ -178,13 +199,19 @@ export const paymentEnvironments = {
     network: config.X402_NETWORK,
     asset: config.X402_ASSET,
     facilitatorUrl: config.X402_FACILITATOR_URL,
+    facilitatorProvider: "configured-url" as const,
     payTo: config.X402_PAY_TO,
   },
   mainnet: {
     enabled: config.X402_MAINNET_ENABLED,
     network: config.X402_MAINNET_NETWORK,
     asset: config.X402_MAINNET_ASSET,
-    facilitatorUrl: config.X402_MAINNET_FACILITATOR_URL,
+    facilitatorUrl: useCdpMainnetFacilitator
+      ? CDP_FACILITATOR_URL
+      : config.X402_MAINNET_FACILITATOR_URL,
+    facilitatorProvider: useCdpMainnetFacilitator
+      ? ("coinbase-cdp" as const)
+      : ("configured-url" as const),
     payTo: config.X402_MAINNET_PAY_TO,
   },
 } as const;

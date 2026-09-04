@@ -1,6 +1,6 @@
 import { randomUUID } from "node:crypto";
 
-import { HTTPFacilitatorClient, x402ResourceServer } from "@x402/core/server";
+import { x402ResourceServer } from "@x402/core/server";
 import type {
   Network,
   PaymentRequirements,
@@ -24,6 +24,7 @@ import {
   paymentEnvironments,
   type PaymentEnvironmentName,
 } from "@/lib/config";
+import { createPaymentFacilitatorClient } from "@/lib/facilitator-client";
 import {
   companyChangesExample,
   companyChangesInputJsonSchema,
@@ -56,7 +57,7 @@ import {
 } from "@/lib/verification-schema";
 
 export const MCP_SERVER_NAME = "Israel Business Intelligence MCP";
-export const MCP_SERVER_VERSION = "1.5.3";
+export const MCP_SERVER_VERSION = "1.6.0";
 
 export const FREE_PREVIEW_TOOL = "preview_israeli_company_free";
 export const PAID_VERIFY_TOOL = "verify_israeli_company_paid";
@@ -304,9 +305,7 @@ async function getResourceServer(
         `${environmentName} MCP payTo must be a real receiving wallet`,
       );
     }
-    const facilitator = new HTTPFacilitatorClient({
-      url: environment.facilitatorUrl,
-    });
+    const facilitator = createPaymentFacilitatorClient(environmentName);
     const server = new x402ResourceServer(facilitator).register(
       "eip155:*",
       new ExactEvmScheme(),

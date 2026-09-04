@@ -1,7 +1,7 @@
 import { createHash } from "node:crypto";
 
 import { encodePaymentRequiredHeader } from "@x402/core/http";
-import { HTTPFacilitatorClient, x402ResourceServer } from "@x402/core/server";
+import { x402ResourceServer } from "@x402/core/server";
 import type {
   HTTPRequestContext,
   HTTPTransportContext,
@@ -20,6 +20,7 @@ import {
   type PaidRouteName,
   type PaymentEnvironmentName,
 } from "@/lib/config";
+import { createPaymentFacilitatorClient } from "@/lib/facilitator-client";
 import {
   buildPaymentRequired,
   buildPaymentRequiredBody,
@@ -232,9 +233,7 @@ function getServer(
       `${environmentName} payTo must be a real receiving wallet when x402 is enabled`,
     );
   }
-  const facilitator = new HTTPFacilitatorClient({
-    url: environment.facilitatorUrl,
-  });
+  const facilitator = createPaymentFacilitatorClient(environmentName);
   const server = new x402ResourceServer(facilitator).register(
     "eip155:*",
     new ExactEvmScheme(),

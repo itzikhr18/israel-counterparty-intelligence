@@ -75,6 +75,8 @@ resource. It does not duplicate or broaden the underlying business-intelligence 
 - 402 Index: `https://402index.io/service/fa0902ac-90a7-431a-8979-97da22a12911`
 - x402scan resource ID: `e9b83616-3c3e-483a-81a2-a93c2b85dd7e`
 - PayAI discovery: `https://facilitator.payai.network/discovery/resources`
+- Coinbase Bazaar readiness: all three Mainnet resources pass live validation; catalog activation
+  requires a conforming payment settled by the authenticated Coinbase CDP facilitator.
 
 ## Test resource
 

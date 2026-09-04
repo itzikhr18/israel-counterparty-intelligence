@@ -149,6 +149,9 @@ X402_MAINNET_PAY_TO=0xYourReceivingWallet
 X402_MAINNET_NETWORK=eip155:8453
 X402_MAINNET_ASSET=0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913
 X402_MAINNET_FACILITATOR_URL=https://facilitator.payai.network
+X402_MAINNET_FACILITATOR_PROVIDER=auto
+CDP_API_KEY_ID=
+CDP_API_KEY_SECRET=
 X402_MAINNET_VERIFY_PRICE=$0.05
 X402_MAINNET_PAYMENT_RISK_PRICE=$0.10
 X402_MAINNET_COMPANY_CHANGES_PRICE=$0.01
@@ -165,6 +168,12 @@ Without a payment signature, a protected endpoint returns `402` with `PAYMENT-RE
 challenge includes Bazaar input/output metadata. A compatible paid client must echo that extension
 in its payment payload. Catalog inclusion happens only after a facilitator processes a conforming
 paid payload and is ultimately controlled by that facilitator.
+
+`X402_MAINNET_FACILITATOR_PROVIDER=auto` preserves the configured URL until both CDP credentials
+are present. When they are added, Mainnet verification and settlement automatically switch to the
+authenticated Coinbase CDP facilitator. The secret never appears in challenges, logs, or health
+responses. Run `npm run bazaar:check` to validate all live paid endpoints against Coinbase Bazaar;
+the same read-only check runs daily in GitHub Actions.
 
 The Base Sepolia and Base Mainnet network identifiers and USDC assets are validated as distinct
 configuration values. Price, asset, network, facilitator and payTo are server-owned and cannot be
