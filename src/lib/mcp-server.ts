@@ -56,7 +56,7 @@ import {
 } from "@/lib/verification-schema";
 
 export const MCP_SERVER_NAME = "Israel Business Intelligence MCP";
-export const MCP_SERVER_VERSION = "1.5.0";
+export const MCP_SERVER_VERSION = "1.5.1";
 
 export const FREE_PREVIEW_TOOL = "preview_israeli_company_free";
 export const PAID_VERIFY_TOOL = "verify_israeli_company_paid";
