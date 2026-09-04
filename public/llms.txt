@@ -16,8 +16,9 @@
 - Test endpoint: https://israel-counterparty-intelligence.vercel.app/v1/verify
 - Test price: $0.10 Test USDC on Base Sepolia (eip155:84532)
 - Protocol: x402 v2
-- Facilitator: https://facilitator.payai.network
-- PayAI resource ID: 6a91c9587356b8e8001ae3e5
+- Mainnet facilitator: authenticated Coinbase CDP (https://api.cdp.coinbase.com/platform/v2/x402)
+- Testnet facilitator: https://facilitator.payai.network
+- Testnet PayAI resource ID: 6a91c9587356b8e8001ae3e5
 - x402 manifest: https://israel-counterparty-intelligence.vercel.app/.well-known/x402
 - OpenAPI: https://israel-counterparty-intelligence.vercel.app/openapi.json
 - README: https://israel-counterparty-intelligence.vercel.app/README.md

@@ -21,7 +21,7 @@ This x402 v2 service has a production Base Mainnet resource and a separate Base 
 - Price: `$0.05`
 - Asset: Real USDC (`0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913`)
 - Network: Base Mainnet (`eip155:8453`)
-- Facilitator: `https://facilitator.payai.network`
+- Facilitator: authenticated Coinbase CDP (`https://api.cdp.coinbase.com/platform/v2/x402`)
 - Receiving wallet: `0xa0A3BB49eA4AC723Bcf4d2d1ecde2EE01BA03C82`
 
 No self-payment or operator-funded Mainnet activation is required. The first genuine external
@@ -33,6 +33,13 @@ Base Mainnet USDC payer will be the first production end-to-end settlement and E
 - Method: `POST`
 - URL: `https://israel-counterparty-intelligence.vercel.app/v1/payment-risk/mainnet`
 - Price: `$0.10`
+- Asset: Real USDC on Base Mainnet (`eip155:8453`)
+- Result: deterministic `PROCEED`, `REVIEW`, or `BLOCK` decision with reason codes and evidence
+
+The service compares invoice identity and contact-domain signals with the resolved public-registry
+record and considers buyer-observed payment changes, urgency, and first-time-vendor context. It does
+not verify bank-account ownership, invoice authenticity, sanctions, PEPs, UBOs, adverse media, or
+creditworthiness.
 
 ## Company changes resource
 
@@ -42,12 +49,6 @@ Base Mainnet USDC payer will be the first production end-to-end settlement and E
 - Output: recent official filing and status-change events, newest first, with source evidence
 - Coverage: approximately one year, subject to the official source dataset
 - Asset: Real USDC on Base Mainnet (`eip155:8453`)
-- Result: deterministic `PROCEED`, `REVIEW`, or `BLOCK` decision with reason codes and evidence
-
-The service compares invoice identity and contact-domain signals with the resolved public-registry
-record and considers buyer-observed payment changes, urgency, and first-time-vendor context. It does
-not verify bank-account ownership, invoice authenticity, sanctions, PEPs, UBOs, adverse media, or
-creditworthiness.
 
 ## Israel Business Intelligence MCP
 
@@ -74,7 +75,7 @@ resource. It does not duplicate or broaden the underlying business-intelligence 
 - Agent Tools: `https://agent-tools.cloud/api/v1/services/israel-counterparty-intelligence-vercel-app-sub393`
 - 402 Index: `https://402index.io/service/fa0902ac-90a7-431a-8979-97da22a12911`
 - x402scan resource ID: `e9b83616-3c3e-483a-81a2-a93c2b85dd7e`
-- PayAI discovery: `https://facilitator.payai.network/discovery/resources`
+- PayAI discovery for the Base Sepolia test resource: `https://facilitator.payai.network/discovery/resources`
 - Coinbase Bazaar readiness: all three Mainnet resources pass live validation; catalog activation
   requires a conforming payment settled by the authenticated Coinbase CDP facilitator.
 
@@ -152,7 +153,8 @@ For MCP clients, configure the production Streamable HTTP URL above. Initializat
 do not require payment. A resolved preview returns an exact `next_action` with reusable verification
 arguments. A call to `verify_israeli_company_paid` returns an
 x402 v2 `PaymentRequired` tool result and must be retried with `_meta["x402/payment"]`. The signed
-payment is verified and settled through PayAI before the tool result is released.
+payment is verified and settled through the authenticated Coinbase CDP facilitator before the tool
+result is released.
 
 ## Response
 
