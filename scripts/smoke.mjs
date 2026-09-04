@@ -13,9 +13,30 @@ function assertResponse(condition, message) {
 const health = await fetch(`${baseUrl}/health`);
 assertResponse(health.ok, `Health failed with ${health.status}`);
 
+const discovery = await fetch(`${baseUrl}/.well-known/x402`);
+assertResponse(discovery.ok, `x402 discovery failed with ${discovery.status}`);
+const discoveryManifest = await discovery.json();
+assertResponse(
+  discoveryManifest.x402Version === 2,
+  "x402 discovery manifest is not v2",
+);
+assertResponse(
+  discoveryManifest.endpoints?.some(
+    (endpoint) =>
+      endpoint.resource === `${baseUrl}/v1/verify/mainnet` &&
+      endpoint.accepts?.some(
+        (requirement) => requirement.network === "eip155:8453",
+      ),
+  ),
+  "x402 discovery manifest is missing the Mainnet verification endpoint",
+);
+
 const verify = await fetch(`${baseUrl}${verifyPath}`, {
   method: "POST",
-  headers: { "content-type": "application/json" },
+  headers: {
+    "content-type": "application/json",
+    "x-discovery-source": "internal-smoke",
+  },
   body: JSON.stringify({ company_number: "514744887", language: "en" }),
 });
 
