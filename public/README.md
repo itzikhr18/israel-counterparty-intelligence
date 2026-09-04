@@ -8,6 +8,7 @@ This x402 v2 service has a production Base Mainnet resource and a separate Base 
 
 - verify Israeli company
 - Israel company verification
+- Recent official Israeli company filing and status-change events
 - Israeli supplier due diligence
 - Israel KYB
 - Israeli business verification
@@ -32,6 +33,14 @@ Base Mainnet USDC payer will be the first production end-to-end settlement and E
 - Method: `POST`
 - URL: `https://israel-counterparty-intelligence.vercel.app/v1/payment-risk/mainnet`
 - Price: `$0.10`
+
+## Company changes resource
+
+- URL: `https://israel-counterparty-intelligence.vercel.app/v1/company-changes/mainnet`
+- Price: `$0.01`
+- Input: exact nine-digit Israeli company number, optional `lookback_days` and `limit`
+- Output: recent official filing and status-change events, newest first, with source evidence
+- Coverage: approximately one year, subject to the official source dataset
 - Asset: Real USDC on Base Mainnet (`eip155:8453`)
 - Result: deterministic `PROCEED`, `REVIEW`, or `BLOCK` decision with reason codes and evidence
 
@@ -50,6 +59,7 @@ creditworthiness.
 - Recommended paid tool: `verify_israeli_company_paid` - 0.05 USDC on Base Mainnet
 - Recommended free preview: `preview_israeli_company_free`
 - Recommended paid payment-risk tool: `assess_israeli_vendor_payment_risk_paid` - 0.10 USDC
+- Low-cost paid changes tool: `get_israeli_company_changes_paid` - 0.01 USDC
 - Free payment-risk preview: `preview_israeli_vendor_payment_risk_free`
 - Free sample: `get_sample_verification_report` - complete static response shape, no live lookup
 - Compatibility names: `verify_company`, `preview_company`

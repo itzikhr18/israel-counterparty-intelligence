@@ -1,4 +1,8 @@
 import { config, paidRouteConfig, type PaidRouteName } from "@/lib/config";
+import {
+  companyChangesInputJsonSchema,
+  companyChangesOutputJsonSchema,
+} from "@/lib/company-changes-schema";
 import { buildPaymentRequired } from "@/lib/payment-challenge";
 import {
   paymentRiskInputJsonSchema,
@@ -11,6 +15,7 @@ import {
 import { x402DiscoverySchema } from "@/lib/x402-discovery-schema";
 
 const discoveryRoutes: PaidRouteName[] = [
+  "company-changes-mainnet",
   "verify-mainnet",
   "payment-risk-mainnet",
   "verify",
@@ -19,6 +24,12 @@ const discoveryRoutes: PaidRouteName[] = [
 ];
 
 function schemasFor(routeName: PaidRouteName) {
+  if (routeName === "company-changes-mainnet") {
+    return {
+      inputSchema: x402DiscoverySchema(companyChangesInputJsonSchema),
+      outputSchema: x402DiscoverySchema(companyChangesOutputJsonSchema),
+    };
+  }
   if (routeName === "payment-risk-mainnet") {
     return {
       inputSchema: x402DiscoverySchema(paymentRiskInputJsonSchema),
@@ -62,12 +73,14 @@ export function wellKnownX402Manifest() {
       ? "MAINNET LIVE - AWAITING FIRST EXTERNAL PAID CALL"
       : "MAINNET DISABLED",
     description:
-      "Paid Israeli company verification and vendor payment-risk intelligence with field-level public-registry evidence. Public-registry evidence only, not Full Regulatory KYB.",
+      "Paid Israeli company verification, daily company-change intelligence, and vendor payment-risk checks with field-level public-registry evidence. Public-registry evidence only, not Full Regulatory KYB.",
     category: "business-intelligence",
     tags: [
       "israel",
       "company",
       "verification",
+      "company-changes",
+      "corporate-events",
       "vendor-payment-risk",
       "kyb",
       "public-registry-kyb-evidence",

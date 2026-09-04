@@ -21,6 +21,7 @@ describe("service root", () => {
             "verify_israeli_company_paid",
             "verify_company",
             "assess_israeli_vendor_payment_risk_paid",
+            "get_israeli_company_changes_paid",
           ],
         },
       },
@@ -47,7 +48,9 @@ describe("service root", () => {
     expect(html).toContain("preview_agent_payment_trust");
     expect(html).toContain("0.05 USDC");
     expect(html).toContain("0.10 USDC");
+    expect(html).toContain("0.01 USDC");
     expect(html).toContain("/v1/payment-risk/mainnet");
+    expect(html).toContain("/v1/company-changes/mainnet");
   });
 
   it("allows an explicit JSON view from a browser", async () => {

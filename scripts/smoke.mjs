@@ -30,6 +30,18 @@ assertResponse(
   ),
   "x402 discovery manifest is missing the Mainnet verification endpoint",
 );
+assertResponse(
+  discoveryManifest.endpoints?.some(
+    (endpoint) =>
+      endpoint.resource === `${baseUrl}/v1/company-changes/mainnet` &&
+      endpoint.accepts?.some(
+        (requirement) =>
+          requirement.network === "eip155:8453" &&
+          requirement.amount === "10000",
+      ),
+  ),
+  "x402 discovery manifest is missing the $0.01 Mainnet company-changes endpoint",
+);
 
 const verify = await fetch(`${baseUrl}${verifyPath}`, {
   method: "POST",

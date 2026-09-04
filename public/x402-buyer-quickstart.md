@@ -68,6 +68,7 @@ ownership. Manifest specification: `/agent-payee-manifest-v0.1.md`.
 - Asset: native Base USDC (`0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913`)
 - Price: `0.05 USDC` per successful `verify_company` call
 - Payment-risk price: `0.10 USDC` per successful `assess_israeli_vendor_payment_risk_paid` call
+- Company-changes price: `0.01 USDC` per successful `get_israeli_company_changes_paid` call
 - Protocol: x402 v2, exact EVM payment
 - Authentication: none
 

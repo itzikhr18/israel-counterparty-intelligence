@@ -29,6 +29,11 @@ import { paymentOptionFor, priceToAtomicUsdc } from "@/lib/payment-config";
 import { createExternalPaidCallEvent } from "@/lib/payment-telemetry";
 import { x402DiscoverySchema } from "@/lib/x402-discovery-schema";
 import {
+  companyChangesExample,
+  companyChangesInputJsonSchema,
+  companyChangesOutputJsonSchema,
+} from "@/lib/company-changes-schema";
+import {
   paymentRiskExample,
   paymentRiskInputJsonSchema,
   paymentRiskOutputJsonSchema,
@@ -158,12 +163,19 @@ function logMainnetSettlement(context: SettleResultContext): void {
   if (context.phase !== "after-handler" || !transport?.responseBody) return;
 
   const payloadResource = context.paymentPayload.resource?.url;
-  const routeName: PaidRouteName =
-    payloadResource?.endsWith(paidRouteConfig["payment-risk-mainnet"].path) ||
-    context.requirements.amount ===
-      priceToAtomicUsdc(paidRouteConfig["payment-risk-mainnet"].price)
+  const routeName: PaidRouteName = payloadResource?.endsWith(
+    paidRouteConfig["company-changes-mainnet"].path,
+  )
+    ? "company-changes-mainnet"
+    : payloadResource?.endsWith(paidRouteConfig["payment-risk-mainnet"].path)
       ? "payment-risk-mainnet"
-      : "verify-mainnet";
+      : context.requirements.amount ===
+          priceToAtomicUsdc(paidRouteConfig["company-changes-mainnet"].price)
+        ? "company-changes-mainnet"
+        : context.requirements.amount ===
+            priceToAtomicUsdc(paidRouteConfig["payment-risk-mainnet"].price)
+          ? "payment-risk-mainnet"
+          : "verify-mainnet";
   const route = paidRouteConfig[routeName];
   const environment = paymentEnvironments.mainnet;
   const resource = payloadResource ?? `${config.PUBLIC_BASE_URL}${route.path}`;
@@ -371,11 +383,20 @@ export function protectWithX402(
                 invoice_company_name: "מנדיי. קום בעמ",
                 language: "en",
               }
-            : { company_number: "514744887", language: "en" },
+            : routeName === "company-changes-mainnet"
+              ? {
+                  company_number: "514744887",
+                  lookback_days: 366,
+                  limit: 25,
+                  language: "en",
+                }
+              : { company_number: "514744887", language: "en" },
         inputSchema:
           routeName === "payment-risk-mainnet"
             ? x402DiscoverySchema(paymentRiskInputJsonSchema)
-            : x402DiscoverySchema(verifyInputJsonSchema),
+            : routeName === "company-changes-mainnet"
+              ? x402DiscoverySchema(companyChangesInputJsonSchema)
+              : x402DiscoverySchema(verifyInputJsonSchema),
         output:
           routeName === "verify" || routeName === "verify-mainnet"
             ? {
@@ -387,7 +408,12 @@ export function protectWithX402(
                   example: paymentRiskExample,
                   schema: x402DiscoverySchema(paymentRiskOutputJsonSchema),
                 }
-              : { example: paymentOutputExample(routeName) },
+              : routeName === "company-changes-mainnet"
+                ? {
+                    example: companyChangesExample,
+                    schema: x402DiscoverySchema(companyChangesOutputJsonSchema),
+                  }
+                : { example: paymentOutputExample(routeName) },
       }),
     },
   };

@@ -38,6 +38,7 @@ const VERIFY_TOOLS = new Set([
   "verify_company",
   "verify_israeli_company_paid",
   "assess_israeli_vendor_payment_risk_paid",
+  "get_israeli_company_changes_paid",
 ]);
 
 function fingerprint(request: NextRequest): string {

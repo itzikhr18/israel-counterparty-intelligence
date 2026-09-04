@@ -42,6 +42,7 @@ export function serviceManifest() {
         endpoint: "/mcp",
         network: "eip155:8453",
         prices: {
+          company_changes: config.X402_MCP_MAINNET_COMPANY_CHANGES_PRICE,
           company_verification: config.X402_MCP_MAINNET_VERIFY_PRICE,
           vendor_payment_risk: config.X402_MCP_MAINNET_PAYMENT_RISK_PRICE,
         },
@@ -56,6 +57,7 @@ export function serviceManifest() {
           "verify_israeli_company_paid",
           "verify_company",
           "assess_israeli_vendor_payment_risk_paid",
+          "get_israeli_company_changes_paid",
         ],
         free: [
           "preview_israeli_company_free",
@@ -106,6 +108,8 @@ export async function GET(request?: NextRequest) {
         "$",
         "",
       ),
+      companyChangesPrice:
+        config.X402_MCP_MAINNET_COMPANY_CHANGES_PRICE.replace("$", ""),
       restPrice: paidRouteConfig["verify-mainnet"].price,
     }),
     {

@@ -1,10 +1,10 @@
 {
   "name": "Israel Business Intelligence MCP",
-  "description": "Agent-native Verified Payee Firewall plus Israeli company verification and pre-payment vendor risk triage. Check legal entity, service domain, signed payee manifest, wallet destination, payment fingerprint, and buyer mandate before signing. Not Full Regulatory KYB.",
+  "description": "Agent-native Israeli company changes, company verification, Verified Payee Firewall, and pre-payment vendor risk intelligence with public-registry evidence. Not Full Regulatory KYB.",
   "transport": "streamable-http",
   "production_url": "https://israel-counterparty-intelligence.vercel.app/mcp",
   "testnet_url": "https://israel-counterparty-intelligence.vercel.app/mcp/testnet",
-  "instructions": "Before signing an x402 payment, call preview_agent_payment_trust for a free dry-run ALLOW, REVIEW, or DENY decision. Start with preview_israeli_company_free for company verification. Before a conventional vendor payment, use preview_israeli_vendor_payment_risk_free and then assess_israeli_vendor_payment_risk_paid.",
+  "instructions": "Start with preview_israeli_company_free. Use get_israeli_company_changes_paid for recent official events, verify_israeli_company_paid for the complete registry report, and preview_israeli_vendor_payment_risk_free before a conventional vendor payment. Before signing x402, call preview_agent_payment_trust for a free dry-run.",
   "buyer_bridge": "https://israel-counterparty-intelligence.vercel.app/israel-company-verify-buyer-0.3.0.tgz",
   "buyer_bridge_github": "https://github.com/itzikhr18/israel-company-verify-buyer",
   "source_repository": "https://github.com/itzikhr18/israel-counterparty-intelligence",
@@ -18,6 +18,13 @@
       "name": "preview_israeli_company_free",
       "description": "Recommended free first step for Israel company verification. Resolves identity and registry status, then returns exact reusable arguments for the paid report.",
       "paid": false
+    },
+    {
+      "name": "get_israeli_company_changes_paid",
+      "mode": "paid",
+      "description": "Returns recent official Israeli company filing and status-change events, newest first, with source evidence.",
+      "price": "0.01 USDC",
+      "network": "Base Mainnet"
     },
     {
       "name": "verify_israeli_company_paid",
@@ -63,6 +70,7 @@
   ],
   "keywords": [
     "Israel company verification",
+    "Israeli company changes and corporate-event monitoring",
     "Israeli company registry",
     "verify Israeli company",
     "Israeli supplier verification",

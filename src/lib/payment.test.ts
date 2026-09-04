@@ -81,6 +81,22 @@ describe("dual-network x402 configuration", () => {
     expect(JSON.stringify(bazaar.info.input)).toContain("invoice_company_name");
   });
 
+  it("creates a discoverable 0.01 USDC company-changes challenge", () => {
+    const challenge = buildPaymentRequired("company-changes-mainnet");
+    expect(challenge).toMatchObject({
+      x402Version: 2,
+      accepts: [
+        {
+          scheme: "exact",
+          network: "eip155:8453",
+          amount: "10000",
+        },
+      ],
+    });
+    expect(challenge.resource?.url).toMatch(/\/v1\/company-changes\/mainnet$/);
+    expect(JSON.stringify(challenge.extensions)).toContain("lookback_days");
+  });
+
   it("gives non-x402-aware buyers a machine-readable path past the 402", () => {
     const body = buildPaymentRequiredBody(
       buildPaymentRequired("verify-mainnet"),

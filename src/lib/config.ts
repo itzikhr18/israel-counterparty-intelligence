@@ -13,6 +13,9 @@ const envSchema = z.object({
   COMPANY_REGISTRY_RESOURCE_ID: z
     .string()
     .default("f004176c-b85f-4542-8901-7b3176f9a054"),
+  COMPANY_CHANGES_RESOURCE_ID: z
+    .string()
+    .default("28780ab5-3ef1-44c7-8377-da82c0aa6781"),
   BUDGETKEY_API_BASE: z.url().default("https://next.obudget.org"),
   UPSTREAM_TIMEOUT_MS: z.coerce
     .number()
@@ -22,6 +25,12 @@ const envSchema = z.object({
     .default(15000),
   UPSTREAM_RETRIES: z.coerce.number().int().min(0).max(3).default(1),
   CACHE_TTL_SECONDS: z.coerce.number().int().min(1).max(86400).default(21600),
+  COMPANY_CHANGES_CACHE_TTL_SECONDS: z.coerce
+    .number()
+    .int()
+    .min(60)
+    .max(86400)
+    .default(3600),
   RATE_LIMIT_REQUESTS: z.coerce.number().int().min(1).max(1000).default(30),
   RATE_LIMIT_WINDOW_SECONDS: z.coerce
     .number()
@@ -56,10 +65,13 @@ const envSchema = z.object({
     .default("https://facilitator.payai.network"),
   X402_MAINNET_VERIFY_PRICE: usdPrice.default("$0.05"),
   X402_MAINNET_PAYMENT_RISK_PRICE: usdPrice.default("$0.10"),
+  X402_MAINNET_COMPANY_CHANGES_PRICE: usdPrice.default("$0.01"),
   X402_MCP_TESTNET_VERIFY_PRICE: usdPrice.default("$0.05"),
   X402_MCP_MAINNET_VERIFY_PRICE: usdPrice.default("$0.05"),
   X402_MCP_TESTNET_PAYMENT_RISK_PRICE: usdPrice.default("$0.10"),
   X402_MCP_MAINNET_PAYMENT_RISK_PRICE: usdPrice.default("$0.10"),
+  X402_MCP_TESTNET_COMPANY_CHANGES_PRICE: usdPrice.default("$0.01"),
+  X402_MCP_MAINNET_COMPANY_CHANGES_PRICE: usdPrice.default("$0.01"),
   PUBLIC_BASE_URL: z.url().optional(),
   PROVIDER_NAME: z.string().min(2).default("Israel Counterparty Intelligence"),
   INTERNAL_TEST_TOKEN: z.string().optional(),
@@ -104,7 +116,8 @@ export type PaidRouteName =
   | "verify-mainnet"
   | "government-footprint"
   | "counterparty-risk"
-  | "payment-risk-mainnet";
+  | "payment-risk-mainnet"
+  | "company-changes-mainnet";
 
 export const paidRouteConfig: Record<
   PaidRouteName,
@@ -148,6 +161,13 @@ export const paidRouteConfig: Record<
     price: config.X402_MAINNET_PAYMENT_RISK_PRICE,
     description:
       "Assess an Israeli vendor before payment using public-registry evidence, invoice identity consistency, contact-domain checks, and buyer-observed payment risk signals",
+    environment: "mainnet",
+  },
+  "company-changes-mainnet": {
+    path: "/v1/company-changes/mainnet",
+    price: config.X402_MAINNET_COMPANY_CHANGES_PRICE,
+    description:
+      "Get recent official Israeli company filing and status-change events, sorted newest first with source evidence",
     environment: "mainnet",
   },
 };

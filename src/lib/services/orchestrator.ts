@@ -5,6 +5,7 @@ import {
 import type { AgentPaymentTrustQuery } from "@/lib/agent-payment-trust-schema";
 import type { CounterpartyQuery, EntityResolution } from "@/lib/domain";
 import { API_VERSION, ApiError } from "@/lib/domain";
+import type { CompanyChangesQuery } from "@/lib/company-changes-schema";
 import type { PaymentRiskQuery } from "@/lib/payment-risk-schema";
 import {
   entityResolutionService,
@@ -12,6 +13,7 @@ import {
 } from "@/lib/services/entity-resolution";
 import { assessAgentPaymentTrust } from "@/lib/services/agent-payment-trust";
 import { assessPaymentRisk } from "@/lib/services/payment-risk";
+import { companyChangesService } from "@/lib/services/company-changes";
 import { scoreRisk } from "@/lib/services/risk-scoring";
 
 function requireResolved(resolution: EntityResolution) {
@@ -150,6 +152,33 @@ export class CounterpartyOrchestrator {
         resolution.confidence,
         resolution.evidence,
       ),
+    };
+  }
+
+  async companyChanges(query: CompanyChangesQuery) {
+    const resolution = requireResolved(
+      await this.resolver.resolve({
+        company_number: query.company_number,
+        language: query.language,
+        depth: "standard",
+      }),
+    );
+    const recent = await companyChangesService.getRecentChanges(
+      query,
+      resolution.entity,
+    );
+    return {
+      api_version: API_VERSION,
+      query,
+      entity: {
+        legal_name: resolution.entity.legal_name,
+        company_number: resolution.entity.company_number,
+        status: resolution.entity.status,
+      },
+      changes: recent.changes,
+      evidence: [...resolution.evidence, ...recent.evidence],
+      limitations: recent.limitations,
+      checked_at: new Date().toISOString(),
     };
   }
 

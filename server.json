@@ -2,8 +2,8 @@
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
   "name": "io.github.itzikhr18/israel-business-intelligence",
   "title": "Israel Business Intelligence MCP",
-  "description": "Verified Payee Firewall and Israeli company verification with public-registry evidence and x402.",
-  "version": "1.2.1",
+  "description": "Israeli company changes, verification, and vendor payment-risk intelligence with public-registry evidence and x402.",
+  "version": "1.5.0",
   "websiteUrl": "https://israel-counterparty-intelligence.vercel.app/README.md",
   "repository": {
     "url": "https://github.com/itzikhr18/israel-counterparty-intelligence",

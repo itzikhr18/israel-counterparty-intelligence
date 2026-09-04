@@ -18,6 +18,11 @@ import {
   paymentRiskOutputJsonSchema,
 } from "@/lib/payment-risk-schema";
 import {
+  companyChangesExample,
+  companyChangesInputJsonSchema,
+  companyChangesOutputJsonSchema,
+} from "@/lib/company-changes-schema";
+import {
   verifyExample,
   verifyInputJsonSchema,
   verifyOutputJsonSchema,
@@ -29,6 +34,7 @@ export function paymentOutputExample(
 ): Record<string, unknown> {
   if (route === "verify") return verifyExample;
   if (route === "payment-risk-mainnet") return paymentRiskExample;
+  if (route === "company-changes-mainnet") return companyChangesExample;
   if (route === "government-footprint") {
     return {
       entity: { company_number: "514744887" },
@@ -74,11 +80,20 @@ export function buildPaymentRequired(
             invoice_company_name: "מנדיי. קום בעמ",
             language: "en",
           }
-        : { company_number: "514744887", language: "en" },
+        : routeName === "company-changes-mainnet"
+          ? {
+              company_number: "514744887",
+              lookback_days: 366,
+              limit: 25,
+              language: "en",
+            }
+          : { company_number: "514744887", language: "en" },
     inputSchema:
       routeName === "payment-risk-mainnet"
         ? x402DiscoverySchema(paymentRiskInputJsonSchema)
-        : x402DiscoverySchema(verifyInputJsonSchema),
+        : routeName === "company-changes-mainnet"
+          ? x402DiscoverySchema(companyChangesInputJsonSchema)
+          : x402DiscoverySchema(verifyInputJsonSchema),
     output:
       routeName === "verify" || routeName === "verify-mainnet"
         ? {
@@ -90,7 +105,12 @@ export function buildPaymentRequired(
               example: paymentRiskExample,
               schema: x402DiscoverySchema(paymentRiskOutputJsonSchema),
             }
-          : { example: paymentOutputExample(routeName) },
+          : routeName === "company-changes-mainnet"
+            ? {
+                example: companyChangesExample,
+                schema: x402DiscoverySchema(companyChangesOutputJsonSchema),
+              }
+            : { example: paymentOutputExample(routeName) },
   });
   const bazaar = extensions.bazaar as {
     info: { input: { method?: string; pathParams?: Record<string, never> } };

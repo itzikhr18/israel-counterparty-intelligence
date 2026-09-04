@@ -2,6 +2,9 @@ import { describe, expect, it } from "vitest";
 
 import {
   MCP_SERVER_NAME,
+  mcpCompanyChangesPrice,
+  mcpCompanyChangesRequirements,
+  mcpCompanyChangesResourceUrl,
   mcpEndpointPath,
   mcpPaymentRequirements,
   mcpPaymentRiskPrice,
@@ -52,6 +55,23 @@ describe("Israel Business Intelligence MCP configuration", () => {
       "assess_payment_risk/mainnet",
     );
     expect(mcpPaymentRiskResourceUrl("mainnet")).not.toBe(
+      mcpToolResourceUrl("mainnet"),
+    );
+  });
+
+  it("charges 0.01 USDC for the distinct company-changes resource", () => {
+    const requirement = mcpCompanyChangesRequirements("mainnet")[0];
+    expect(mcpCompanyChangesPrice("mainnet")).toBe("$0.01");
+    expect(requirement).toMatchObject({
+      scheme: "exact",
+      network: "eip155:8453",
+      amount: "10000",
+      asset: "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+    });
+    expect(mcpCompanyChangesResourceUrl("mainnet")).toContain(
+      "company_changes/mainnet",
+    );
+    expect(mcpCompanyChangesResourceUrl("mainnet")).not.toBe(
       mcpToolResourceUrl("mainnet"),
     );
   });

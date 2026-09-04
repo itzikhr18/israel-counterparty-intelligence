@@ -1,6 +1,6 @@
 # Israel Company Verify
 
-> Paid Israeli company verification by legal name or company number with field-level public-registry evidence. Free preview returns identity/status and an exact next action only. Not Full Regulatory KYB.
+> Paid Israeli company changes, verification, and vendor payment-risk intelligence with field-level public-registry evidence. Free preview returns identity/status and an exact next action only. Not Full Regulatory KYB.
 
 - Status: PRODUCTION LIVE
 
@@ -9,6 +9,8 @@
 - Price: $0.05 real USDC
 - Payment-risk endpoint: https://israel-counterparty-intelligence.vercel.app/v1/payment-risk/mainnet
 - Payment-risk price: $0.10 real USDC
+- Company-changes endpoint: https://israel-counterparty-intelligence.vercel.app/v1/company-changes/mainnet
+- Company-changes price: $0.01 real USDC
 - Network: Base Mainnet (eip155:8453)
 - USDC contract: 0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913
 - Test endpoint: https://israel-counterparty-intelligence.vercel.app/v1/verify
@@ -28,7 +30,7 @@
 - Public buyer bridge: https://github.com/itzikhr18/israel-company-verify-buyer
 - Public service source: https://github.com/itzikhr18/israel-counterparty-intelligence
 - Free preview command: npx --yes github:itzikhr18/israel-company-verify-buyer --company-number 514744887
-- MCP tools: preview_agent_payment_trust (free dry-run ALLOW, REVIEW, or DENY before signing); verify_israeli_company_paid (paid full registry evidence, 0.05 USDC); assess_israeli_vendor_payment_risk_paid (paid pre-payment decision, 0.10 USDC); preview_israeli_company_free and preview_israeli_vendor_payment_risk_free (free previews); get_sample_verification_report, describe_service, and get_schema (free)
+- MCP tools: preview_agent_payment_trust (free dry-run ALLOW, REVIEW, or DENY before signing); get_israeli_company_changes_paid (recent official events, 0.01 USDC); verify_israeli_company_paid (paid full registry evidence, 0.05 USDC); assess_israeli_vendor_payment_risk_paid (paid pre-payment decision, 0.10 USDC); preview_israeli_company_free and preview_israeli_vendor_payment_risk_free (free previews); get_sample_verification_report, describe_service, and get_schema (free)
 - Agent Tools: https://agent-tools.cloud/api/v1/services/israel-counterparty-intelligence-vercel-app-sub393
 - 402 Index: https://402index.io/service/fa0902ac-90a7-431a-8979-97da22a12911
 - x402scan resource ID: e9b83616-3c3e-483a-81a2-a93c2b85dd7e
@@ -36,6 +38,10 @@
 Search intents: verify Israeli company; Israel company verification; Israeli supplier due diligence;
 public-registry KYB evidence; Israeli business verification; Israel company registry; Israeli company number; Israel counterparty
 intelligence.
+
+Company-changes intent: get recent official Israeli company filing and status-change events by
+exact company number; monitor counterparties for new corporate events; return source evidence.
+Coverage is approximately one year, and an empty result does not prove no earlier change occurred.
 
 Payment-risk intent: assess Israeli vendor before payment; compare invoice company identity with
 Israeli registry; return PROCEED, REVIEW, or BLOCK. It does not verify bank-account ownership,

@@ -17,7 +17,7 @@ remain separate payment routes so Test USDC can never unlock the Mainnet resourc
 
 The same verification engine is also exposed as a stateless Remote Streamable HTTP MCP server:
 
-- `POST /mcp` - Base Mainnet, 0.05 USDC for company verification or 0.10 USDC for vendor payment-risk assessment.
+- `POST /mcp` - Base Mainnet, 0.01 USDC for recent company changes, 0.05 USDC for company verification, or 0.10 USDC for vendor payment-risk assessment.
 - `POST /mcp/testnet` - Base Sepolia, 0.05 Test USDC per successful `verify_company` call.
 - `POST /mcp/pilot` - invitation-only partner evaluation with a time-limited bearer token.
 - Company and payment-risk previews, `preview_agent_payment_trust`, `describe_service`, and `get_schema` are free on both MCP endpoints.
@@ -35,6 +35,7 @@ or investment service.
 - `POST /v1/government-footprint` - public contracts and supports by exact company number.
 - `POST /v1/counterparty-risk` - combined result and deterministic reason-coded score.
 - `POST /v1/payment-risk/mainnet` - Mainnet pre-payment vendor triage with a `PROCEED`, `REVIEW`, or `BLOCK` result.
+- `POST /v1/company-changes/mainnet` - recent official company filing and status-change events for an exact company number, newest first, with source evidence.
 - `POST /v1/agent-payment-trust` - free dry-run x402 pre-sign firewall with `ALLOW`, `REVIEW`, or `DENY`; it never signs or submits a payment.
 - `GET /health` - health check.
 - `GET /openapi.json` - machine-readable contract.
@@ -66,8 +67,11 @@ first production end-to-end settlement and External Paid Call #1.
 
 ## Public sources
 
-The company adapter uses the Ministry of Justice Companies Registrar open CKAN dataset on
-`data.gov.il`. The government-footprint adapter uses the public BudgetKey table API. Source URLs,
+The company adapters use the Ministry of Justice Companies Registrar open CKAN company dataset and
+the Corporations Authority daily changes dataset on `data.gov.il`. The changes source covers up to
+approximately one year; an empty result does not prove that no earlier change occurred. Official
+request types are returned as facts and mapped to deterministic navigation categories, not risk
+conclusions. The government-footprint adapter uses the public BudgetKey table API. Source URLs,
 retrieval time, source record identifiers, and confidence are returned in `evidence`.
 
 The service returns `null` and `missing_data` when data is unavailable. It does not convert a
@@ -147,10 +151,13 @@ X402_MAINNET_ASSET=0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913
 X402_MAINNET_FACILITATOR_URL=https://facilitator.payai.network
 X402_MAINNET_VERIFY_PRICE=$0.05
 X402_MAINNET_PAYMENT_RISK_PRICE=$0.10
+X402_MAINNET_COMPANY_CHANGES_PRICE=$0.01
 X402_MCP_TESTNET_VERIFY_PRICE=$0.05
 X402_MCP_MAINNET_VERIFY_PRICE=$0.05
 X402_MCP_TESTNET_PAYMENT_RISK_PRICE=$0.10
 X402_MCP_MAINNET_PAYMENT_RISK_PRICE=$0.10
+X402_MCP_TESTNET_COMPANY_CHANGES_PRICE=$0.01
+X402_MCP_MAINNET_COMPANY_CHANGES_PRICE=$0.01
 MAINNET_INTERNAL_TEST_PAYER=0xYourIsolatedMainnetTestWallet
 ```
 

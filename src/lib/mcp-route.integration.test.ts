@@ -64,6 +64,7 @@ describe("Streamable HTTP MCP route", () => {
     ).toEqual([
       "assess_israeli_vendor_payment_risk_paid",
       "describe_service",
+      "get_israeli_company_changes_paid",
       "get_sample_verification_report",
       "get_schema",
       "preview_agent_payment_trust",

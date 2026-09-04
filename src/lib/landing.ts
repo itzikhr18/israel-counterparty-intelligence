@@ -2,6 +2,7 @@ interface LandingPageOptions {
   providerName: string;
   mcpPrice: string;
   paymentRiskPrice: string;
+  companyChangesPrice: string;
   restPrice: string;
 }
 
@@ -18,6 +19,7 @@ export function renderLandingPage(options: LandingPageOptions): string {
   const providerName = escapeHtml(options.providerName);
   const mcpPrice = escapeHtml(options.mcpPrice);
   const paymentRiskPrice = escapeHtml(options.paymentRiskPrice);
+  const companyChangesPrice = escapeHtml(options.companyChangesPrice);
   const restPrice = escapeHtml(options.restPrice);
 
   return `<!doctype html>
@@ -84,7 +86,7 @@ export function renderLandingPage(options: LandingPageOptions): string {
         <a class="button" href="/openapi.json">OpenAPI schema</a>
       </div>
       <div class="contract" aria-label="Payment contract">
-        <span>Verification ${mcpPrice} USDC</span><span>Payment risk ${paymentRiskPrice} USDC</span><span>Base Mainnet</span><span>x402 v2</span><span>No API key</span>
+        <span>Company changes ${companyChangesPrice} USDC</span><span>Verification ${mcpPrice} USDC</span><span>Payment risk ${paymentRiskPrice} USDC</span><span>Base Mainnet</span><span>x402 v2</span><span>No API key</span>
       </div>
     </header>
 
@@ -93,6 +95,7 @@ export function renderLandingPage(options: LandingPageOptions): string {
       <p class="section-copy">Use the evidence as one input inside your existing decision process.</p>
       <div class="grid" style="margin-top: 20px">
         <article class="card"><h3>Supplier onboarding</h3><p>Confirm the Israeli legal entity before qualification, procurement, or vendor-master creation.</p></article>
+        <article class="card"><h3>Company-change monitoring</h3><p>Check recent official filings and status-change events for an exact company number, newest first.</p></article>
         <article class="card"><h3>Agentic commerce</h3><p>Give an agent a structured jurisdiction-specific trust signal with sources and confidence.</p></article>
         <article class="card"><h3>Pre-sign payment firewall</h3><p>Fingerprint x402 terms and return ALLOW, REVIEW, or DENY before the buyer wallet signs.</p></article>
       </div>
@@ -100,7 +103,7 @@ export function renderLandingPage(options: LandingPageOptions): string {
 
     <section aria-labelledby="connect">
       <h2 id="connect">Connect over MCP</h2>
-      <p class="section-copy">Start with <code>preview_agent_payment_trust</code> before an x402 payment, <code>preview_israeli_company_free</code> for registry verification, or <code>preview_israeli_vendor_payment_risk_free</code> before a conventional vendor payment.</p>
+      <p class="section-copy">Start with <code>preview_agent_payment_trust</code> before an x402 payment, <code>preview_israeli_company_free</code> for registry verification, <code>get_israeli_company_changes_paid</code> for recent corporate events, or <code>preview_israeli_vendor_payment_risk_free</code> before a conventional vendor payment.</p>
       <div class="code-card" style="margin-top: 20px">
         <div class="code-title">One-command free preview · public source on GitHub</div>
         <pre><code>npx --yes github:itzikhr18/israel-company-verify-buyer \\
@@ -131,6 +134,12 @@ export function renderLandingPage(options: LandingPageOptions): string {
         <pre><code>curl -i https://israel-counterparty-intelligence.vercel.app/v1/payment-risk/mainnet \
   -H 'content-type: application/json' \
   --data '{"company_number":"514744887","invoice_company_number":"514744887","invoice_company_name":"מנדיי. קום בעמ"}'</code></pre>
+      </div>
+      <div class="code-card" style="margin-top: 16px">
+        <div class="code-title">Inspect the $${companyChangesPrice} recent company-changes challenge</div>
+        <pre><code>curl -i https://israel-counterparty-intelligence.vercel.app/v1/company-changes/mainnet \
+  -H 'content-type: application/json' \
+  --data '{"company_number":"514744887","lookback_days":366,"limit":25}'</code></pre>
       </div>
     </section>
 

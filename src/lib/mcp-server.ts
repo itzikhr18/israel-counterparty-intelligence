@@ -25,6 +25,13 @@ import {
   type PaymentEnvironmentName,
 } from "@/lib/config";
 import {
+  companyChangesExample,
+  companyChangesInputJsonSchema,
+  companyChangesOutputJsonSchema,
+  companyChangesQuerySchema,
+  type CompanyChangesQuery,
+} from "@/lib/company-changes-schema";
+import {
   ApiError,
   counterpartyQuerySchema,
   previewCompanyQuerySchema,
@@ -49,7 +56,7 @@ import {
 } from "@/lib/verification-schema";
 
 export const MCP_SERVER_NAME = "Israel Business Intelligence MCP";
-export const MCP_SERVER_VERSION = "1.4.0";
+export const MCP_SERVER_VERSION = "1.5.0";
 
 export const FREE_PREVIEW_TOOL = "preview_israeli_company_free";
 export const PAID_VERIFY_TOOL = "verify_israeli_company_paid";
@@ -58,6 +65,7 @@ export const FREE_PAYMENT_RISK_PREVIEW_TOOL =
   "preview_israeli_vendor_payment_risk_free";
 export const PAID_PAYMENT_RISK_TOOL = "assess_israeli_vendor_payment_risk_paid";
 export const AGENT_PAYMENT_TRUST_TOOL = "preview_agent_payment_trust";
+export const PAID_COMPANY_CHANGES_TOOL = "get_israeli_company_changes_paid";
 
 const DESCRIPTION =
   "Paid Israeli company verification by legal name or company number. Resolves records in the Israeli Companies Registry and returns structured, field-level public-registry evidence for supplier checks, due diligence, and public-registry KYB evidence. Not Full Regulatory KYB.";
@@ -75,7 +83,7 @@ function serverInstructions(accessMode: "paid" | "pilot"): string {
   if (accessMode === "pilot") {
     return "Use verify_company for invitation-only partner verification. Payment is waived only when this authenticated pilot endpoint is used. Use get_sample_verification_report to inspect the response shape without a live lookup.";
   }
-  return `Start with ${FREE_PREVIEW_TOOL} for a free identity and registry-status check. If it resolves the company, reuse next_action.arguments with ${PAID_VERIFY_TOOL} for the complete evidence-backed result. Before an agent signs an x402 payment, use ${AGENT_PAYMENT_TRUST_TOOL} for a free dry-run that binds the legal entity, service domain, signed payee manifest, payment destination, and buyer mandate into an ALLOW, REVIEW, or DENY decision. For invoice and vendor-context risk, use ${FREE_PAYMENT_RISK_PREVIEW_TOOL}, then ${PAID_PAYMENT_RISK_TOOL}. Company verification costs $0.05 USDC and payment-risk assessment costs $0.10 USDC on Base Mainnet. Use ${SAMPLE_REPORT_TOOL} to inspect a static full-report example without payment. Buyer bridge: ${X402_BUYER_BRIDGE_URL}`;
+  return `Start with ${FREE_PREVIEW_TOOL} for a free identity and registry-status check. If it resolves the company, reuse the exact company number with ${PAID_COMPANY_CHANGES_TOOL} for recent official filing and status-change events, or use next_action.arguments with ${PAID_VERIFY_TOOL} for the complete evidence-backed result. Before an agent signs an x402 payment, use ${AGENT_PAYMENT_TRUST_TOOL} for a free dry-run that binds the legal entity, service domain, signed payee manifest, payment destination, and buyer mandate into an ALLOW, REVIEW, or DENY decision. For invoice and vendor-context risk, use ${FREE_PAYMENT_RISK_PREVIEW_TOOL}, then ${PAID_PAYMENT_RISK_TOOL}. Company changes cost $0.01 USDC, company verification costs $0.05 USDC, and payment-risk assessment costs $0.10 USDC on Base Mainnet. Use ${SAMPLE_REPORT_TOOL} to inspect a static full-report example without payment. Buyer bridge: ${X402_BUYER_BRIDGE_URL}`;
 }
 
 const previewCandidateSchema = z.object({
@@ -186,6 +194,14 @@ export function mcpPaymentRiskPrice(
     : config.X402_MCP_TESTNET_PAYMENT_RISK_PRICE;
 }
 
+export function mcpCompanyChangesPrice(
+  environmentName: PaymentEnvironmentName,
+): string {
+  return environmentName === "mainnet"
+    ? config.X402_MCP_MAINNET_COMPANY_CHANGES_PRICE
+    : config.X402_MCP_TESTNET_COMPANY_CHANGES_PRICE;
+}
+
 export function mcpPaymentRequirements(
   environmentName: PaymentEnvironmentName,
 ): PaymentRequirements[] {
@@ -226,10 +242,39 @@ export function mcpPaymentRiskRequirements(
   ];
 }
 
+export function mcpCompanyChangesResourceUrl(
+  environmentName: PaymentEnvironmentName,
+): string {
+  return `mcp://israel-business-intelligence/company_changes/${environmentName}`;
+}
+
+export function mcpCompanyChangesRequirements(
+  environmentName: PaymentEnvironmentName,
+): PaymentRequirements[] {
+  const environment = paymentEnvironments[environmentName];
+  return [
+    {
+      scheme: "exact",
+      network: environment.network as Network,
+      amount: priceToAtomicUsdc(mcpCompanyChangesPrice(environmentName)),
+      asset: environment.asset,
+      payTo: environment.payTo,
+      maxTimeoutSeconds: 60,
+      extra: usdcEip712Domain(environmentName),
+    },
+  ];
+}
+
 function paidToolFromRequirements(
   environmentName: PaymentEnvironmentName,
   requirements: PaymentRequirements,
 ): string {
+  if (
+    requirements.amount ===
+    priceToAtomicUsdc(mcpCompanyChangesPrice(environmentName))
+  ) {
+    return PAID_COMPANY_CHANGES_TOOL;
+  }
   return requirements.amount ===
     priceToAtomicUsdc(mcpPaymentRiskPrice(environmentName))
     ? PAID_PAYMENT_RISK_TOOL
@@ -382,6 +427,21 @@ function serviceDescription(
               "adverse media",
               "creditworthiness",
             ],
+          },
+    company_changes:
+      accessMode === "pilot"
+        ? undefined
+        : {
+            price: `${mcpCompanyChangesPrice(environmentName).slice(1)} USDC`,
+            network:
+              environmentName === "mainnet" ? "Base Mainnet" : "Base Sepolia",
+            asset: "USDC",
+            protocol: "x402 v2 over MCP",
+            tool: PAID_COMPANY_CHANGES_TOOL,
+            purpose:
+              "Return recent official Israeli company filing and status-change events, newest first, with source evidence.",
+            coverage:
+              "Approximately one year, subject to the official source dataset.",
           },
     agent_payment_trust:
       accessMode === "pilot"
@@ -683,6 +743,8 @@ export async function createIsraelMcpServer(
   const environment = paymentEnvironments[environmentName];
   const requirements = mcpPaymentRequirements(environmentName);
   const paymentRiskRequirements = mcpPaymentRiskRequirements(environmentName);
+  const companyChangesRequirements =
+    mcpCompanyChangesRequirements(environmentName);
   const server = new McpServer(
     { name: MCP_SERVER_NAME, version: MCP_SERVER_VERSION },
     { instructions: serverInstructions(accessMode) },
@@ -724,6 +786,7 @@ export async function createIsraelMcpServer(
         tools: [
           "verify_company",
           PAID_PAYMENT_RISK_TOOL,
+          PAID_COMPANY_CHANGES_TOOL,
           AGENT_PAYMENT_TRUST_TOOL,
         ],
         preview_company: {
@@ -741,6 +804,12 @@ export async function createIsraelMcpServer(
           preview_output_schema: z.toJSONSchema(paymentRiskPreviewOutputSchema),
           paid_output_schema: paymentRiskOutputJsonSchema,
         },
+        company_changes: {
+          paid_tool: PAID_COMPANY_CHANGES_TOOL,
+          input_schema: companyChangesInputJsonSchema,
+          paid_output_schema: companyChangesOutputJsonSchema,
+          price: mcpCompanyChangesPrice(environmentName),
+        },
         agent_payment_trust: {
           tool: AGENT_PAYMENT_TRUST_TOOL,
           mode: "free_dry_run",
@@ -754,6 +823,7 @@ export async function createIsraelMcpServer(
           sample_report: SAMPLE_REPORT_TOOL,
           free_payment_risk_preview: FREE_PAYMENT_RISK_PREVIEW_TOOL,
           paid_payment_risk_assessment: PAID_PAYMENT_RISK_TOOL,
+          paid_company_changes: PAID_COMPANY_CHANGES_TOOL,
           pre_sign_payment_firewall: AGENT_PAYMENT_TRUST_TOOL,
         },
       }),
@@ -1056,6 +1126,24 @@ export async function createIsraelMcpServer(
         return textAndStructured({ request_id: randomUUID(), ...result });
       },
     );
+    server.registerTool(
+      PAID_COMPANY_CHANGES_TOOL,
+      {
+        title: "Get recent Israeli company changes",
+        description:
+          "Recent official Israeli company filing and status-change events with source evidence. Payment is disabled in this environment.",
+        inputSchema: companyChangesQuerySchema,
+        annotations: {
+          readOnlyHint: true,
+          destructiveHint: false,
+          idempotentHint: true,
+        },
+      },
+      async (args) => {
+        const result = await counterpartyOrchestrator.companyChanges(args);
+        return textAndStructured({ request_id: randomUUID(), ...result });
+      },
+    );
     return server;
   }
 
@@ -1157,6 +1245,58 @@ export async function createIsraelMcpServer(
     },
   });
 
+  const paidCompanyChanges = createPaymentWrapper(resourceServer, {
+    accepts: companyChangesRequirements,
+    resource: {
+      url: mcpCompanyChangesResourceUrl(environmentName),
+      description:
+        "Recent official Israeli company filing and status-change events, sorted newest first with source evidence. Categories are navigation labels, not risk conclusions.",
+      mimeType: "application/json",
+      serviceName: MCP_SERVER_NAME,
+      tags: [
+        "israeli-company-changes",
+        "corporate-events",
+        "company-monitoring",
+        "israeli-company-registry",
+        "x402",
+      ],
+    },
+    extensions: declareDiscoveryExtension({
+      toolName: PAID_COMPANY_CHANGES_TOOL,
+      description:
+        "Get recent official Israeli company filing and status-change events for an exact company number.",
+      transport: "streamable-http",
+      inputSchema: x402DiscoverySchema(companyChangesInputJsonSchema),
+      example: {
+        company_number: "514744887",
+        lookback_days: 366,
+        limit: 25,
+        language: "en",
+      },
+      output: {
+        example: companyChangesExample,
+        schema: x402DiscoverySchema(companyChangesOutputJsonSchema),
+      },
+    }),
+    hooks: {
+      onAfterSettlement: async ({
+        settlement,
+        paymentPayload,
+        paymentRequirements,
+      }) => {
+        settlementTelemetry(
+          environmentName,
+          settlement,
+          paymentPayload,
+          paymentRequirements,
+          PAID_COMPANY_CHANGES_TOOL,
+          mcpCompanyChangesPrice(environmentName),
+          mcpCompanyChangesResourceUrl(environmentName),
+        );
+      },
+    },
+  });
+
   const verifyCompany = async (
     args: z.infer<typeof counterpartyQuerySchema>,
   ) => {
@@ -1205,6 +1345,29 @@ export async function createIsraelMcpServer(
     }
   };
   const paidAssessPaymentRisk = paidPaymentRisk(paymentRisk);
+  const getCompanyChanges = async (args: CompanyChangesQuery) => {
+    try {
+      const result = await counterpartyOrchestrator.companyChanges(args);
+      return textAndStructured({ request_id: randomUUID(), ...result });
+    } catch (error) {
+      const normalized =
+        error instanceof ApiError
+          ? error
+          : new ApiError(500, "INTERNAL_ERROR", "An unexpected error occurred");
+      return {
+        content: [
+          {
+            type: "text" as const,
+            text: JSON.stringify({
+              error: { code: normalized.code, message: normalized.message },
+            }),
+          },
+        ],
+        isError: true,
+      };
+    }
+  };
+  const paidGetCompanyChanges = paidCompanyChanges(getCompanyChanges);
   const paidToolMeta = {
     "x402/pricing": {
       x402Version: 2,
@@ -1221,6 +1384,17 @@ export async function createIsraelMcpServer(
     "x402/pricing": {
       x402Version: 2,
       price: mcpPaymentRiskPrice(environmentName),
+      asset: environment.asset,
+      network: environment.network,
+      payTo: environment.payTo,
+      facilitator: environment.facilitatorUrl,
+      buyerQuickstart: X402_BUYER_QUICKSTART_URL,
+    },
+  };
+  const companyChangesToolMeta = {
+    "x402/pricing": {
+      x402Version: 2,
+      price: mcpCompanyChangesPrice(environmentName),
       asset: environment.asset,
       network: environment.network,
       payTo: environment.payTo,
@@ -1275,6 +1449,22 @@ export async function createIsraelMcpServer(
       _meta: paymentRiskToolMeta,
     },
     paidAssessPaymentRisk,
+  );
+
+  server.registerTool(
+    PAID_COMPANY_CHANGES_TOOL,
+    {
+      title: "Get recent Israeli company changes - paid",
+      description: `LOW-COST REPEATABLE MONITORING LOOKUP for an exact Israeli company number. Returns recent official filing and status-change events, newest first, with source URLs and deterministic categories. Costs ${mcpCompanyChangesPrice(environmentName)} USDC on ${environmentName === "mainnet" ? "Base Mainnet" : "Base Sepolia"}. Coverage is approximately one year and an empty result is not proof that no earlier change occurred.`,
+      inputSchema: companyChangesQuerySchema,
+      annotations: {
+        readOnlyHint: true,
+        destructiveHint: false,
+        idempotentHint: true,
+      },
+      _meta: companyChangesToolMeta,
+    },
+    paidGetCompanyChanges,
   );
 
   return server;

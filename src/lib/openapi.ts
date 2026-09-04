@@ -8,6 +8,10 @@ import {
   paymentRiskInputJsonSchema,
   paymentRiskOutputJsonSchema,
 } from "@/lib/payment-risk-schema";
+import {
+  companyChangesInputJsonSchema,
+  companyChangesOutputJsonSchema,
+} from "@/lib/company-changes-schema";
 
 const requestSchema = {
   type: "object",
@@ -143,6 +147,18 @@ export const openApiDocument = {
           paidRouteConfig["payment-risk-mainnet"].price,
           paymentRiskInputJsonSchema,
           paymentRiskOutputJsonSchema,
+        ),
+      },
+    },
+    "/v1/company-changes/mainnet": {
+      post: {
+        tags: ["counterparty"],
+        ...paidPost(
+          "Get recent Israeli company changes",
+          paidRouteConfig["company-changes-mainnet"].description,
+          paidRouteConfig["company-changes-mainnet"].price,
+          companyChangesInputJsonSchema,
+          companyChangesOutputJsonSchema,
         ),
       },
     },
