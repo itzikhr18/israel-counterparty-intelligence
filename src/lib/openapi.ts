@@ -12,6 +12,10 @@ import {
   companyChangesInputJsonSchema,
   companyChangesOutputJsonSchema,
 } from "@/lib/company-changes-schema";
+import {
+  invoiceGateInputJsonSchema,
+  invoiceGateOutputJsonSchema,
+} from "@/lib/invoice-gate-schema";
 
 const requestSchema = {
   type: "object",
@@ -147,6 +151,43 @@ export const openApiDocument = {
           paidRouteConfig["payment-risk-mainnet"].price,
           paymentRiskInputJsonSchema,
           paymentRiskOutputJsonSchema,
+        ),
+      },
+    },
+    "/v1/invoice-gate/preview": {
+      post: {
+        tags: ["agent-payments"],
+        summary: "Preview an Israeli invoice payment gate for free",
+        description:
+          "Free structural check of VAT arithmetic, invoice totals, and the date-sensitive Israel Invoices allocation-number threshold. Does not resolve the supplier or contact the Tax Authority.",
+        operationId: "preview_israeli_invoice_payment_gate",
+        requestBody: {
+          required: true,
+          content: {
+            "application/json": { schema: invoiceGateInputJsonSchema },
+          },
+        },
+        responses: {
+          "200": {
+            description: "Structural preview; never authorization to pay",
+            content: {
+              "application/json": { schema: invoiceGateOutputJsonSchema },
+            },
+          },
+          "400": { description: "Invalid input" },
+          "429": { description: "Rate limited" },
+        },
+      },
+    },
+    "/v1/invoice-gate/mainnet": {
+      post: {
+        tags: ["agent-payments"],
+        ...paidPost(
+          "Authorize an Israeli invoice payment",
+          paidRouteConfig["invoice-gate-mainnet"].description,
+          paidRouteConfig["invoice-gate-mainnet"].price,
+          invoiceGateInputJsonSchema,
+          invoiceGateOutputJsonSchema,
         ),
       },
     },

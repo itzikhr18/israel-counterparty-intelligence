@@ -1,6 +1,6 @@
 ---
 name: israel-company-intelligence
-description: Verify Israeli companies, screen suppliers before payment, and monitor recent Israeli company-registry changes using structured official-source evidence. Use for Israel company lookup, Israeli supplier verification, public-registry KYB pre-checks, vendor onboarding, procurement, invoice-risk triage, and counterparty monitoring.
+description: Gate Israeli invoices before payment, verify Israeli companies, screen suppliers, and monitor registry changes. Use for Israel Invoices allocation-number checks, VAT arithmetic, supplier payments, company lookup, KYB pre-checks, procurement, and invoice-risk triage.
 ---
 
 # Israel Company Intelligence
@@ -9,6 +9,7 @@ Use this service when the target company or supplier is registered in Israel and
 
 ## Best tool by intent
 
+- Need to check an Israeli tax invoice before payment: call `preview_israeli_invoice_payment_gate_free`, then `authorize_israeli_invoice_payment_paid` for 0.25 USDC. It returns `PAY`, `HOLD`, or `BLOCK`.
 - Need a free identity/status check: call `preview_israeli_company_free`.
 - Need recent official filing or status-change events: call `get_israeli_company_changes_paid` for 0.01 USDC on Base Mainnet.
 - Need the complete field-level registry evidence report: call `verify_israeli_company_paid` for 0.05 USDC on Base Mainnet.
@@ -28,4 +29,4 @@ Prefer an exact nine-digit Israeli company number. A legal company name is also 
 
 ## Evidence boundary
 
-The service provides Israeli public company-registry evidence and buyer-supplied transaction context. It does not verify bank-account ownership or invoice authenticity, and it is not sanctions, PEP, UBO, credit, legal, or Full Regulatory KYB certification.
+The service provides Israeli public company-registry evidence and buyer-supplied transaction context. Direct Tax Authority verification requires authorized access. Buyer-supplied Tax Authority results are labeled `BUYER_ATTESTED` and are not independently authenticated. It does not verify bank-account ownership and is not sanctions, PEP, UBO, credit, legal, tax, accounting, or Full Regulatory KYB certification.

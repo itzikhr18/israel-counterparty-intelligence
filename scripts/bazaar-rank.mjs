@@ -8,6 +8,9 @@ const searches = [
   "Israel KYB",
   "Israeli vendor payment risk",
   "recent Israeli company changes",
+  "Israel invoice payment gate",
+  "Israeli invoice allocation number verification",
+  "verify Israeli tax invoice before payment",
 ];
 
 async function searchResources(query) {

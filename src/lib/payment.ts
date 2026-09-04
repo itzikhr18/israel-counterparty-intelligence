@@ -8,7 +8,6 @@ import type {
 } from "@x402/core/server";
 import type { Network, SettleResultContext } from "@x402/core/types";
 import { ExactEvmScheme } from "@x402/evm/exact/server";
-import { declareDiscoveryExtension } from "@x402/extensions/bazaar";
 import { withX402FromHTTPServer, x402HTTPResourceServer } from "@x402/next";
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
@@ -24,25 +23,9 @@ import { createPaymentFacilitatorClient } from "@/lib/facilitator-client";
 import {
   buildPaymentRequired,
   buildPaymentRequiredBody,
-  paymentOutputExample,
 } from "@/lib/payment-challenge";
 import { paymentOptionFor, priceToAtomicUsdc } from "@/lib/payment-config";
 import { createExternalPaidCallEvent } from "@/lib/payment-telemetry";
-import { x402DiscoverySchema } from "@/lib/x402-discovery-schema";
-import {
-  companyChangesExample,
-  companyChangesInputJsonSchema,
-  companyChangesOutputJsonSchema,
-} from "@/lib/company-changes-schema";
-import {
-  paymentRiskExample,
-  paymentRiskInputJsonSchema,
-  paymentRiskOutputJsonSchema,
-} from "@/lib/payment-risk-schema";
-import {
-  verifyInputJsonSchema,
-  verifyOutputJsonSchema,
-} from "@/lib/verification-schema";
 
 type RouteHandler = (request: NextRequest) => Promise<NextResponse>;
 
@@ -165,18 +148,25 @@ function logMainnetSettlement(context: SettleResultContext): void {
 
   const payloadResource = context.paymentPayload.resource?.url;
   const routeName: PaidRouteName = payloadResource?.endsWith(
-    paidRouteConfig["company-changes-mainnet"].path,
+    paidRouteConfig["invoice-gate-mainnet"].path,
   )
-    ? "company-changes-mainnet"
-    : payloadResource?.endsWith(paidRouteConfig["payment-risk-mainnet"].path)
-      ? "payment-risk-mainnet"
-      : context.requirements.amount ===
-          priceToAtomicUsdc(paidRouteConfig["company-changes-mainnet"].price)
-        ? "company-changes-mainnet"
+    ? "invoice-gate-mainnet"
+    : payloadResource?.endsWith(paidRouteConfig["company-changes-mainnet"].path)
+      ? "company-changes-mainnet"
+      : payloadResource?.endsWith(paidRouteConfig["payment-risk-mainnet"].path)
+        ? "payment-risk-mainnet"
         : context.requirements.amount ===
-            priceToAtomicUsdc(paidRouteConfig["payment-risk-mainnet"].price)
-          ? "payment-risk-mainnet"
-          : "verify-mainnet";
+            priceToAtomicUsdc(paidRouteConfig["invoice-gate-mainnet"].price)
+          ? "invoice-gate-mainnet"
+          : context.requirements.amount ===
+              priceToAtomicUsdc(
+                paidRouteConfig["company-changes-mainnet"].price,
+              )
+            ? "company-changes-mainnet"
+            : context.requirements.amount ===
+                priceToAtomicUsdc(paidRouteConfig["payment-risk-mainnet"].price)
+              ? "payment-risk-mainnet"
+              : "verify-mainnet";
   const route = paidRouteConfig[routeName];
   const environment = paymentEnvironments.mainnet;
   const resource = payloadResource ?? `${config.PUBLIC_BASE_URL}${route.path}`;
@@ -355,6 +345,7 @@ export function protectWithX402(
   // request in the background for crawlers, health checks, and MCP discovery calls.
   // A signed buyer initializes the same server lazily immediately before verification.
   const syncFacilitatorOnStart = false;
+  const challenge = buildPaymentRequired(routeName);
   const routeConfig = {
     accepts: {
       ...paymentOptionFor(routeName),
@@ -363,58 +354,10 @@ export function protectWithX402(
     resource: `${config.PUBLIC_BASE_URL}${route.path}`,
     description: route.description,
     mimeType: "application/json",
-    serviceName:
-      routeName === "verify" || routeName === "verify-mainnet"
-        ? "Israel Company Verify"
-        : config.PROVIDER_NAME,
-    tags:
-      routeName === "verify" || routeName === "verify-mainnet"
-        ? ["israel", "company", "verification", "kyb", "due-diligence"]
-        : ["israel", "company", "supplier", "kyb", "due-diligence"],
-    extensions: {
-      ...declareDiscoveryExtension({
-        bodyType: "json",
-        input:
-          routeName === "payment-risk-mainnet"
-            ? {
-                company_number: "514744887",
-                invoice_company_number: "514744887",
-                invoice_company_name: "מנדיי. קום בעמ",
-                language: "en",
-              }
-            : routeName === "company-changes-mainnet"
-              ? {
-                  company_number: "514744887",
-                  lookback_days: 366,
-                  limit: 25,
-                  language: "en",
-                }
-              : { company_number: "514744887", language: "en" },
-        inputSchema:
-          routeName === "payment-risk-mainnet"
-            ? x402DiscoverySchema(paymentRiskInputJsonSchema)
-            : routeName === "company-changes-mainnet"
-              ? x402DiscoverySchema(companyChangesInputJsonSchema)
-              : x402DiscoverySchema(verifyInputJsonSchema),
-        output:
-          routeName === "verify" || routeName === "verify-mainnet"
-            ? {
-                example: paymentOutputExample("verify"),
-                schema: x402DiscoverySchema(verifyOutputJsonSchema),
-              }
-            : routeName === "payment-risk-mainnet"
-              ? {
-                  example: paymentRiskExample,
-                  schema: x402DiscoverySchema(paymentRiskOutputJsonSchema),
-                }
-              : routeName === "company-changes-mainnet"
-                ? {
-                    example: companyChangesExample,
-                    schema: x402DiscoverySchema(companyChangesOutputJsonSchema),
-                  }
-                : { example: paymentOutputExample(routeName) },
-      }),
-    },
+    serviceName: challenge.resource.serviceName,
+    tags: challenge.resource.tags,
+    iconUrl: challenge.resource.iconUrl,
+    extensions: challenge.extensions,
   };
   const httpServer = new x402HTTPResourceServer(getServer(route.environment), {
     [`POST ${route.path}`]: routeConfig,

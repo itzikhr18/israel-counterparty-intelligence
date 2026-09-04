@@ -63,6 +63,7 @@ describe("Streamable HTTP MCP route", () => {
         .sort(),
     ).toEqual([
       "assess_israeli_vendor_payment_risk_paid",
+      "authorize_israeli_invoice_payment_paid",
       "describe_service",
       "get_israeli_company_changes_paid",
       "get_sample_verification_report",
@@ -70,6 +71,7 @@ describe("Streamable HTTP MCP route", () => {
       "preview_agent_payment_trust",
       "preview_company",
       "preview_israeli_company_free",
+      "preview_israeli_invoice_payment_gate_free",
       "preview_israeli_vendor_payment_risk_free",
       "verify_company",
       "verify_israeli_company_paid",

@@ -6,6 +6,9 @@ import {
   mcpCompanyChangesRequirements,
   mcpCompanyChangesResourceUrl,
   mcpEndpointPath,
+  mcpInvoiceGatePrice,
+  mcpInvoiceGateRequirements,
+  mcpInvoiceGateResourceUrl,
   mcpPaymentRequirements,
   mcpPaymentRiskPrice,
   mcpPaymentRiskRequirements,
@@ -56,6 +59,20 @@ describe("Israel Business Intelligence MCP configuration", () => {
     );
     expect(mcpPaymentRiskResourceUrl("mainnet")).not.toBe(
       mcpToolResourceUrl("mainnet"),
+    );
+  });
+
+  it("charges 0.25 USDC for the distinct invoice-gate resource", () => {
+    const requirement = mcpInvoiceGateRequirements("mainnet")[0];
+    expect(mcpInvoiceGatePrice("mainnet")).toBe("$0.25");
+    expect(requirement).toMatchObject({
+      scheme: "exact",
+      network: "eip155:8453",
+      amount: "250000",
+      asset: "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+    });
+    expect(mcpInvoiceGateResourceUrl("mainnet")).toContain(
+      "invoice_payment_gate/mainnet",
     );
   });
 

@@ -23,6 +23,13 @@ export function serviceManifest() {
     free_endpoints: [
       {
         method: "POST",
+        path: "/v1/invoice-gate/preview",
+        price: "free",
+        description:
+          "Checks Israeli invoice VAT arithmetic, totals, and the date-sensitive allocation-number threshold; never authorizes payment.",
+      },
+      {
+        method: "POST",
         path: "/v1/agent-payment-trust",
         price: "free during dry-run MVP",
         description:
@@ -45,6 +52,7 @@ export function serviceManifest() {
           company_changes: config.X402_MCP_MAINNET_COMPANY_CHANGES_PRICE,
           company_verification: config.X402_MCP_MAINNET_VERIFY_PRICE,
           vendor_payment_risk: config.X402_MCP_MAINNET_PAYMENT_RISK_PRICE,
+          invoice_payment_gate: config.X402_MCP_MAINNET_INVOICE_GATE_PRICE,
         },
       },
       testnet: {
@@ -57,11 +65,13 @@ export function serviceManifest() {
           "verify_israeli_company_paid",
           "verify_company",
           "assess_israeli_vendor_payment_risk_paid",
+          "authorize_israeli_invoice_payment_paid",
           "get_israeli_company_changes_paid",
         ],
         free: [
           "preview_israeli_company_free",
           "preview_israeli_vendor_payment_risk_free",
+          "preview_israeli_invoice_payment_gate_free",
           "preview_agent_payment_trust",
           "get_sample_verification_report",
           "preview_company",
@@ -110,6 +120,10 @@ export async function GET(request?: NextRequest) {
       ),
       companyChangesPrice:
         config.X402_MCP_MAINNET_COMPANY_CHANGES_PRICE.replace("$", ""),
+      invoiceGatePrice: config.X402_MCP_MAINNET_INVOICE_GATE_PRICE.replace(
+        "$",
+        "",
+      ),
       restPrice: paidRouteConfig["verify-mainnet"].price,
     }),
     {

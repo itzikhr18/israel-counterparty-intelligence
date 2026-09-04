@@ -41,6 +41,20 @@ record and considers buyer-observed payment changes, urgency, and first-time-ven
 not verify bank-account ownership, invoice authenticity, sanctions, PEPs, UBOs, adverse media, or
 creditworthiness.
 
+## Israeli invoice payment gate
+
+- Free preview: `POST https://israel-counterparty-intelligence.vercel.app/v1/invoice-gate/preview`
+- Paid gate: `POST https://israel-counterparty-intelligence.vercel.app/v1/invoice-gate/mainnet`
+- Price: `$0.25` real USDC on Base Mainnet
+- MCP: `preview_israeli_invoice_payment_gate_free`, then `authorize_israeli_invoice_payment_paid`
+- Result: deterministic `PAY`, `HOLD`, or `BLOCK` with reason codes
+
+The gate checks VAT and total arithmetic, the date-sensitive Israel Invoices allocation-number
+threshold, supplier public-registry identity, and vendor-risk signals. Direct verification through
+the Israel Tax Authority requires an authorized dealer or representative login/connection.
+Buyer-supplied results are labeled `BUYER_ATTESTED` and are never described as independently
+authenticated.
+
 ## Company changes resource
 
 - URL: `https://israel-counterparty-intelligence.vercel.app/v1/company-changes/mainnet`
@@ -62,6 +76,8 @@ creditworthiness.
 - Recommended paid payment-risk tool: `assess_israeli_vendor_payment_risk_paid` - 0.10 USDC
 - Low-cost paid changes tool: `get_israeli_company_changes_paid` - 0.01 USDC
 - Free payment-risk preview: `preview_israeli_vendor_payment_risk_free`
+- Free invoice preview: `preview_israeli_invoice_payment_gate_free`
+- Paid invoice gate: `authorize_israeli_invoice_payment_paid` - 0.25 USDC
 - Free sample: `get_sample_verification_report` - complete static response shape, no live lookup
 - Compatibility names: `verify_company`, `preview_company`
 - Free metadata tools: `describe_service`, `get_schema`
@@ -76,7 +92,7 @@ resource. It does not duplicate or broaden the underlying business-intelligence 
 - 402 Index: `https://402index.io/service/fa0902ac-90a7-431a-8979-97da22a12911`
 - x402scan resource ID: `e9b83616-3c3e-483a-81a2-a93c2b85dd7e`
 - PayAI discovery for the Base Sepolia test resource: `https://facilitator.payai.network/discovery/resources`
-- Coinbase Bazaar readiness: all three Mainnet resources pass live validation; catalog activation
+- Coinbase Bazaar readiness: the automated check validates every Mainnet resource; catalog activation
   requires a conforming payment settled by the authenticated Coinbase CDP facilitator.
 
 ## Test resource

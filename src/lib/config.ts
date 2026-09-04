@@ -72,11 +72,14 @@ const envSchema = z.object({
   CDP_API_KEY_SECRET: z.string().min(1).optional(),
   X402_MAINNET_VERIFY_PRICE: usdPrice.default("$0.05"),
   X402_MAINNET_PAYMENT_RISK_PRICE: usdPrice.default("$0.10"),
+  X402_MAINNET_INVOICE_GATE_PRICE: usdPrice.default("$0.25"),
   X402_MAINNET_COMPANY_CHANGES_PRICE: usdPrice.default("$0.01"),
   X402_MCP_TESTNET_VERIFY_PRICE: usdPrice.default("$0.05"),
   X402_MCP_MAINNET_VERIFY_PRICE: usdPrice.default("$0.05"),
   X402_MCP_TESTNET_PAYMENT_RISK_PRICE: usdPrice.default("$0.10"),
+  X402_MCP_TESTNET_INVOICE_GATE_PRICE: usdPrice.default("$0.25"),
   X402_MCP_MAINNET_PAYMENT_RISK_PRICE: usdPrice.default("$0.10"),
+  X402_MCP_MAINNET_INVOICE_GATE_PRICE: usdPrice.default("$0.25"),
   X402_MCP_TESTNET_COMPANY_CHANGES_PRICE: usdPrice.default("$0.01"),
   X402_MCP_MAINNET_COMPANY_CHANGES_PRICE: usdPrice.default("$0.01"),
   PUBLIC_BASE_URL: z.url().optional(),
@@ -138,6 +141,7 @@ export type PaidRouteName =
   | "government-footprint"
   | "counterparty-risk"
   | "payment-risk-mainnet"
+  | "invoice-gate-mainnet"
   | "company-changes-mainnet";
 
 export const paidRouteConfig: Record<
@@ -182,6 +186,13 @@ export const paidRouteConfig: Record<
     price: config.X402_MAINNET_PAYMENT_RISK_PRICE,
     description:
       "Israeli supplier and vendor payment-risk check before funds move. Resolves the legal company, compares invoice identity and contact domains, evaluates buyer-observed bank-detail-change and urgency signals, and returns deterministic PROCEED, REVIEW, or BLOCK reason codes with public-registry evidence. Use for accounts payable, supplier onboarding, invoice verification, procurement, and payment-fraud triage. Does not verify bank-account ownership.",
+    environment: "mainnet",
+  },
+  "invoice-gate-mainnet": {
+    path: "/v1/invoice-gate/mainnet",
+    price: config.X402_MAINNET_INVOICE_GATE_PRICE,
+    description:
+      "Pre-payment gate for Israeli tax invoices. Checks VAT and total arithmetic, determines whether an Israel Invoices allocation number is required, resolves the supplier against the public company registry, combines vendor-fraud signals, and returns deterministic PAY, HOLD, or BLOCK reason codes. Official Tax Authority verification requires buyer authorization; buyer-attested results are labeled and are not independently authenticated.",
     environment: "mainnet",
   },
   "company-changes-mainnet": {

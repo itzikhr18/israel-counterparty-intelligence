@@ -3,6 +3,7 @@ interface LandingPageOptions {
   mcpPrice: string;
   paymentRiskPrice: string;
   companyChangesPrice: string;
+  invoiceGatePrice: string;
   restPrice: string;
 }
 
@@ -36,6 +37,7 @@ export function renderLandingPage(options: LandingPageOptions): string {
   const mcpPrice = escapeHtml(options.mcpPrice);
   const paymentRiskPrice = escapeHtml(options.paymentRiskPrice);
   const companyChangesPrice = escapeHtml(options.companyChangesPrice);
+  const invoiceGatePrice = escapeHtml(options.invoiceGatePrice);
   const restPrice = escapeHtml(options.restPrice);
 
   return `<!doctype html>
@@ -43,8 +45,8 @@ export function renderLandingPage(options: LandingPageOptions): string {
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Official Israeli company registry verification, supplier due diligence, company-change monitoring, and vendor payment-risk intelligence for AI agents.">
-  <meta name="keywords" content="Israel company registry, verify Israeli company, Israeli supplier verification, Israel KYB, Israeli vendor payment risk">
+  <meta name="description" content="Israeli invoice payment gate, allocation-number checks, company registry verification, and supplier payment-risk intelligence for AI agents.">
+  <meta name="keywords" content="Israel invoice verification, Israel Invoices allocation number, Israeli supplier payment gate, Israel company registry, Israeli VAT invoice">
   <link rel="canonical" href="https://israel-counterparty-intelligence.vercel.app/">
   <title>Israel Company Registry Verification for AI Agents · ${providerName}</title>
   <style>
@@ -102,21 +104,21 @@ export function renderLandingPage(options: LandingPageOptions): string {
 
     <header class="hero">
       <div class="eyebrow">Official-source Israeli business intelligence</div>
-      <h1>Verify an Israeli company before an agent trusts or pays it.</h1>
-      <p class="lead">Search the Israeli company registry, verify a supplier, monitor corporate changes, or assess vendor payment risk. Structured evidence, exact source links, and deterministic decisions for AI agents.</p>
+      <h1>Stop a bad Israeli invoice before an agent pays it.</h1>
+      <p class="lead">Check VAT arithmetic and allocation-number requirements, resolve the supplier, and return PAY, HOLD, or BLOCK. Structured evidence and deterministic decisions for AI agents.</p>
       <div class="actions">
         <a class="button primary" href="#free-preview">Run a free preview</a>
         <a class="button" href="/mcp.json">Inspect MCP metadata</a>
         <a class="button" href="/openapi.json">OpenAPI schema</a>
       </div>
       <div class="contract" aria-label="Payment contract">
-        <span>Company changes ${companyChangesPrice} USDC</span><span>Verification ${mcpPrice} USDC</span><span>Payment risk ${paymentRiskPrice} USDC</span><span>Base Mainnet</span><span>x402 v2</span><span>No API key</span>
+        <span>Invoice gate ${invoiceGatePrice} USDC</span><span>Company changes ${companyChangesPrice} USDC</span><span>Verification ${mcpPrice} USDC</span><span>Payment risk ${paymentRiskPrice} USDC</span><span>Base Mainnet</span><span>x402 v2</span><span>No API key</span>
       </div>
     </header>
 
     <section aria-labelledby="why-number-one">
       <h2 id="why-number-one">One Israel-specific toolchain, from identity to payment</h2>
-      <p class="section-copy">Start with a free registry preview, buy recent company changes for ${companyChangesPrice} USDC, unlock the full evidence report for ${mcpPrice} USDC, or run a pre-payment supplier decision for ${paymentRiskPrice} USDC. No subscription and no API key.</p>
+      <p class="section-copy">Start with a free invoice or registry preview. Run the full invoice payment gate for ${invoiceGatePrice} USDC, recent company changes for ${companyChangesPrice}, full verification for ${mcpPrice}, or vendor-risk triage for ${paymentRiskPrice}. No subscription and no API key.</p>
     </section>
 
     <section id="free-preview" aria-labelledby="free-preview-title">
@@ -140,13 +142,14 @@ export function renderLandingPage(options: LandingPageOptions): string {
         <article class="card"><h3>Supplier onboarding</h3><p>Confirm the Israeli legal entity before qualification, procurement, or vendor-master creation.</p></article>
         <article class="card"><h3>Company-change monitoring</h3><p>Check recent official filings and status-change events for an exact company number, newest first.</p></article>
         <article class="card"><h3>Agentic commerce</h3><p>Give an agent a structured jurisdiction-specific trust signal with sources and confidence.</p></article>
+        <article class="card"><h3>Invoice payment gate</h3><p>Check VAT math, allocation-number rules, supplier identity, and payment-risk signals before funds move.</p></article>
         <article class="card"><h3>Pre-sign payment firewall</h3><p>Fingerprint x402 terms and return ALLOW, REVIEW, or DENY before the buyer wallet signs.</p></article>
       </div>
     </section>
 
     <section aria-labelledby="connect">
       <h2 id="connect">Connect over MCP</h2>
-      <p class="section-copy">Start with <code>preview_agent_payment_trust</code> before an x402 payment, <code>preview_israeli_company_free</code> for registry verification, <code>get_israeli_company_changes_paid</code> for recent corporate events, or <code>preview_israeli_vendor_payment_risk_free</code> before a conventional vendor payment.</p>
+      <p class="section-copy">Start with <code>preview_israeli_invoice_payment_gate_free</code> for an invoice, then use <code>authorize_israeli_invoice_payment_paid</code>. Company verification, changes, vendor risk, and the <code>preview_agent_payment_trust</code> x402 pre-sign firewall remain available.</p>
       <div class="code-card" style="margin-top: 20px">
         <div class="code-title">One-command free preview · public source on GitHub</div>
         <pre><code>npx --yes github:itzikhr18/israel-company-verify-buyer \\
@@ -173,6 +176,12 @@ export function renderLandingPage(options: LandingPageOptions): string {
   --data '{"company_number":"514744887","language":"en"}'</code></pre>
       </div>
       <div class="code-card" style="margin-top: 16px">
+        <div class="code-title">Run the free invoice structural preview</div>
+        <pre><code>curl -X POST https://israel-counterparty-intelligence.vercel.app/v1/invoice-gate/preview \
+  -H 'content-type: application/json' \
+  --data '{"supplier_company_number":"514744887","invoice_number":"INV-1","invoice_date":"2026-09-04","amount_before_vat":6000,"vat_amount":1080,"total_amount":7080,"allocation_number":"123456789"}'</code></pre>
+      </div>
+      <div class="code-card" style="margin-top: 16px">
         <div class="code-title">Inspect the $${paymentRiskPrice} vendor payment-risk challenge</div>
         <pre><code>curl -i https://israel-counterparty-intelligence.vercel.app/v1/payment-risk/mainnet \
   -H 'content-type: application/json' \
@@ -188,7 +197,7 @@ export function renderLandingPage(options: LandingPageOptions): string {
 
     <section class="scope" aria-labelledby="scope">
       <h2 id="scope">Evidence scope</h2>
-      Public Israeli company-registry evidence and buyer-provided transaction context only. This service does not verify bank-account ownership or invoice authenticity and is not full regulatory KYB, legal advice, sanctions screening, UBO or PEP research, credit advice, or a compliance certification.
+      Public Israeli company-registry evidence and buyer-provided transaction context only. Direct Tax Authority verification requires authorized access; buyer-supplied results are clearly labeled and never presented as independently authenticated. The service does not verify bank-account ownership and is not legal, tax, accounting, credit, or compliance advice.
     </section>
 
     <footer>

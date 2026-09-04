@@ -1,5 +1,6 @@
 const bazaarMcp = "https://api.cdp.coinbase.com/platform/v2/x402/discovery/mcp";
 const endpoints = [
+  "/v1/invoice-gate/mainnet",
   "/v1/company-changes/mainnet",
   "/v1/verify/mainnet",
   "/v1/payment-risk/mainnet",

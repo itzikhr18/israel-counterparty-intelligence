@@ -21,6 +21,7 @@ describe("service root", () => {
             "verify_israeli_company_paid",
             "verify_company",
             "assess_israeli_vendor_payment_risk_paid",
+            "authorize_israeli_invoice_payment_paid",
             "get_israeli_company_changes_paid",
           ],
         },
@@ -41,7 +42,7 @@ describe("service root", () => {
       "default-src 'none'",
     );
     expect(html).toContain(
-      "Verify an Israeli company before an agent trusts or pays it.",
+      "Stop a bad Israeli invoice before an agent pays it.",
     );
     expect(html).toContain('href="#free-preview"');
     expect(html).toContain('action="/preview"');
@@ -52,6 +53,8 @@ describe("service root", () => {
     expect(html).toContain("0.05 USDC");
     expect(html).toContain("0.10 USDC");
     expect(html).toContain("0.01 USDC");
+    expect(html).toContain("0.25 USDC");
+    expect(html).toContain("/v1/invoice-gate/preview");
     expect(html).toContain("/v1/payment-risk/mainnet");
     expect(html).toContain("/v1/company-changes/mainnet");
     expect(response.headers.get("content-security-policy")).toContain(

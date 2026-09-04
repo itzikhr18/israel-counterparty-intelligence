@@ -7,12 +7,14 @@ import type { CounterpartyQuery, EntityResolution } from "@/lib/domain";
 import { API_VERSION, ApiError } from "@/lib/domain";
 import type { CompanyChangesQuery } from "@/lib/company-changes-schema";
 import type { PaymentRiskQuery } from "@/lib/payment-risk-schema";
+import type { InvoiceGateQuery } from "@/lib/invoice-gate-schema";
 import {
   entityResolutionService,
   type EntityResolutionService,
 } from "@/lib/services/entity-resolution";
 import { assessAgentPaymentTrust } from "@/lib/services/agent-payment-trust";
 import { assessPaymentRisk } from "@/lib/services/payment-risk";
+import { assessInvoiceGate } from "@/lib/services/invoice-gate";
 import { companyChangesService } from "@/lib/services/company-changes";
 import { scoreRisk } from "@/lib/services/risk-scoring";
 
@@ -147,6 +149,29 @@ export class CounterpartyOrchestrator {
       api_version: API_VERSION,
       query,
       ...assessPaymentRisk(
+        query,
+        resolution.entity,
+        resolution.confidence,
+        resolution.evidence,
+      ),
+    };
+  }
+
+  async invoiceGate(query: InvoiceGateQuery) {
+    const resolution = requireResolved(
+      await this.resolver.resolve({
+        company_number: query.supplier_company_number,
+        company_name: query.supplier_name,
+        website: query.invoice_website,
+        city: query.invoice_city,
+        language: query.language,
+        depth: "standard",
+      }),
+    );
+    return {
+      api_version: API_VERSION,
+      query,
+      ...assessInvoiceGate(
         query,
         resolution.entity,
         resolution.confidence,

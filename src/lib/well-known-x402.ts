@@ -13,8 +13,13 @@ import {
   verifyOutputJsonSchema,
 } from "@/lib/verification-schema";
 import { x402DiscoverySchema } from "@/lib/x402-discovery-schema";
+import {
+  invoiceGateInputJsonSchema,
+  invoiceGateOutputJsonSchema,
+} from "@/lib/invoice-gate-schema";
 
 const discoveryRoutes: PaidRouteName[] = [
+  "invoice-gate-mainnet",
   "company-changes-mainnet",
   "verify-mainnet",
   "payment-risk-mainnet",
@@ -24,6 +29,12 @@ const discoveryRoutes: PaidRouteName[] = [
 ];
 
 function schemasFor(routeName: PaidRouteName) {
+  if (routeName === "invoice-gate-mainnet") {
+    return {
+      inputSchema: x402DiscoverySchema(invoiceGateInputJsonSchema),
+      outputSchema: x402DiscoverySchema(invoiceGateOutputJsonSchema),
+    };
+  }
   if (routeName === "company-changes-mainnet") {
     return {
       inputSchema: x402DiscoverySchema(companyChangesInputJsonSchema),
@@ -73,7 +84,7 @@ export function wellKnownX402Manifest() {
       ? "MAINNET LIVE - AWAITING FIRST EXTERNAL PAID CALL"
       : "MAINNET DISABLED",
     description:
-      "Paid Israeli company verification, daily company-change intelligence, and vendor payment-risk checks with field-level public-registry evidence. Public-registry evidence only, not Full Regulatory KYB.",
+      "Paid Israeli invoice payment gates, company verification, daily company-change intelligence, and vendor payment-risk checks with field-level public-registry evidence. Official Tax Authority verification requires buyer authorization; buyer-attested results are not independently authenticated.",
     category: "business-intelligence",
     tags: [
       "israel",
@@ -82,6 +93,8 @@ export function wellKnownX402Manifest() {
       "company-changes",
       "corporate-events",
       "vendor-payment-risk",
+      "invoice-payment-gate",
+      "allocation-number",
       "kyb",
       "public-registry-kyb-evidence",
       "israeli-company-registry",

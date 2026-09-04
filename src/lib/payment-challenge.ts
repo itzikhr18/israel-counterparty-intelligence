@@ -27,6 +27,11 @@ import {
   verifyInputJsonSchema,
   verifyOutputJsonSchema,
 } from "@/lib/verification-schema";
+import {
+  invoiceGateExample,
+  invoiceGateInputJsonSchema,
+  invoiceGateOutputJsonSchema,
+} from "@/lib/invoice-gate-schema";
 import { x402DiscoverySchema } from "@/lib/x402-discovery-schema";
 
 export function paymentOutputExample(
@@ -34,6 +39,7 @@ export function paymentOutputExample(
 ): Record<string, unknown> {
   if (route === "verify") return verifyExample;
   if (route === "payment-risk-mainnet") return paymentRiskExample;
+  if (route === "invoice-gate-mainnet") return invoiceGateExample;
   if (route === "company-changes-mainnet") return companyChangesExample;
   if (route === "government-footprint") {
     return {
@@ -54,43 +60,54 @@ export function buildPaymentRequired(
   const environment = paymentEnvironments[route.environment];
   const option = paymentOptionFor(routeName);
   const serviceMetadata =
-    routeName === "payment-risk-mainnet"
+    routeName === "invoice-gate-mainnet"
       ? {
-          serviceName: "Israel Vendor Payment Risk",
+          serviceName: "Israel Invoice Payment Gate",
           tags: [
             "israel",
-            "vendor-risk",
-            "supplier-payments",
             "invoice-verification",
-            "fraud-prevention",
+            "allocation-number",
+            "supplier-payments",
+            "vat",
           ],
         }
-      : routeName === "company-changes-mainnet"
+      : routeName === "payment-risk-mainnet"
         ? {
-            serviceName: "Israel Company Changes",
+            serviceName: "Israel Vendor Payment Risk",
             tags: [
               "israel",
-              "company-changes",
-              "corporate-events",
-              "registry-monitoring",
-              "due-diligence",
+              "vendor-risk",
+              "supplier-payments",
+              "invoice-verification",
+              "fraud-prevention",
             ],
           }
-        : routeName === "verify" || routeName === "verify-mainnet"
+        : routeName === "company-changes-mainnet"
           ? {
-              serviceName: "Israel Company Registry",
+              serviceName: "Israel Company Changes",
               tags: [
                 "israel",
-                "company-registry",
-                "company-verification",
-                "supplier-verification",
-                "kyb",
+                "company-changes",
+                "corporate-events",
+                "registry-monitoring",
+                "due-diligence",
               ],
             }
-          : {
-              serviceName: "Israel Counterparty Intel",
-              tags: ["israel", "company", "supplier", "kyb", "due-diligence"],
-            };
+          : routeName === "verify" || routeName === "verify-mainnet"
+            ? {
+                serviceName: "Israel Company Registry",
+                tags: [
+                  "israel",
+                  "company-registry",
+                  "company-verification",
+                  "supplier-verification",
+                  "kyb",
+                ],
+              }
+            : {
+                serviceName: "Israel Counterparty Intel",
+                tags: ["israel", "company", "supplier", "kyb", "due-diligence"],
+              };
   const requirement: PaymentRequirements = {
     scheme: option.scheme,
     network: environment.network as Network,
@@ -103,27 +120,41 @@ export function buildPaymentRequired(
   const extensions = declareDiscoveryExtension({
     bodyType: "json",
     input:
-      routeName === "payment-risk-mainnet"
+      routeName === "invoice-gate-mainnet"
         ? {
-            company_number: "514744887",
-            invoice_company_number: "514744887",
-            invoice_company_name: "מנדיי. קום בעמ",
+            supplier_company_number: "514744887",
+            invoice_number: "INV-2026-001",
+            invoice_date: "2026-09-04",
+            amount_before_vat: 6000,
+            vat_amount: 1080,
+            total_amount: 7080,
+            currency: "ILS",
+            allocation_number: "123456789",
             language: "en",
           }
-        : routeName === "company-changes-mainnet"
+        : routeName === "payment-risk-mainnet"
           ? {
               company_number: "514744887",
-              lookback_days: 366,
-              limit: 25,
+              invoice_company_number: "514744887",
+              invoice_company_name: "מנדיי. קום בעמ",
               language: "en",
             }
-          : { company_number: "514744887", language: "en" },
+          : routeName === "company-changes-mainnet"
+            ? {
+                company_number: "514744887",
+                lookback_days: 366,
+                limit: 25,
+                language: "en",
+              }
+            : { company_number: "514744887", language: "en" },
     inputSchema:
-      routeName === "payment-risk-mainnet"
-        ? x402DiscoverySchema(paymentRiskInputJsonSchema)
-        : routeName === "company-changes-mainnet"
-          ? x402DiscoverySchema(companyChangesInputJsonSchema)
-          : x402DiscoverySchema(verifyInputJsonSchema),
+      routeName === "invoice-gate-mainnet"
+        ? x402DiscoverySchema(invoiceGateInputJsonSchema)
+        : routeName === "payment-risk-mainnet"
+          ? x402DiscoverySchema(paymentRiskInputJsonSchema)
+          : routeName === "company-changes-mainnet"
+            ? x402DiscoverySchema(companyChangesInputJsonSchema)
+            : x402DiscoverySchema(verifyInputJsonSchema),
     output:
       routeName === "verify" || routeName === "verify-mainnet"
         ? {
@@ -135,18 +166,22 @@ export function buildPaymentRequired(
               example: paymentRiskExample,
               schema: x402DiscoverySchema(paymentRiskOutputJsonSchema),
             }
-          : routeName === "company-changes-mainnet"
+          : routeName === "invoice-gate-mainnet"
             ? {
-                example: companyChangesExample,
-                schema: x402DiscoverySchema(companyChangesOutputJsonSchema),
+                example: invoiceGateExample,
+                schema: x402DiscoverySchema(invoiceGateOutputJsonSchema),
               }
-            : { example: paymentOutputExample(routeName) },
+            : routeName === "company-changes-mainnet"
+              ? {
+                  example: companyChangesExample,
+                  schema: x402DiscoverySchema(companyChangesOutputJsonSchema),
+                }
+              : { example: paymentOutputExample(routeName) },
   });
   const bazaar = extensions.bazaar as {
-    info: { input: { method?: string; pathParams?: Record<string, never> } };
+    info: { input: { method?: string } };
   };
   bazaar.info.input.method = "POST";
-  bazaar.info.input.pathParams = {};
 
   return {
     x402Version: 2,

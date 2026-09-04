@@ -1,6 +1,6 @@
 {
   "name": "Israel Business Intelligence MCP",
-  "description": "Agent-native Israeli company changes, company verification, Verified Payee Firewall, and pre-payment vendor risk intelligence with public-registry evidence. Not Full Regulatory KYB.",
+  "description": "Agent-native Israeli invoice payment gates, company changes, verification, Verified Payee Firewall, and vendor-risk intelligence with public-registry evidence.",
   "transport": "streamable-http",
   "production_url": "https://israel-counterparty-intelligence.vercel.app/mcp",
   "testnet_url": "https://israel-counterparty-intelligence.vercel.app/mcp/testnet",
@@ -9,11 +9,24 @@
   "payment_asset": "USDC",
   "icon_url": "https://israel-counterparty-intelligence.vercel.app/icon.svg",
   "agent_skill": "https://israel-counterparty-intelligence.vercel.app/SKILL.md",
-  "instructions": "Start with preview_israeli_company_free. Use get_israeli_company_changes_paid for recent official events, verify_israeli_company_paid for the complete registry report, and preview_israeli_vendor_payment_risk_free before a conventional vendor payment. Before signing x402, call preview_agent_payment_trust for a free dry-run.",
+  "instructions": "For an Israeli tax invoice, start with preview_israeli_invoice_payment_gate_free, then authorize_israeli_invoice_payment_paid. Official Tax Authority verification requires buyer authorization. For company intelligence start with preview_israeli_company_free. Before signing x402, call preview_agent_payment_trust.",
   "buyer_bridge": "https://israel-counterparty-intelligence.vercel.app/israel-company-verify-buyer-0.3.0.tgz",
   "buyer_bridge_github": "https://github.com/itzikhr18/israel-company-verify-buyer",
   "source_repository": "https://github.com/itzikhr18/israel-counterparty-intelligence",
   "tools": [
+    {
+      "name": "preview_israeli_invoice_payment_gate_free",
+      "description": "Free VAT arithmetic, total, and date-sensitive Israel Invoices allocation-number threshold check. Never authorizes payment.",
+      "paid": false
+    },
+    {
+      "name": "authorize_israeli_invoice_payment_paid",
+      "description": "Registry-backed Israeli invoice gate returning PAY, HOLD, or BLOCK. Buyer-attested Tax Authority results are not independently authenticated.",
+      "paid": true,
+      "price": "0.25 USDC",
+      "network": "Base Mainnet",
+      "protocol": "x402 v2"
+    },
     {
       "name": "preview_agent_payment_trust",
       "description": "Free dry-run payment firewall. Binds Israeli legal identity, service origin, a signed domain payee manifest, x402 destination and terms, and the buyer mandate into ALLOW, REVIEW, or DENY. It never signs or submits a payment.",
@@ -75,6 +88,9 @@
   ],
   "keywords": [
     "Israel company verification",
+    "Israel invoice payment gate",
+    "Israeli invoice allocation number verification",
+    "Israeli VAT invoice check",
     "official Israeli company registry lookup",
     "Israeli company changes and corporate-event monitoring",
     "Israeli company registry",

@@ -47,6 +47,14 @@ import {
   type PaymentRiskQuery,
 } from "@/lib/payment-risk-schema";
 import { createExternalPaidCallEvent } from "@/lib/payment-telemetry";
+import {
+  invoiceGateExample,
+  invoiceGateInputJsonSchema,
+  invoiceGateOutputJsonSchema,
+  invoiceGateQuerySchema,
+  type InvoiceGateQuery,
+} from "@/lib/invoice-gate-schema";
+import { previewInvoiceGate } from "@/lib/services/invoice-gate";
 import { pilotMetadata, runPilotVerification } from "@/lib/pilot";
 import { counterpartyOrchestrator } from "@/lib/services/orchestrator";
 import { x402DiscoverySchema } from "@/lib/x402-discovery-schema";
@@ -57,7 +65,7 @@ import {
 } from "@/lib/verification-schema";
 
 export const MCP_SERVER_NAME = "Israel Business Intelligence MCP";
-export const MCP_SERVER_VERSION = "1.6.0";
+export const MCP_SERVER_VERSION = "1.7.0";
 
 export const FREE_PREVIEW_TOOL = "preview_israeli_company_free";
 export const PAID_VERIFY_TOOL = "verify_israeli_company_paid";
@@ -67,9 +75,12 @@ export const FREE_PAYMENT_RISK_PREVIEW_TOOL =
 export const PAID_PAYMENT_RISK_TOOL = "assess_israeli_vendor_payment_risk_paid";
 export const AGENT_PAYMENT_TRUST_TOOL = "preview_agent_payment_trust";
 export const PAID_COMPANY_CHANGES_TOOL = "get_israeli_company_changes_paid";
+export const FREE_INVOICE_GATE_PREVIEW_TOOL =
+  "preview_israeli_invoice_payment_gate_free";
+export const PAID_INVOICE_GATE_TOOL = "authorize_israeli_invoice_payment_paid";
 
 const DESCRIPTION =
-  "Paid Israeli company verification by legal name or company number. Resolves records in the Israeli Companies Registry and returns structured, field-level public-registry evidence for supplier checks, due diligence, and public-registry KYB evidence. Not Full Regulatory KYB.";
+  "Israeli invoice payment gates and paid company verification. Checks invoice arithmetic and allocation-number rules, resolves records in the Israeli Companies Registry, and returns structured public-registry evidence. Tax Authority access requires buyer authorization. Not Full Regulatory KYB.";
 
 export const X402_BUYER_QUICKSTART_URL = `${config.PUBLIC_BASE_URL}/x402-buyer-quickstart.md`;
 export const X402_BUYER_BRIDGE_URL = `${config.PUBLIC_BASE_URL}/israel-company-verify-buyer-0.3.0.tgz`;
@@ -84,7 +95,7 @@ function serverInstructions(accessMode: "paid" | "pilot"): string {
   if (accessMode === "pilot") {
     return "Use verify_company for invitation-only partner verification. Payment is waived only when this authenticated pilot endpoint is used. Use get_sample_verification_report to inspect the response shape without a live lookup.";
   }
-  return `Start with ${FREE_PREVIEW_TOOL} for a free identity and registry-status check. If it resolves the company, follow next_action to get recent official filing and status-change events for $0.01, or use full_verification.recommended_arguments with ${PAID_VERIFY_TOOL} for the complete evidence-backed result. Before an agent signs an x402 payment, use ${AGENT_PAYMENT_TRUST_TOOL} for a free dry-run that binds the legal entity, service domain, signed payee manifest, payment destination, and buyer mandate into an ALLOW, REVIEW, or DENY decision. For invoice and vendor-context risk, use ${FREE_PAYMENT_RISK_PREVIEW_TOOL}, then ${PAID_PAYMENT_RISK_TOOL}. Company changes cost $0.01 USDC, company verification costs $0.05 USDC, and payment-risk assessment costs $0.10 USDC on Base Mainnet. Use ${SAMPLE_REPORT_TOOL} to inspect a static full-report example without payment. Buyer bridge: ${X402_BUYER_BRIDGE_URL}`;
+  return `For an Israeli tax invoice, start with ${FREE_INVOICE_GATE_PREVIEW_TOOL}, then use ${PAID_INVOICE_GATE_TOOL} for the PAY, HOLD, or BLOCK gate. Official Tax Authority verification requires buyer authorization and buyer-attested results are never presented as independently authenticated. For company intelligence, start with ${FREE_PREVIEW_TOOL}, then use ${PAID_VERIFY_TOOL}; company changes cost $0.01 USDC, full verification $0.05, vendor payment risk through ${PAID_PAYMENT_RISK_TOOL} costs $0.10, and the invoice gate $0.25 on Base Mainnet. Before signing an x402 payment, use ${AGENT_PAYMENT_TRUST_TOOL}. Buyer bridge: ${X402_BUYER_BRIDGE_URL}`;
 }
 
 const previewCandidateSchema = z.object({
@@ -205,6 +216,14 @@ export function mcpPaymentRiskPrice(
     : config.X402_MCP_TESTNET_PAYMENT_RISK_PRICE;
 }
 
+export function mcpInvoiceGatePrice(
+  environmentName: PaymentEnvironmentName,
+): string {
+  return environmentName === "mainnet"
+    ? config.X402_MCP_MAINNET_INVOICE_GATE_PRICE
+    : config.X402_MCP_TESTNET_INVOICE_GATE_PRICE;
+}
+
 export function mcpCompanyChangesPrice(
   environmentName: PaymentEnvironmentName,
 ): string {
@@ -253,6 +272,29 @@ export function mcpPaymentRiskRequirements(
   ];
 }
 
+export function mcpInvoiceGateResourceUrl(
+  environmentName: PaymentEnvironmentName,
+): string {
+  return `mcp://israel-business-intelligence/invoice_payment_gate/${environmentName}`;
+}
+
+export function mcpInvoiceGateRequirements(
+  environmentName: PaymentEnvironmentName,
+): PaymentRequirements[] {
+  const environment = paymentEnvironments[environmentName];
+  return [
+    {
+      scheme: "exact",
+      network: environment.network as Network,
+      amount: priceToAtomicUsdc(mcpInvoiceGatePrice(environmentName)),
+      asset: environment.asset,
+      payTo: environment.payTo,
+      maxTimeoutSeconds: 60,
+      extra: usdcEip712Domain(environmentName),
+    },
+  ];
+}
+
 export function mcpCompanyChangesResourceUrl(
   environmentName: PaymentEnvironmentName,
 ): string {
@@ -280,6 +322,12 @@ function paidToolFromRequirements(
   environmentName: PaymentEnvironmentName,
   requirements: PaymentRequirements,
 ): string {
+  if (
+    requirements.amount ===
+    priceToAtomicUsdc(mcpInvoiceGatePrice(environmentName))
+  ) {
+    return PAID_INVOICE_GATE_TOOL;
+  }
   if (
     requirements.amount ===
     priceToAtomicUsdc(mcpCompanyChangesPrice(environmentName))
@@ -389,7 +437,7 @@ function serviceDescription(
   return {
     name: MCP_SERVER_NAME,
     description: DESCRIPTION,
-    does: "Verifies an Israeli company and returns structured public-registry data with field-level evidence.",
+    does: "Gates Israeli invoices before payment and verifies Israeli companies with structured public-registry evidence.",
     does_not:
       "It does not provide Full Regulatory KYB, legal advice, sanctions/PEP/UBO certification, credit advice, or a guarantee that a counterparty is safe.",
     verify_company:
@@ -436,6 +484,27 @@ function serviceDescription(
               "adverse media",
               "creditworthiness",
             ],
+          },
+    invoice_payment_gate:
+      accessMode === "pilot"
+        ? undefined
+        : {
+            price: `${mcpInvoiceGatePrice(environmentName).slice(1)} USDC`,
+            network:
+              environmentName === "mainnet" ? "Base Mainnet" : "Base Sepolia",
+            asset: "USDC",
+            protocol: "x402 v2 over MCP",
+            free_preview_tool: FREE_INVOICE_GATE_PREVIEW_TOOL,
+            paid_tool: PAID_INVOICE_GATE_TOOL,
+            decisions: ["PAY", "HOLD", "BLOCK"],
+            checks: [
+              "VAT and total arithmetic",
+              "date-sensitive allocation-number requirement",
+              "supplier public-registry identity",
+              "vendor-risk signals",
+            ],
+            limitation:
+              "Tax Authority access requires buyer authorization; buyer-attested results are not independently authenticated.",
           },
     company_changes:
       accessMode === "pilot"
@@ -714,6 +783,10 @@ async function runPaymentRiskPreview(
   };
 }
 
+function runInvoiceGatePreview(args: InvoiceGateQuery) {
+  return { request_id: randomUUID(), ...previewInvoiceGate(args) };
+}
+
 function settlementTelemetry(
   environmentName: PaymentEnvironmentName,
   settlement: SettleResponse,
@@ -784,6 +857,7 @@ export async function createIsraelMcpServer(
   const environment = paymentEnvironments[environmentName];
   const requirements = mcpPaymentRequirements(environmentName);
   const paymentRiskRequirements = mcpPaymentRiskRequirements(environmentName);
+  const invoiceGateRequirements = mcpInvoiceGateRequirements(environmentName);
   const companyChangesRequirements =
     mcpCompanyChangesRequirements(environmentName);
   const server = new McpServer(
@@ -826,6 +900,7 @@ export async function createIsraelMcpServer(
         tool: "verify_company",
         tools: [
           "verify_company",
+          PAID_INVOICE_GATE_TOOL,
           PAID_PAYMENT_RISK_TOOL,
           PAID_COMPANY_CHANGES_TOOL,
           AGENT_PAYMENT_TRUST_TOOL,
@@ -844,6 +919,15 @@ export async function createIsraelMcpServer(
           input_schema: paymentRiskInputJsonSchema,
           preview_output_schema: z.toJSONSchema(paymentRiskPreviewOutputSchema),
           paid_output_schema: paymentRiskOutputJsonSchema,
+        },
+        invoice_payment_gate: {
+          preview_tool: FREE_INVOICE_GATE_PREVIEW_TOOL,
+          paid_tool: PAID_INVOICE_GATE_TOOL,
+          rest_preview_endpoint: `${config.PUBLIC_BASE_URL}/v1/invoice-gate/preview`,
+          rest_paid_endpoint: `${config.PUBLIC_BASE_URL}/v1/invoice-gate/mainnet`,
+          input_schema: invoiceGateInputJsonSchema,
+          paid_output_schema: invoiceGateOutputJsonSchema,
+          price: mcpInvoiceGatePrice(environmentName),
         },
         company_changes: {
           paid_tool: PAID_COMPANY_CHANGES_TOOL,
@@ -864,6 +948,8 @@ export async function createIsraelMcpServer(
           sample_report: SAMPLE_REPORT_TOOL,
           free_payment_risk_preview: FREE_PAYMENT_RISK_PREVIEW_TOOL,
           paid_payment_risk_assessment: PAID_PAYMENT_RISK_TOOL,
+          free_invoice_gate_preview: FREE_INVOICE_GATE_PREVIEW_TOOL,
+          paid_invoice_gate: PAID_INVOICE_GATE_TOOL,
           paid_company_changes: PAID_COMPANY_CHANGES_TOOL,
           pre_sign_payment_firewall: AGENT_PAYMENT_TRUST_TOOL,
         },
@@ -1029,6 +1115,21 @@ export async function createIsraelMcpServer(
   );
 
   server.registerTool(
+    FREE_INVOICE_GATE_PREVIEW_TOOL,
+    {
+      title: "Preview an Israeli invoice payment gate - free",
+      description: `FREE FIRST STEP before paying an Israeli tax invoice. Checks VAT and total arithmetic and the date-sensitive Israel Invoices allocation-number threshold. It never authorizes payment, resolves the supplier, or contacts the Tax Authority. Use ${PAID_INVOICE_GATE_TOOL} for the registry-backed PAY, HOLD, or BLOCK decision.`,
+      inputSchema: invoiceGateQuerySchema,
+      annotations: {
+        readOnlyHint: true,
+        destructiveHint: false,
+        idempotentHint: true,
+      },
+    },
+    async (args) => textAndStructured(runInvoiceGatePreview(args)),
+  );
+
+  server.registerTool(
     "preview_company",
     {
       title: "Preview Israeli company identity - free and limited",
@@ -1168,6 +1269,24 @@ export async function createIsraelMcpServer(
       },
     );
     server.registerTool(
+      PAID_INVOICE_GATE_TOOL,
+      {
+        title: "Authorize an Israeli invoice payment",
+        description:
+          "Registry-backed Israeli invoice payment gate with VAT, allocation-number, and supplier-risk checks. Payment is disabled in this environment.",
+        inputSchema: invoiceGateQuerySchema,
+        annotations: {
+          readOnlyHint: true,
+          destructiveHint: false,
+          idempotentHint: true,
+        },
+      },
+      async (args) => {
+        const result = await counterpartyOrchestrator.invoiceGate(args);
+        return textAndStructured({ request_id: randomUUID(), ...result });
+      },
+    );
+    server.registerTool(
       PAID_COMPANY_CHANGES_TOOL,
       {
         title: "Get recent Israeli company changes",
@@ -1288,6 +1407,63 @@ export async function createIsraelMcpServer(
     },
   });
 
+  const paidInvoiceGate = createPaymentWrapper(resourceServer, {
+    accepts: invoiceGateRequirements,
+    resource: {
+      url: mcpInvoiceGateResourceUrl(environmentName),
+      description:
+        "Pre-payment gate for Israeli tax invoices. Checks invoice arithmetic, Israel Invoices allocation-number requirements, supplier registry identity, and vendor-risk signals. Tax Authority results supplied by the buyer are labeled as buyer-attested and are not independently authenticated.",
+      mimeType: "application/json",
+      serviceName: "Israel Invoice Payment Gate",
+      tags: [
+        "israel",
+        "invoice-verification",
+        "allocation-number",
+        "supplier-payments",
+        "vat",
+      ],
+      iconUrl: `${config.PUBLIC_BASE_URL}/icon.svg`,
+    },
+    extensions: declareDiscoveryExtension({
+      toolName: PAID_INVOICE_GATE_TOOL,
+      description:
+        "Return a deterministic PAY, HOLD, or BLOCK decision for an Israeli supplier invoice before funds move.",
+      transport: "streamable-http",
+      inputSchema: x402DiscoverySchema(invoiceGateInputJsonSchema),
+      example: {
+        supplier_company_number: "514744887",
+        invoice_number: "INV-2026-001",
+        invoice_date: "2026-09-04",
+        amount_before_vat: 6000,
+        vat_amount: 1080,
+        total_amount: 7080,
+        allocation_number: "123456789",
+        language: "en",
+      },
+      output: {
+        example: invoiceGateExample,
+        schema: x402DiscoverySchema(invoiceGateOutputJsonSchema),
+      },
+    }),
+    hooks: {
+      onAfterSettlement: async ({
+        settlement,
+        paymentPayload,
+        paymentRequirements,
+      }) => {
+        settlementTelemetry(
+          environmentName,
+          settlement,
+          paymentPayload,
+          paymentRequirements,
+          PAID_INVOICE_GATE_TOOL,
+          mcpInvoiceGatePrice(environmentName),
+          mcpInvoiceGateResourceUrl(environmentName),
+        );
+      },
+    },
+  });
+
   const paidCompanyChanges = createPaymentWrapper(resourceServer, {
     accepts: companyChangesRequirements,
     resource: {
@@ -1389,6 +1565,29 @@ export async function createIsraelMcpServer(
     }
   };
   const paidAssessPaymentRisk = paidPaymentRisk(paymentRisk);
+  const invoiceGate = async (args: InvoiceGateQuery) => {
+    try {
+      const result = await counterpartyOrchestrator.invoiceGate(args);
+      return textAndStructured({ request_id: randomUUID(), ...result });
+    } catch (error) {
+      const normalized =
+        error instanceof ApiError
+          ? error
+          : new ApiError(500, "INTERNAL_ERROR", "An unexpected error occurred");
+      return {
+        content: [
+          {
+            type: "text" as const,
+            text: JSON.stringify({
+              error: { code: normalized.code, message: normalized.message },
+            }),
+          },
+        ],
+        isError: true,
+      };
+    }
+  };
+  const paidAuthorizeInvoice = paidInvoiceGate(invoiceGate);
   const getCompanyChanges = async (args: CompanyChangesQuery) => {
     try {
       const result = await counterpartyOrchestrator.companyChanges(args);
@@ -1428,6 +1627,17 @@ export async function createIsraelMcpServer(
     "x402/pricing": {
       x402Version: 2,
       price: mcpPaymentRiskPrice(environmentName),
+      asset: environment.asset,
+      network: environment.network,
+      payTo: environment.payTo,
+      facilitator: environment.facilitatorUrl,
+      buyerQuickstart: X402_BUYER_QUICKSTART_URL,
+    },
+  };
+  const invoiceGateToolMeta = {
+    "x402/pricing": {
+      x402Version: 2,
+      price: mcpInvoiceGatePrice(environmentName),
       asset: environment.asset,
       network: environment.network,
       payTo: environment.payTo,
@@ -1493,6 +1703,22 @@ export async function createIsraelMcpServer(
       _meta: paymentRiskToolMeta,
     },
     paidAssessPaymentRisk,
+  );
+
+  server.registerTool(
+    PAID_INVOICE_GATE_TOOL,
+    {
+      title: "Authorize an Israeli invoice payment - paid",
+      description: `PRE-PAYMENT GATE for an Israeli tax invoice. Checks VAT and total arithmetic, the date-sensitive Israel Invoices allocation-number requirement, supplier public-registry identity, and vendor-risk signals, then returns PAY, HOLD, or BLOCK with deterministic reason codes. Costs ${mcpInvoiceGatePrice(environmentName)} USDC on ${environmentName === "mainnet" ? "Base Mainnet" : "Base Sepolia"}. Official Tax Authority verification requires buyer authorization; buyer-attested results are labeled and not independently authenticated. Use ${FREE_INVOICE_GATE_PREVIEW_TOOL} first.`,
+      inputSchema: invoiceGateQuerySchema,
+      annotations: {
+        readOnlyHint: true,
+        destructiveHint: false,
+        idempotentHint: true,
+      },
+      _meta: invoiceGateToolMeta,
+    },
+    paidAuthorizeInvoice,
   );
 
   server.registerTool(

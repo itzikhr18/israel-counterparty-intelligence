@@ -44,6 +44,18 @@ describe("x402 well-known discovery", () => {
             }),
           ],
         }),
+        expect.objectContaining({
+          resource: expect.stringMatching(/\/v1\/invoice-gate\/mainnet$/),
+          method: "POST",
+          environment: "production",
+          price: "$0.25",
+          accepts: [
+            expect.objectContaining({
+              network: "eip155:8453",
+              amount: "250000",
+            }),
+          ],
+        }),
       ]),
     );
   });
