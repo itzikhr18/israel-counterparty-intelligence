@@ -30,11 +30,26 @@ function optionalText(form: FormData, name: string): string | undefined {
   return value.trim();
 }
 
+function optionalBoolean(form: FormData, name: string): boolean | undefined {
+  const value = optionalText(form, name);
+  if (value === "true") return true;
+  if (value === "false") return false;
+  return undefined;
+}
+
 export async function POST(request: NextRequest) {
   try {
     const form = await request.formData();
     const parsed = invoiceGateQuerySchema.safeParse({
       supplier_company_number: optionalText(form, "supplier_company_number"),
+      buyer_is_authorized_dealer: optionalBoolean(
+        form,
+        "buyer_is_authorized_dealer",
+      ),
+      buyer_requested_allocation_number: optionalBoolean(
+        form,
+        "buyer_requested_allocation_number",
+      ),
       invoice_number: optionalText(form, "invoice_number"),
       invoice_date: optionalText(form, "invoice_date"),
       amount_before_vat: Number(optionalText(form, "amount_before_vat")),
@@ -64,6 +79,8 @@ export async function POST(request: NextRequest) {
       reasonCodes: [...preview.decision.reason_codes],
       explanation: preview.decision.explanation,
       allocationRequired: preview.policy.allocation_required,
+      allocationApplicability: preview.policy.allocation_applicability,
+      allocationMissingInputs: [...preview.policy.missing_inputs],
       allocationThresholdIls: preview.policy.allocation_threshold_ils,
       invoiceDate: parsed.data.invoice_date,
       amountBeforeVat: parsed.data.amount_before_vat,

@@ -1,6 +1,6 @@
-# Israel Counterparty Intelligence
+# Israel Invoice Payment Gate and Counterparty Intelligence
 
-One call to understand an Israeli business counterparty.
+One agent-native gate to check an Israeli supplier invoice before payment, with public-registry counterparty evidence.
 
 Public source: <https://github.com/itzikhr18/israel-counterparty-intelligence>
 
@@ -35,7 +35,7 @@ or investment service.
 - `POST /v1/government-footprint` - public contracts and supports by exact company number.
 - `POST /v1/counterparty-risk` - combined result and deterministic reason-coded score.
 - `POST /v1/payment-risk/mainnet` - Mainnet pre-payment vendor triage with a `PROCEED`, `REVIEW`, or `BLOCK` result.
-- `POST /v1/invoice-gate/preview` - free invoice arithmetic and allocation-threshold preview; never authorization to pay.
+- `POST /v1/invoice-gate/preview` - free invoice arithmetic and allocation-applicability preview using date, amount, VAT component, and buyer-attested conditions; never authorization to pay.
 - `POST /v1/invoice-gate/mainnet` - 0.25 USDC registry-backed Israeli invoice gate returning `PAY`, `HOLD`, or `BLOCK`.
 - `POST /v1/company-changes/mainnet` - recent official company filing and status-change events for an exact company number, newest first, with source evidence.
 - `POST /v1/agent-payment-trust` - free dry-run x402 pre-sign firewall with `ALLOW`, `REVIEW`, or `DENY`; it never signs or submits a payment.
@@ -44,7 +44,7 @@ or investment service.
 - x402 v2 fixed-price protection and Bazaar metadata when `X402_ENABLED=true`.
 - Remote Streamable HTTP MCP with paid `verify_company` plus free `preview_company`, `preview_agent_payment_trust`, `describe_service`, and `get_schema`.
 
-Official Tax Authority allocation verification requires an authorized dealer/representative connection. Buyer-supplied verification results are labeled `BUYER_ATTESTED` and are not independently authenticated. Not included: dashboards, accounts, subscriptions, PDF reports, broad scraping, bank-account
+Allocation applicability uses a strictly-greater-than amount threshold and also depends on a VAT component, an authorized-dealer buyer, and a buyer request; missing buyer context fails safely to `HOLD`. Official Tax Authority allocation verification requires an authorized dealer/representative connection. Buyer-supplied verification results are labeled `BUYER_ATTESTED` and are not independently authenticated. Not included: dashboards, accounts, subscriptions, PDF reports, broad scraping, bank-account
 ownership verification, document forensics, UBO/PEP/sanctions certification, adverse-media
 screening, creditworthiness, TASE enrichment, or a custom ML model.
 

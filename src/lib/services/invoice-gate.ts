@@ -2,9 +2,11 @@ import type { Evidence, ResolvedEntity } from "@/lib/domain";
 import type { InvoiceGateQuery } from "@/lib/invoice-gate-schema";
 import { assessPaymentRisk } from "@/lib/services/payment-risk";
 
-export const INVOICE_GATE_VERSION = "1.0.0";
+export const INVOICE_GATE_VERSION = "1.1.0";
 export const TAX_AUTHORITY_VERIFIER_URL =
   "https://www.gov.il/en/service/verify-vendor-invoice-information";
+export const TAX_AUTHORITY_ALLOCATION_POLICY_URL =
+  "https://www.gov.il/he/service/request-assignment-number-for-tax-invoice";
 const MONEY_TOLERANCE = 0.02;
 
 type GateCheckStatus = "MATCH" | "MISMATCH" | "PASS" | "MISSING" | "SIGNAL";
@@ -23,6 +25,22 @@ function roundMoney(value: number): number {
 }
 
 export function allocationPolicy(invoiceDate: string, amountBeforeVat: number) {
+  return allocationPolicyWithContext(invoiceDate, amountBeforeVat, {});
+}
+
+interface AllocationPolicyContext {
+  has_vat_component?: boolean;
+  buyer_is_authorized_dealer?: boolean;
+  buyer_requested_allocation_number?: boolean;
+}
+
+type AllocationApplicability = "REQUIRED" | "NOT_REQUIRED" | "UNKNOWN";
+
+function allocationPolicyWithContext(
+  invoiceDate: string,
+  amountBeforeVat: number,
+  context: AllocationPolicyContext,
+) {
   const threshold =
     invoiceDate >= "2026-06-01"
       ? 5_000
@@ -35,13 +53,83 @@ export function allocationPolicy(invoiceDate: string, amountBeforeVat: number) {
       : invoiceDate >= "2026-01-01"
         ? "2026-01-01"
         : "2025-01-01";
+  const amountExceedsThreshold = amountBeforeVat > threshold;
+  const missingInputs: string[] = [];
+  if (amountExceedsThreshold && context.has_vat_component !== false) {
+    if (context.has_vat_component === undefined)
+      missingInputs.push("has_vat_component");
+    if (context.buyer_is_authorized_dealer === undefined)
+      missingInputs.push("buyer_is_authorized_dealer");
+    if (context.buyer_requested_allocation_number === undefined)
+      missingInputs.push("buyer_requested_allocation_number");
+  }
+  const allocationApplicability: AllocationApplicability =
+    !amountExceedsThreshold ||
+    context.has_vat_component === false ||
+    context.buyer_is_authorized_dealer === false ||
+    context.buyer_requested_allocation_number === false
+      ? "NOT_REQUIRED"
+      : missingInputs.length > 0
+        ? "UNKNOWN"
+        : "REQUIRED";
   return {
     allocation_threshold_ils: threshold,
-    allocation_required: amountBeforeVat >= threshold,
+    threshold_comparison: "strictly_greater_than",
+    amount_exceeds_threshold: amountExceedsThreshold,
+    has_vat_component: context.has_vat_component ?? null,
+    buyer_is_authorized_dealer: context.buyer_is_authorized_dealer ?? null,
+    buyer_requested_allocation_number:
+      context.buyer_requested_allocation_number ?? null,
+    allocation_applicability: allocationApplicability,
+    allocation_required:
+      allocationApplicability === "REQUIRED"
+        ? true
+        : allocationApplicability === "NOT_REQUIRED"
+          ? false
+          : null,
+    missing_inputs: missingInputs,
     policy_as_of: policyAsOf,
-    source_url: TAX_AUTHORITY_VERIFIER_URL,
-    note: "Threshold is evaluated against the invoice amount before VAT. Tax rules can change; the authenticated Tax Authority service remains authoritative.",
+    source_url: TAX_AUTHORITY_ALLOCATION_POLICY_URL,
+    note: "The amount before VAT must be strictly greater than the date-sensitive threshold. A mandatory allocation number also depends on a VAT component, an authorized-dealer buyer, and the buyer requesting the number. Tax rules can change; the authenticated Tax Authority service remains authoritative.",
   };
+}
+
+function policyForQuery(query: InvoiceGateQuery) {
+  return allocationPolicyWithContext(
+    query.invoice_date,
+    query.amount_before_vat,
+    {
+      has_vat_component: query.vat_amount > 0,
+      buyer_is_authorized_dealer: query.buyer_is_authorized_dealer,
+      buyer_requested_allocation_number:
+        query.buyer_requested_allocation_number,
+    },
+  );
+}
+
+function allocationContextChecks(
+  query: InvoiceGateQuery,
+  policy: ReturnType<typeof policyForQuery>,
+): GateCheck[] {
+  if (!policy.amount_exceeds_threshold || query.vat_amount <= 0) return [];
+  const checks: GateCheck[] = [];
+  for (const [code, value] of [
+    ["BUYER_AUTHORIZED_DEALER", query.buyer_is_authorized_dealer],
+    [
+      "BUYER_REQUESTED_ALLOCATION_NUMBER",
+      query.buyer_requested_allocation_number,
+    ],
+  ] as const) {
+    checks.push({
+      code,
+      status: value === undefined ? "MISSING" : "PASS",
+      severity: value === undefined ? "MEDIUM" : "INFO",
+      claimed: value ?? null,
+      observed: value === undefined ? "buyer_attestation_required" : value,
+      points: value === undefined ? 20 : 0,
+    });
+  }
+  return checks;
 }
 
 function invoiceChecks(query: InvoiceGateQuery): GateCheck[] {
@@ -114,8 +202,11 @@ function officialChecks(query: InvoiceGateQuery): GateCheck[] {
 }
 
 export function previewInvoiceGate(query: InvoiceGateQuery, now = new Date()) {
-  const policy = allocationPolicy(query.invoice_date, query.amount_before_vat);
-  const checks = invoiceChecks(query);
+  const policy = policyForQuery(query);
+  const checks = [
+    ...invoiceChecks(query),
+    ...allocationContextChecks(query, policy),
+  ];
   if (policy.allocation_required) {
     checks.push({
       code: "ALLOCATION_NUMBER_PRESENT",
@@ -131,11 +222,16 @@ export function previewInvoiceGate(query: InvoiceGateQuery, now = new Date()) {
   );
   const missingAllocation =
     policy.allocation_required && !query.allocation_number;
+  const allocationContextMissing =
+    policy.allocation_applicability === "UNKNOWN";
   const action = arithmeticMismatch || missingAllocation ? "BLOCK" : "HOLD";
   const reasonCodes = [
     ...(arithmeticMismatch ? ["INVOICE_ARITHMETIC_MISMATCH"] : []),
     ...(missingAllocation ? ["ALLOCATION_NUMBER_REQUIRED"] : []),
-    ...(!arithmeticMismatch && !missingAllocation
+    ...(allocationContextMissing
+      ? ["ALLOCATION_REQUIREMENT_CONTEXT_MISSING"]
+      : []),
+    ...(!arithmeticMismatch && !missingAllocation && !allocationContextMissing
       ? ["PAID_REGISTRY_GATE_REQUIRED"]
       : []),
   ];
@@ -155,7 +251,9 @@ export function previewInvoiceGate(query: InvoiceGateQuery, now = new Date()) {
       explanation:
         action === "BLOCK"
           ? "Fix the invoice issues before payment."
-          : "The invoice arithmetic passed. Run the paid gate to resolve the supplier and obtain a payment decision.",
+          : allocationContextMissing
+            ? "Hold payment until the buyer confirms authorized-dealer status and whether an allocation number was requested."
+            : "The invoice arithmetic passed. Run the paid gate to resolve the supplier and obtain a payment decision.",
     },
     checks,
     official_verification: {
@@ -182,7 +280,7 @@ export function assessInvoiceGate(
   registryEvidence: Evidence[],
   now = new Date(),
 ) {
-  const policy = allocationPolicy(query.invoice_date, query.amount_before_vat);
+  const policy = policyForQuery(query);
   const paymentRisk = assessPaymentRisk(
     {
       company_number: query.supplier_company_number,
@@ -206,6 +304,7 @@ export function assessInvoiceGate(
   );
   const checks: GateCheck[] = [
     ...invoiceChecks(query),
+    ...allocationContextChecks(query, policy),
     ...officialChecks(query),
   ];
   if (policy.allocation_required) {
@@ -223,6 +322,8 @@ export function assessInvoiceGate(
   const hardMismatch = checks.some((check) => check.status === "MISMATCH");
   const missingAllocation =
     policy.allocation_required && !query.allocation_number;
+  const allocationContextMissing =
+    policy.allocation_applicability === "UNKNOWN";
   const official = query.official_verification;
   const officialFailure =
     official?.status === "MISMATCH" || official?.status === "NOT_FOUND";
@@ -233,6 +334,8 @@ export function assessInvoiceGate(
 
   if (hardMismatch) reasons.add("INVOICE_OR_OFFICIAL_DATA_MISMATCH");
   if (missingAllocation) reasons.add("ALLOCATION_NUMBER_REQUIRED");
+  if (allocationContextMissing)
+    reasons.add("ALLOCATION_REQUIREMENT_CONTEXT_MISSING");
   if (officialFailure) reasons.add("OFFICIAL_ALLOCATION_VERIFICATION_FAILED");
   if (officialPending) reasons.add("OFFICIAL_ALLOCATION_VERIFICATION_REQUIRED");
   if (official?.status === "MATCH")
@@ -244,7 +347,9 @@ export function assessInvoiceGate(
     officialFailure ||
     paymentRisk.decision.action === "BLOCK"
       ? "BLOCK"
-      : officialPending || paymentRisk.decision.action === "REVIEW"
+      : allocationContextMissing ||
+          officialPending ||
+          paymentRisk.decision.action === "REVIEW"
         ? "HOLD"
         : "PAY";
   const score = Math.min(
@@ -264,7 +369,7 @@ export function assessInvoiceGate(
     value: { action, score, reason_codes: [...reasons] },
     type: "inference",
     source: "Israel Invoice Payment Gate deterministic rules",
-    source_url: TAX_AUTHORITY_VERIFIER_URL,
+    source_url: TAX_AUTHORITY_ALLOCATION_POLICY_URL,
     retrieved_at: now.toISOString(),
     source_record_id: `${entity.company_number}:${query.invoice_number}`,
     confidence: paymentRisk.decision.confidence,

@@ -23,6 +23,18 @@ export const invoiceGateQuerySchema = z.object({
   ),
   supplier_name: z.string().trim().min(2).max(200).optional(),
   buyer_vat_number: nineDigits.optional(),
+  buyer_is_authorized_dealer: z
+    .boolean()
+    .describe(
+      "Buyer-attested answer: whether the invoice recipient is an Israeli authorized dealer (osek murshe). Required for a definitive allocation-number applicability result above the threshold.",
+    )
+    .optional(),
+  buyer_requested_allocation_number: z
+    .boolean()
+    .describe(
+      "Buyer-attested answer: whether the buyer requested an allocation number for this invoice. Required for a definitive applicability result above the threshold.",
+    )
+    .optional(),
   invoice_number: z.string().trim().min(1).max(100),
   invoice_date: z.iso.date().refine((value) => value >= "2025-01-01", {
     message: "Invoice gate policy coverage begins on 2025-01-01",
@@ -59,6 +71,16 @@ export const invoiceGateInputJsonSchema = {
     },
     supplier_name: { type: "string", minLength: 2, maxLength: 200 },
     buyer_vat_number: { type: "string", pattern: "^\\d{9}$" },
+    buyer_is_authorized_dealer: {
+      type: "boolean",
+      description:
+        "Buyer-attested authorized-dealer status. If omitted above the threshold, allocation applicability is UNKNOWN and payment is held.",
+    },
+    buyer_requested_allocation_number: {
+      type: "boolean",
+      description:
+        "Buyer-attested confirmation that the buyer requested an allocation number. If omitted above the threshold, allocation applicability is UNKNOWN and payment is held.",
+    },
     invoice_number: { type: "string", minLength: 1, maxLength: 100 },
     invoice_date: {
       type: "string",
@@ -169,13 +191,20 @@ export const invoiceGateOutputJsonSchema = {
 } as const;
 
 export const invoiceGateExample = {
-  gate_version: "1.0.0",
+  gate_version: "1.1.0",
   policy: {
     allocation_threshold_ils: 5000,
+    threshold_comparison: "strictly_greater_than",
+    amount_exceeds_threshold: true,
+    has_vat_component: true,
+    buyer_is_authorized_dealer: true,
+    buyer_requested_allocation_number: true,
+    allocation_applicability: "REQUIRED",
     allocation_required: true,
+    missing_inputs: [],
     policy_as_of: "2026-06-01",
     source_url:
-      "https://www.gov.il/en/service/verify-vendor-invoice-information",
+      "https://www.gov.il/he/service/request-assignment-number-for-tax-invoice",
   },
   entity: {
     legal_name: "מנדיי. קום בע״מ",

@@ -1,6 +1,6 @@
-# Israel Company Verify
+# Israel Invoice Payment Gate and Company Intelligence
 
-Verify an Israeli company and return structured public registry data with evidence.
+Check an Israeli supplier invoice before payment, return `PAY`, `HOLD`, or `BLOCK`, and retrieve structured public-registry evidence.
 
 Status: **MAINNET LIVE - AWAITING FIRST EXTERNAL PAID CALL**
 
@@ -49,8 +49,10 @@ creditworthiness.
 - MCP: `preview_israeli_invoice_payment_gate_free`, then `authorize_israeli_invoice_payment_paid`
 - Result: deterministic `PAY`, `HOLD`, or `BLOCK` with reason codes
 
-The gate checks VAT and total arithmetic, the date-sensitive Israel Invoices allocation-number
-threshold, supplier public-registry identity, and vendor-risk signals. Direct verification through
+The gate checks VAT and total arithmetic; the date, amount, VAT component, authorized-dealer buyer,
+and buyer-request conditions for an Israel Invoices allocation number; supplier public-registry
+identity; and vendor-risk signals. The statutory amount comparison is strictly greater than the
+applicable threshold, and missing buyer context returns `HOLD` rather than a guessed answer. Direct verification through
 the Israel Tax Authority requires an authorized dealer or representative login/connection.
 Buyer-supplied results are labeled `BUYER_ATTESTED` and are never described as independently
 authenticated.

@@ -82,7 +82,7 @@ export const openApiDocument = {
     title: "Israel Counterparty Intelligence API",
     version: API_VERSION,
     description:
-      "Agent-native Israeli counterparty intelligence and an x402 pre-sign payment firewall. Heuristic output is not legal, credit, or payment advice.",
+      "Agent-native Israeli invoice payment gate, supplier-registry intelligence, and x402 pre-sign payment firewall. Allocation applicability uses date, amount, VAT component, and buyer-attested conditions; missing context fails safely. Output is not official Tax Authority authentication, legal, credit, or payment advice.",
   },
   servers: [{ url: config.PUBLIC_BASE_URL }],
   tags: [
@@ -159,7 +159,7 @@ export const openApiDocument = {
         tags: ["agent-payments"],
         summary: "Preview an Israeli invoice payment gate for free",
         description:
-          "Free structural check of VAT arithmetic, invoice totals, and the date-sensitive Israel Invoices allocation-number threshold. Does not resolve the supplier or contact the Tax Authority.",
+          "Free structural check of VAT arithmetic, invoice totals, and date-, amount-, VAT-, and buyer-sensitive Israel Invoices allocation-number applicability. Missing buyer context returns a safe hold. Does not resolve the supplier or contact the Tax Authority.",
         operationId: "preview_israeli_invoice_payment_gate",
         requestBody: {
           required: true,

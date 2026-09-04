@@ -1,6 +1,6 @@
 {
   "name": "Israel Business Intelligence MCP",
-  "description": "Agent-native Israeli invoice payment gates, company changes, verification, Verified Payee Firewall, and vendor-risk intelligence with public-registry evidence.",
+  "description": "Israeli supplier-invoice payment gate for AI agents: VAT arithmetic, allocation-number applicability, PAY/HOLD/BLOCK decisions, company verification, changes, and public-registry evidence.",
   "transport": "streamable-http",
   "production_url": "https://israel-counterparty-intelligence.vercel.app/mcp",
   "testnet_url": "https://israel-counterparty-intelligence.vercel.app/mcp/testnet",
@@ -16,12 +16,12 @@
   "tools": [
     {
       "name": "preview_israeli_invoice_payment_gate_free",
-      "description": "Free VAT arithmetic, total, and date-sensitive Israel Invoices allocation-number threshold check. Never authorizes payment.",
+      "description": "Free VAT arithmetic, total, and date-, amount-, VAT-, and buyer-sensitive Israel Invoices allocation-number applicability check. Missing buyer context fails safely. Never authorizes payment.",
       "paid": false
     },
     {
       "name": "authorize_israeli_invoice_payment_paid",
-      "description": "Registry-backed Israeli invoice gate returning PAY, HOLD, or BLOCK. Buyer-attested Tax Authority results are not independently authenticated.",
+      "description": "Registry-backed Israeli supplier-invoice gate returning PAY, HOLD, or BLOCK. Uses buyer-attested allocation conditions and holds when context is missing. Tax Authority results are not independently authenticated.",
       "paid": true,
       "price": "0.25 USDC",
       "network": "Base Mainnet",
@@ -89,6 +89,9 @@
   "keywords": [
     "Israel company verification",
     "Israel invoice payment gate",
+    "verify Israeli tax invoice before payment",
+    "Israeli accounts payable automation",
+    "Israel Invoices allocation number requirement",
     "Israeli invoice allocation number verification",
     "Israeli VAT invoice check",
     "official Israeli company registry lookup",

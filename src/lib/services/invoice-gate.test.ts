@@ -52,11 +52,18 @@ describe("Israeli invoice payment gate", () => {
     );
     expect(allocationPolicy("2026-01-01", 10_000)).toMatchObject({
       allocation_threshold_ils: 10_000,
-      allocation_required: true,
+      amount_exceeds_threshold: false,
+      allocation_required: false,
     });
     expect(allocationPolicy("2026-06-01", 5_000)).toMatchObject({
       allocation_threshold_ils: 5_000,
-      allocation_required: true,
+      amount_exceeds_threshold: false,
+      allocation_required: false,
+    });
+    expect(allocationPolicy("2026-06-01", 5_000.01)).toMatchObject({
+      amount_exceeds_threshold: true,
+      allocation_applicability: "UNKNOWN",
+      allocation_required: null,
     });
   });
 
@@ -79,7 +86,13 @@ describe("Israeli invoice payment gate", () => {
 
   it("blocks a threshold invoice that lacks an allocation number", () => {
     const result = assessInvoiceGate(
-      query({ amount_before_vat: 6000, vat_amount: 1080, total_amount: 7080 }),
+      query({
+        amount_before_vat: 6000,
+        vat_amount: 1080,
+        total_amount: 7080,
+        buyer_is_authorized_dealer: true,
+        buyer_requested_allocation_number: true,
+      }),
       entity,
       0.99,
       [],
@@ -90,12 +103,55 @@ describe("Israeli invoice payment gate", () => {
     );
   });
 
+  it("holds instead of guessing when buyer allocation context is missing", () => {
+    const result = assessInvoiceGate(
+      query({ amount_before_vat: 6000, vat_amount: 1080, total_amount: 7080 }),
+      entity,
+      0.99,
+      [],
+    );
+    expect(result.policy).toMatchObject({
+      allocation_applicability: "UNKNOWN",
+      allocation_required: null,
+      missing_inputs: [
+        "buyer_is_authorized_dealer",
+        "buyer_requested_allocation_number",
+      ],
+    });
+    expect(result.decision.action).toBe("HOLD");
+    expect(result.decision.reason_codes).toContain(
+      "ALLOCATION_REQUIREMENT_CONTEXT_MISSING",
+    );
+  });
+
+  it("does not require allocation when the buyer did not request it", () => {
+    const result = assessInvoiceGate(
+      query({
+        amount_before_vat: 6000,
+        vat_amount: 1080,
+        total_amount: 7080,
+        buyer_is_authorized_dealer: true,
+        buyer_requested_allocation_number: false,
+      }),
+      entity,
+      0.99,
+      [],
+    );
+    expect(result.policy).toMatchObject({
+      allocation_applicability: "NOT_REQUIRED",
+      allocation_required: false,
+    });
+    expect(result.decision.action).toBe("PAY");
+  });
+
   it("holds a threshold invoice until authenticated official verification", () => {
     const result = assessInvoiceGate(
       query({
         amount_before_vat: 6000,
         vat_amount: 1080,
         total_amount: 7080,
+        buyer_is_authorized_dealer: true,
+        buyer_requested_allocation_number: true,
         allocation_number: "123456789",
       }),
       entity,
@@ -115,6 +171,8 @@ describe("Israeli invoice payment gate", () => {
         amount_before_vat: 6000,
         vat_amount: 1080,
         total_amount: 7080,
+        buyer_is_authorized_dealer: true,
+        buyer_requested_allocation_number: true,
         allocation_number: "123456789",
         official_verification: {
           status: "MATCH",

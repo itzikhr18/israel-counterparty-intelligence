@@ -192,7 +192,7 @@ export const paidRouteConfig: Record<
     path: "/v1/invoice-gate/mainnet",
     price: config.X402_MAINNET_INVOICE_GATE_PRICE,
     description:
-      "Pre-payment gate for Israeli tax invoices. Checks VAT and total arithmetic, determines whether an Israel Invoices allocation number is required, resolves the supplier against the public company registry, combines vendor-fraud signals, and returns deterministic PAY, HOLD, or BLOCK reason codes. Official Tax Authority verification requires buyer authorization; buyer-attested results are labeled and are not independently authenticated.",
+      "Pre-payment gate for Israeli tax invoices and accounts-payable agents. Checks VAT and totals; applies the date, amount, VAT-component, authorized-dealer-buyer, and buyer-request conditions for an Israel Invoices allocation number; resolves the supplier against the public company registry; combines vendor-fraud signals; and returns deterministic PAY, HOLD, or BLOCK reason codes. Missing buyer context fails safely to HOLD. Official Tax Authority verification requires buyer authorization; buyer-attested results are labeled and are not independently authenticated.",
     environment: "mainnet",
   },
   "company-changes-mainnet": {

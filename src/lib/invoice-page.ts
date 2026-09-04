@@ -3,7 +3,9 @@ export interface InvoicePreviewPageResult {
   score: number;
   reasonCodes: string[];
   explanation: string;
-  allocationRequired: boolean;
+  allocationRequired: boolean | null;
+  allocationApplicability: "REQUIRED" | "NOT_REQUIRED" | "UNKNOWN";
+  allocationMissingInputs: string[];
   allocationThresholdIls: number;
   invoiceDate: string;
   amountBeforeVat: number;
@@ -36,6 +38,8 @@ const CHECK_LABELS: Record<string, string> = {
   VAT_ARITHMETIC: "VAT calculation",
   INVOICE_TOTAL_ARITHMETIC: "Invoice total",
   ALLOCATION_NUMBER_PRESENT: "Allocation number",
+  BUYER_AUTHORIZED_DEALER: "Buyer is an authorized dealer",
+  BUYER_REQUESTED_ALLOCATION_NUMBER: "Buyer requested allocation number",
 };
 
 const REASON_LABELS: Record<string, string> = {
@@ -43,6 +47,8 @@ const REASON_LABELS: Record<string, string> = {
     "One or more invoice amounts do not add up. Correct them before payment.",
   ALLOCATION_NUMBER_REQUIRED:
     "An allocation number is required for this invoice value and date.",
+  ALLOCATION_REQUIREMENT_CONTEXT_MISSING:
+    "Buyer status or allocation-request information is missing. Confirm both before payment.",
   PAID_REGISTRY_GATE_REQUIRED:
     "The figures passed. Supplier registry verification is still required before payment.",
 };
@@ -59,9 +65,11 @@ export function renderInvoicePreviewPage(options: {
   const actionTitle =
     result?.action === "BLOCK"
       ? "Do not pay yet"
-      : result?.action === "HOLD"
-        ? "Hold for the next check"
-        : "Ready for the paid supplier gate";
+      : result?.allocationApplicability === "UNKNOWN"
+        ? "Confirm the buyer conditions"
+        : result?.action === "HOLD"
+          ? "Hold for the next check"
+          : "Ready for the paid supplier gate";
   const resultHtml = error
     ? `<section class="result error" role="alert"><div class="eyebrow">Input problem</div><h1>We could not check this invoice</h1><p>${error}</p></section>`
     : result
@@ -70,7 +78,7 @@ export function renderInvoicePreviewPage(options: {
           <h1>${actionTitle}</h1>
           <p>${escapeHtml(result.explanation)}</p>
           <div class="summary">
-            <div><span>Allocation required</span><strong>${result.allocationRequired ? "Yes" : "No"}</strong></div>
+            <div><span>Allocation requirement</span><strong>${result.allocationRequired === true ? "Required" : result.allocationRequired === false ? "Not required" : "Need buyer answers"}</strong></div>
             <div><span>Current threshold</span><strong>₪${result.allocationThresholdIls.toLocaleString("en-US")}</strong></div>
             <div><span>Amount before VAT</span><strong>₪${result.amountBeforeVat.toLocaleString("en-US")}</strong></div>
             <div><span>Invoice total</span><strong>₪${result.totalAmount.toLocaleString("en-US")}</strong></div>
@@ -135,7 +143,7 @@ export function renderInvoicePreviewPage(options: {
   <main>
     <nav><a class="brand" href="/">${providerName}</a><a class="back" href="/#invoice-preview">← Check another invoice</a></nav>
     ${resultHtml}
-    ${result ? `<section class="offer"><h2>${result.action === "BLOCK" ? "Correct the invoice first" : "Need the complete supplier decision?"}</h2><p>${result.action === "BLOCK" ? "Return to the invoice and correct the fields identified above before any further verification." : "The paid gate resolves the supplier against the Israeli company registry and combines the invoice with vendor-risk signals for $0.25 USDC."}</p><div class="actions"><a class="button primary" href="/mcp.json">Connect through MCP</a><a class="button" href="/README.md#israeli-invoice-payment-gate">View integration details</a></div></section>` : ""}
+    ${result ? `<section class="offer"><h2>${result.action === "BLOCK" ? "Correct the invoice first" : result.allocationApplicability === "UNKNOWN" ? "Complete the buyer answers first" : "Need the complete supplier decision?"}</h2><p>${result.action === "BLOCK" ? "Return to the invoice and correct the fields identified above before any further verification." : result.allocationApplicability === "UNKNOWN" ? "Confirm whether the buyer is an authorized dealer and requested an allocation number. Paying for the full gate before that would only return HOLD." : "The paid gate resolves the supplier against the Israeli company registry and combines the invoice with vendor-risk signals for $0.25 USDC."}</p><div class="actions">${result.action === "BLOCK" || result.allocationApplicability === "UNKNOWN" ? `<a class="button primary" href="/#invoice-preview">Return to invoice form</a>` : `<a class="button primary" href="/mcp.json">Connect through MCP</a><a class="button" href="/README.md#israeli-invoice-payment-gate">View integration details</a>`}</div></section>` : ""}
     <p class="scope">This free structural check is not authorization to pay and does not contact the Israel Tax Authority. Direct official verification requires authorized access.</p>
   </main>
 </body>

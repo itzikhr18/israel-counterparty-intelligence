@@ -45,10 +45,10 @@ export function renderLandingPage(options: LandingPageOptions): string {
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Israeli invoice payment gate, allocation-number checks, company registry verification, and supplier payment-risk intelligence for AI agents.">
-  <meta name="keywords" content="Israel invoice verification, Israel Invoices allocation number, Israeli supplier payment gate, Israel company registry, Israeli VAT invoice">
+  <meta name="description" content="Check an Israeli supplier invoice before payment. VAT arithmetic, allocation-number applicability, company-registry evidence, and a PAY, HOLD, or BLOCK decision for AI agents.">
+  <meta name="keywords" content="verify Israeli tax invoice before payment, Israel Invoices allocation number, Israeli supplier payment gate, accounts payable AI agent, Israel company registry, Israeli VAT invoice">
   <link rel="canonical" href="https://israel-counterparty-intelligence.vercel.app/">
-  <title>Israel Company Registry Verification for AI Agents · ${providerName}</title>
+  <title>Israeli Invoice Payment Gate for AI Agents · ${providerName}</title>
   <style>
     :root { color-scheme: dark; --bg: #07110f; --panel: #0d1c18; --line: #24433a; --text: #effbf6; --muted: #a9c3b8; --accent: #61e6ad; --accent-dark: #082119; }
     * { box-sizing: border-box; }
@@ -135,7 +135,7 @@ export function renderLandingPage(options: LandingPageOptions): string {
       <div class="invoice-panel">
         <div class="eyebrow">Free invoice check · no wallet required</div>
         <h2 id="invoice-preview-title">Check an Israeli invoice before payment</h2>
-        <p class="section-copy">Enter the figures printed on the invoice. We check VAT arithmetic, the total, and whether an Israel Invoices allocation number is required for its date and value.</p>
+        <p class="section-copy">Enter the invoice figures and two buyer confirmations. We check VAT arithmetic, the total, and whether an Israel Invoices allocation number is required for the date, value, VAT component, and buyer conditions.</p>
         <form class="invoice-form" action="/invoice-preview" method="post">
           <div class="field">
             <label for="supplier-company-number">Supplier company or VAT number</label>
@@ -152,6 +152,16 @@ export function renderLandingPage(options: LandingPageOptions): string {
           <div class="field">
             <label for="vat-rate">Expected VAT rate</label>
             <select id="vat-rate" name="expected_vat_rate"><option value="18" selected>18%</option><option value="0">0% — exempt or zero-rated only</option></select>
+          </div>
+          <div class="field">
+            <label for="buyer-authorized-dealer">Is the buyer an authorized dealer?</label>
+            <select id="buyer-authorized-dealer" name="buyer_is_authorized_dealer" required><option value="" selected disabled>Select an answer</option><option value="true">Yes</option><option value="false">No</option></select>
+            <small>Buyer-attested. Required to determine allocation-number applicability.</small>
+          </div>
+          <div class="field">
+            <label for="buyer-requested-allocation">Did the buyer request an allocation number?</label>
+            <select id="buyer-requested-allocation" name="buyer_requested_allocation_number" required><option value="" selected disabled>Select an answer</option><option value="true">Yes</option><option value="false">No</option></select>
+            <small>Allocation can also be requested voluntarily below the threshold.</small>
           </div>
           <div class="field">
             <label for="amount-before-vat">Amount before VAT (ILS)</label>
@@ -171,7 +181,7 @@ export function renderLandingPage(options: LandingPageOptions): string {
           </div>
           <div class="form-actions">
             <button class="button primary" type="submit">Check invoice free</button>
-            <p class="form-note">The free check never authorizes a payment or contacts the Tax Authority.</p>
+            <p class="form-note">Buyer answers are treated as declarations. The free check never authorizes payment or contacts the Tax Authority.</p>
           </div>
         </form>
       </div>
@@ -235,7 +245,7 @@ export function renderLandingPage(options: LandingPageOptions): string {
         <div class="code-title">Run the free invoice structural preview</div>
         <pre tabindex="0"><code>curl -X POST https://israel-counterparty-intelligence.vercel.app/v1/invoice-gate/preview \
   -H 'content-type: application/json' \
-  --data '{"supplier_company_number":"514744887","invoice_number":"INV-1","invoice_date":"2026-09-04","amount_before_vat":6000,"vat_amount":1080,"total_amount":7080,"allocation_number":"123456789"}'</code></pre>
+  --data '{"supplier_company_number":"514744887","invoice_number":"INV-1","invoice_date":"2026-09-04","amount_before_vat":6000,"vat_amount":1080,"total_amount":7080,"buyer_is_authorized_dealer":true,"buyer_requested_allocation_number":true,"allocation_number":"123456789"}'</code></pre>
       </div>
       <div class="code-card" style="margin-top: 16px">
         <div class="code-title">Inspect the $${paymentRiskPrice} vendor payment-risk challenge</div>

@@ -1118,7 +1118,7 @@ export async function createIsraelMcpServer(
     FREE_INVOICE_GATE_PREVIEW_TOOL,
     {
       title: "Preview an Israeli invoice payment gate - free",
-      description: `FREE FIRST STEP before paying an Israeli tax invoice. Checks VAT and total arithmetic and the date-sensitive Israel Invoices allocation-number threshold. It never authorizes payment, resolves the supplier, or contacts the Tax Authority. Use ${PAID_INVOICE_GATE_TOOL} for the registry-backed PAY, HOLD, or BLOCK decision.`,
+      description: `FREE FIRST STEP before paying an Israeli tax invoice. Checks VAT and total arithmetic plus date-, amount-, VAT-, and buyer-sensitive Israel Invoices allocation-number applicability. Missing buyer context fails safely to HOLD. It never authorizes payment, resolves the supplier, or contacts the Tax Authority. Use ${PAID_INVOICE_GATE_TOOL} for the registry-backed PAY, HOLD, or BLOCK decision.`,
       inputSchema: invoiceGateQuerySchema,
       annotations: {
         readOnlyHint: true,
@@ -1437,6 +1437,8 @@ export async function createIsraelMcpServer(
         amount_before_vat: 6000,
         vat_amount: 1080,
         total_amount: 7080,
+        buyer_is_authorized_dealer: true,
+        buyer_requested_allocation_number: true,
         allocation_number: "123456789",
         language: "en",
       },
@@ -1709,7 +1711,7 @@ export async function createIsraelMcpServer(
     PAID_INVOICE_GATE_TOOL,
     {
       title: "Authorize an Israeli invoice payment - paid",
-      description: `PRE-PAYMENT GATE for an Israeli tax invoice. Checks VAT and total arithmetic, the date-sensitive Israel Invoices allocation-number requirement, supplier public-registry identity, and vendor-risk signals, then returns PAY, HOLD, or BLOCK with deterministic reason codes. Costs ${mcpInvoiceGatePrice(environmentName)} USDC on ${environmentName === "mainnet" ? "Base Mainnet" : "Base Sepolia"}. Official Tax Authority verification requires buyer authorization; buyer-attested results are labeled and not independently authenticated. Use ${FREE_INVOICE_GATE_PREVIEW_TOOL} first.`,
+      description: `PRE-PAYMENT GATE for an Israeli tax invoice and accounts-payable agent. Checks VAT and total arithmetic; date, amount, VAT component, authorized-dealer buyer and buyer-request conditions for an Israel Invoices allocation number; supplier public-registry identity; and vendor-risk signals. Returns PAY, HOLD, or BLOCK with deterministic reason codes and fails safely when buyer context is missing. Costs ${mcpInvoiceGatePrice(environmentName)} USDC on ${environmentName === "mainnet" ? "Base Mainnet" : "Base Sepolia"}. Official Tax Authority verification requires buyer authorization; buyer-attested results are labeled and not independently authenticated. Use ${FREE_INVOICE_GATE_PREVIEW_TOOL} first.`,
       inputSchema: invoiceGateQuerySchema,
       annotations: {
         readOnlyHint: true,

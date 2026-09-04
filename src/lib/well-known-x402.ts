@@ -84,7 +84,7 @@ export function wellKnownX402Manifest() {
       ? "MAINNET LIVE - AWAITING FIRST EXTERNAL PAID CALL"
       : "MAINNET DISABLED",
     description:
-      "Paid Israeli invoice payment gates, company verification, daily company-change intelligence, and vendor payment-risk checks with field-level public-registry evidence. Official Tax Authority verification requires buyer authorization; buyer-attested results are not independently authenticated.",
+      "Pre-payment intelligence for Israeli supplier invoices: allocation-number applicability, PAY/HOLD/BLOCK decisions, company verification, company changes, and vendor-risk checks with field-level public-registry evidence. Missing buyer context fails safely. Official Tax Authority verification requires buyer authorization; buyer-attested results are not independently authenticated.",
     category: "business-intelligence",
     tags: [
       "israel",
@@ -94,6 +94,9 @@ export function wellKnownX402Manifest() {
       "corporate-events",
       "vendor-payment-risk",
       "invoice-payment-gate",
+      "accounts-payable",
+      "verify-invoice-before-payment",
+      "israel-invoices",
       "allocation-number",
       "kyb",
       "public-registry-kyb-evidence",

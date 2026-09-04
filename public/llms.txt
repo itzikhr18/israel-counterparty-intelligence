@@ -1,4 +1,4 @@
-# Israel Company Verify
+# Israel Invoice Payment Gate and Company Intelligence
 
 > Israeli invoice payment gates, company changes, verification, and vendor payment-risk intelligence with public-registry evidence. Official Tax Authority verification requires buyer authorization.
 
@@ -36,7 +36,7 @@
 - Public buyer bridge: https://github.com/itzikhr18/israel-company-verify-buyer
 - Public service source: https://github.com/itzikhr18/israel-counterparty-intelligence
 - Free preview command: npx --yes github:itzikhr18/israel-company-verify-buyer --company-number 514744887
-- MCP tools: preview_israeli_invoice_payment_gate_free (free arithmetic and threshold check); authorize_israeli_invoice_payment_paid (PAY, HOLD, or BLOCK, 0.25 USDC); preview_agent_payment_trust; get_israeli_company_changes_paid; verify_israeli_company_paid; assess_israeli_vendor_payment_risk_paid; free previews and metadata tools.
+- MCP tools: preview_israeli_invoice_payment_gate_free (free arithmetic and allocation-applicability check using date, amount, VAT component, and buyer-attested conditions); authorize_israeli_invoice_payment_paid (PAY, HOLD, or BLOCK, 0.25 USDC); preview_agent_payment_trust; get_israeli_company_changes_paid; verify_israeli_company_paid; assess_israeli_vendor_payment_risk_paid; free previews and metadata tools.
 - Agent Tools: https://agent-tools.cloud/api/v1/services/israel-counterparty-intelligence-vercel-app-sub393
 - 402 Index: https://402index.io/service/fa0902ac-90a7-431a-8979-97da22a12911
 - x402scan resource ID: e9b83616-3c3e-483a-81a2-a93c2b85dd7e
@@ -45,7 +45,7 @@ Search intents: verify Israeli company; Israel company verification; Israeli sup
 public-registry KYB evidence; Israeli business verification; Israel company registry; Israeli company number; Israel counterparty
 intelligence.
 
-Invoice-gate intent: verify an Israeli invoice before payment; check Israel Invoices allocation-number requirements; validate Israeli VAT arithmetic; resolve the supplier; return PAY, HOLD, or BLOCK. Buyer-attested Tax Authority results are not independently authenticated.
+Invoice-gate intent: verify an Israeli invoice before payment; check Israel Invoices allocation-number applicability using a strictly-greater-than threshold plus VAT and buyer-attested conditions; validate Israeli VAT arithmetic; resolve the supplier; return PAY, HOLD, or BLOCK. Missing buyer context returns HOLD. Buyer-attested Tax Authority results are not independently authenticated.
 
 Company-changes intent: get recent official Israeli company filing and status-change events by
 exact company number; monitor counterparties for new corporate events; return source evidence.

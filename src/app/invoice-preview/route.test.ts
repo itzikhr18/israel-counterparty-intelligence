@@ -21,6 +21,8 @@ describe("free browser invoice preview", () => {
         amount_before_vat: "6000",
         vat_amount: "1080",
         total_amount: "7080",
+        buyer_is_authorized_dealer: "true",
+        buyer_requested_allocation_number: "true",
         allocation_number: "123456789",
         expected_vat_rate: "18",
       }),
@@ -31,7 +33,8 @@ describe("free browser invoice preview", () => {
     expect(response.headers.get("cache-control")).toBe("no-store");
     expect(html).toContain("Free invoice result · HOLD");
     expect(html).toContain("Hold for the next check");
-    expect(html).toContain("Allocation required");
+    expect(html).toContain("Allocation requirement");
+    expect(html).toContain("Required");
     expect(html).toContain("₪5,000");
     expect(html).toContain("Connect through MCP");
     expect(html).not.toContain("514744887");
@@ -46,6 +49,8 @@ describe("free browser invoice preview", () => {
         amount_before_vat: "6000",
         vat_amount: "1080",
         total_amount: "7080",
+        buyer_is_authorized_dealer: "true",
+        buyer_requested_allocation_number: "true",
         expected_vat_rate: "18",
       }),
     );
@@ -57,6 +62,32 @@ describe("free browser invoice preview", () => {
     expect(html).toContain(
       "An allocation number is required for this invoice value and date.",
     );
+  });
+
+  it("asks for buyer conditions instead of guessing", async () => {
+    const response = await POST(
+      request({
+        supplier_company_number: "514744887",
+        invoice_number: "INV-2026-003",
+        invoice_date: "2026-09-04",
+        amount_before_vat: "6000",
+        vat_amount: "1080",
+        total_amount: "7080",
+        expected_vat_rate: "18",
+      }),
+    );
+    const html = await response.text();
+
+    expect(response.status).toBe(200);
+    expect(html).toContain("Confirm the buyer conditions");
+    expect(html).toContain("Need buyer answers");
+    expect(html).toContain(
+      "Buyer status or allocation-request information is missing.",
+    );
+    expect(html).toContain(
+      "Paying for the full gate before that would only return HOLD.",
+    );
+    expect(html).not.toContain("Connect through MCP");
   });
 
   it("rejects malformed form input", async () => {

@@ -129,6 +129,8 @@ export function buildPaymentRequired(
             vat_amount: 1080,
             total_amount: 7080,
             currency: "ILS",
+            buyer_is_authorized_dealer: true,
+            buyer_requested_allocation_number: true,
             allocation_number: "123456789",
             language: "en",
           }
