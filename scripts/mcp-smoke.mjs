@@ -6,6 +6,8 @@ const expectedNetwork = process.env.EXPECTED_X402_NETWORK;
 const expectedAmount = process.env.EXPECTED_X402_AMOUNT ?? "50000";
 const expectedPaymentRiskAmount =
   process.env.EXPECTED_X402_PAYMENT_RISK_AMOUNT ?? "100000";
+const expectedInvoiceGateAmount =
+  process.env.EXPECTED_X402_INVOICE_GATE_AMOUNT ?? "250000";
 const expectedCompanyChangesAmount =
   process.env.EXPECTED_X402_COMPANY_CHANGES_AMOUNT ?? "10000";
 const expectedAsset = process.env.EXPECTED_X402_ASSET;
@@ -31,6 +33,7 @@ try {
     JSON.stringify(names) ===
       JSON.stringify([
         "assess_israeli_vendor_payment_risk_paid",
+        "authorize_israeli_invoice_payment_paid",
         "describe_service",
         "get_israeli_company_changes_paid",
         "get_sample_verification_report",
@@ -38,6 +41,7 @@ try {
         "preview_agent_payment_trust",
         "preview_company",
         "preview_israeli_company_free",
+        "preview_israeli_invoice_payment_gate_free",
         "preview_israeli_vendor_payment_risk_free",
         "verify_company",
         "verify_israeli_company_paid",
@@ -106,6 +110,26 @@ try {
     invoice_company_name: "מנדיי. קום בעמ",
     language: "en",
   };
+  const invoiceGateArguments = {
+    supplier_company_number: "514744887",
+    supplier_name: "מנדיי. קום בעמ",
+    invoice_number: "INV-2026-001",
+    invoice_date: "2026-09-04",
+    amount_before_vat: 6000,
+    vat_amount: 1080,
+    total_amount: 7080,
+    allocation_number: "123456789",
+    language: "en",
+  };
+  const invoiceGatePreview = await client.callTool({
+    name: "preview_israeli_invoice_payment_gate_free",
+    arguments: invoiceGateArguments,
+  });
+  assert(!invoiceGatePreview.isError, "invoice-gate preview failed");
+  assert(
+    invoiceGatePreview.structuredContent?.decision?.action === "HOLD",
+    "invoice-gate preview did not fail closed",
+  );
   const paymentRiskPreview = await client.callTool({
     name: "preview_israeli_vendor_payment_risk_free",
     arguments: paymentRiskArguments,
@@ -219,6 +243,26 @@ try {
       `Unexpected company-changes network ${companyChangesRequirement?.network}`,
     );
 
+  const unpaidInvoiceGate = await client.callTool({
+    name: "authorize_israeli_invoice_payment_paid",
+    arguments: invoiceGateArguments,
+  });
+  assert(
+    unpaidInvoiceGate.isError === true,
+    "invoice-gate tool did not require payment",
+  );
+  const invoiceGateRequirement =
+    unpaidInvoiceGate.structuredContent?.accepts?.[0];
+  assert(
+    invoiceGateRequirement?.amount === expectedInvoiceGateAmount,
+    `Unexpected invoice-gate amount ${invoiceGateRequirement?.amount}`,
+  );
+  if (expectedNetwork)
+    assert(
+      invoiceGateRequirement?.network === expectedNetwork,
+      `Unexpected invoice-gate network ${invoiceGateRequirement?.network}`,
+    );
+
   console.log(
     JSON.stringify({
       status: "ok",
@@ -232,12 +276,14 @@ try {
         "preview_agent_payment_trust",
         "preview_company",
         "preview_israeli_company_free",
+        "preview_israeli_invoice_payment_gate_free",
         "preview_israeli_vendor_payment_risk_free",
       ],
       previewNextAction: preview.structuredContent?.next_action,
       paymentRequired: requirement,
       paymentRiskRequired: paymentRiskRequirement,
       companyChangesRequired: companyChangesRequirement,
+      invoiceGateRequired: invoiceGateRequirement,
     }),
   );
 } finally {
