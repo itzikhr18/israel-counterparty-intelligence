@@ -198,6 +198,22 @@ describe("Streamable HTTP MCP route", () => {
           network: "eip155:84532",
           asset: "USDC",
         },
+        paid_actions: [
+          {
+            preferred_tool: "get_israeli_company_changes_paid",
+            price: "$0.01",
+            recommended_arguments: {
+              company_number: "514744887",
+              lookback_days: 366,
+              limit: 25,
+              language: "en",
+            },
+          },
+          {
+            preferred_tool: "verify_israeli_company_paid",
+            price: "$0.05",
+          },
+        ],
       });
       expect(preview.body.result.structuredContent).not.toHaveProperty(
         "evidence",

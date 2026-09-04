@@ -56,7 +56,7 @@ import {
 } from "@/lib/verification-schema";
 
 export const MCP_SERVER_NAME = "Israel Business Intelligence MCP";
-export const MCP_SERVER_VERSION = "1.5.1";
+export const MCP_SERVER_VERSION = "1.5.2";
 
 export const FREE_PREVIEW_TOOL = "preview_israeli_company_free";
 export const PAID_VERIFY_TOOL = "verify_israeli_company_paid";
@@ -135,6 +135,16 @@ const previewCompanyOutputSchema = z.object({
     recommended_arguments: z.record(z.string(), z.unknown()),
     unlocks: z.array(z.string()),
   }),
+  paid_actions: z.array(
+    z.object({
+      preferred_tool: z.enum([PAID_COMPANY_CHANGES_TOOL, PAID_VERIFY_TOOL]),
+      purpose: z.string(),
+      price: z.string(),
+      network: z.string(),
+      asset: z.literal("USDC"),
+      recommended_arguments: z.record(z.string(), z.unknown()),
+    }),
+  ),
   next_action: nextActionSchema,
 });
 
@@ -543,6 +553,33 @@ async function runCompanyPreview(
       }
     : {};
   const shouldBuy = Boolean(resolved);
+  const paidActions = resolved
+    ? [
+        {
+          preferred_tool: PAID_COMPANY_CHANGES_TOOL,
+          purpose:
+            "Get recent official filing and status-change events for repeatable monitoring.",
+          price: mcpCompanyChangesPrice(environmentName),
+          network: paymentEnvironments[environmentName].network,
+          asset: "USDC" as const,
+          recommended_arguments: {
+            company_number: resolved.company_number,
+            lookback_days: 366,
+            limit: 25,
+            language: args.language,
+          },
+        },
+        {
+          preferred_tool: PAID_VERIFY_TOOL,
+          purpose:
+            "Get the complete field-level company-registry evidence report.",
+          price: mcpPrice(environmentName),
+          network: paymentEnvironments[environmentName].network,
+          asset: "USDC" as const,
+          recommended_arguments: recommendedArguments,
+        },
+      ]
+    : [];
   const nextAction = shouldBuy
     ? {
         recommended: true,
@@ -577,7 +614,7 @@ async function runCompanyPreview(
 
   return {
     request_id: randomUUID(),
-    preview_version: "1.1.0",
+    preview_version: "1.2.0",
     mode: "free_preview" as const,
     resolution_status: result.resolution_status,
     company: resolved
@@ -601,6 +638,7 @@ async function runCompanyPreview(
       "Use verify_company for the complete evidence-backed result",
     ],
     full_verification: verificationOffer(environmentName, recommendedArguments),
+    paid_actions: paidActions,
     next_action: nextAction,
   };
 }
