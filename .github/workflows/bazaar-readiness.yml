@@ -19,3 +19,5 @@ jobs:
           node-version: 24
       - name: Validate live paid endpoints with Coinbase Bazaar
         run: node scripts/bazaar-readiness.mjs
+      - name: Measure rank for buyer-intent searches
+        run: node scripts/bazaar-rank.mjs

@@ -53,14 +53,44 @@ export function buildPaymentRequired(
   const route = paidRouteConfig[routeName];
   const environment = paymentEnvironments[route.environment];
   const option = paymentOptionFor(routeName);
-  const serviceName =
-    routeName === "verify" || routeName === "verify-mainnet"
-      ? "Israel Company Verify"
-      : config.PROVIDER_NAME;
-  const tags =
-    routeName === "verify" || routeName === "verify-mainnet"
-      ? ["israel", "company", "verification", "kyb", "due-diligence"]
-      : ["israel", "company", "supplier", "kyb", "due-diligence"];
+  const serviceMetadata =
+    routeName === "payment-risk-mainnet"
+      ? {
+          serviceName: "Israel Vendor Payment Risk",
+          tags: [
+            "israel",
+            "vendor-risk",
+            "supplier-payments",
+            "invoice-verification",
+            "fraud-prevention",
+          ],
+        }
+      : routeName === "company-changes-mainnet"
+        ? {
+            serviceName: "Israel Company Changes",
+            tags: [
+              "israel",
+              "company-changes",
+              "corporate-events",
+              "registry-monitoring",
+              "due-diligence",
+            ],
+          }
+        : routeName === "verify" || routeName === "verify-mainnet"
+          ? {
+              serviceName: "Israel Company Registry",
+              tags: [
+                "israel",
+                "company-registry",
+                "company-verification",
+                "supplier-verification",
+                "kyb",
+              ],
+            }
+          : {
+              serviceName: "Israel Counterparty Intel",
+              tags: ["israel", "company", "supplier", "kyb", "due-diligence"],
+            };
   const requirement: PaymentRequirements = {
     scheme: option.scheme,
     network: environment.network as Network,
@@ -125,8 +155,9 @@ export function buildPaymentRequired(
       url: `${config.PUBLIC_BASE_URL}${route.path}`,
       description: route.description,
       mimeType: "application/json",
-      serviceName,
-      tags,
+      serviceName: serviceMetadata.serviceName,
+      tags: serviceMetadata.tags,
+      iconUrl: `${config.PUBLIC_BASE_URL}/icon.svg`,
     },
     accepts: [requirement],
     extensions,

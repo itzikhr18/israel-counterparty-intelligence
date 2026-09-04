@@ -1203,6 +1203,7 @@ export async function createIsraelMcpServer(
         "public-registry-kyb",
         "x402",
       ],
+      iconUrl: `${config.PUBLIC_BASE_URL}/icon.svg`,
     },
     extensions: declareDiscoveryExtension({
       toolName: "verify_company",
@@ -1241,7 +1242,7 @@ export async function createIsraelMcpServer(
       description:
         "Pre-payment triage for an Israeli vendor using public-registry evidence, invoice identity consistency, contact-domain consistency, and buyer-observed risk signals. Does not verify bank-account ownership or provide AML certification.",
       mimeType: "application/json",
-      serviceName: MCP_SERVER_NAME,
+      serviceName: "Israel Vendor Payment Risk",
       tags: [
         "israeli-vendor-payment-risk",
         "invoice-risk",
@@ -1249,6 +1250,7 @@ export async function createIsraelMcpServer(
         "payment-fraud-triage",
         "x402",
       ],
+      iconUrl: `${config.PUBLIC_BASE_URL}/icon.svg`,
     },
     extensions: declareDiscoveryExtension({
       toolName: PAID_PAYMENT_RISK_TOOL,
@@ -1293,7 +1295,7 @@ export async function createIsraelMcpServer(
       description:
         "Recent official Israeli company filing and status-change events, sorted newest first with source evidence. Categories are navigation labels, not risk conclusions.",
       mimeType: "application/json",
-      serviceName: MCP_SERVER_NAME,
+      serviceName: "Israel Company Changes",
       tags: [
         "israeli-company-changes",
         "corporate-events",
@@ -1301,6 +1303,7 @@ export async function createIsraelMcpServer(
         "israeli-company-registry",
         "x402",
       ],
+      iconUrl: `${config.PUBLIC_BASE_URL}/icon.svg`,
     },
     extensions: declareDiscoveryExtension({
       toolName: PAID_COMPANY_CHANGES_TOOL,

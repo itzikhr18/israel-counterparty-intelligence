@@ -160,7 +160,7 @@ export const paidRouteConfig: Record<
     path: "/v1/verify/mainnet",
     price: config.X402_MAINNET_VERIFY_PRICE,
     description:
-      "Verify an Israeli company using structured public registry data with evidence.",
+      "Official Israeli company registry verification for AI agents. Search by nine-digit company number or legal name. Returns resolved legal identity, registry status, address, incorporation and annual-report fields, confidence, missing-data disclosure, checked_at, and field-level source evidence. Use for Israel company lookup, Israeli supplier verification, public-registry KYB pre-check, onboarding, procurement, and due diligence. Not sanctions, PEP, UBO, credit, or Full Regulatory KYB.",
     environment: "mainnet",
   },
   "government-footprint": {
@@ -181,14 +181,14 @@ export const paidRouteConfig: Record<
     path: "/v1/payment-risk/mainnet",
     price: config.X402_MAINNET_PAYMENT_RISK_PRICE,
     description:
-      "Assess an Israeli vendor before payment using public-registry evidence, invoice identity consistency, contact-domain checks, and buyer-observed payment risk signals",
+      "Israeli supplier and vendor payment-risk check before funds move. Resolves the legal company, compares invoice identity and contact domains, evaluates buyer-observed bank-detail-change and urgency signals, and returns deterministic PROCEED, REVIEW, or BLOCK reason codes with public-registry evidence. Use for accounts payable, supplier onboarding, invoice verification, procurement, and payment-fraud triage. Does not verify bank-account ownership.",
     environment: "mainnet",
   },
   "company-changes-mainnet": {
     path: "/v1/company-changes/mainnet",
     price: config.X402_MAINNET_COMPANY_CHANGES_PRICE,
     description:
-      "Get recent official Israeli company filing and status-change events, sorted newest first with source evidence",
+      "Monitor recent official Israeli company-registry changes for an exact nine-digit company number. Returns filing and status-change events newest first, with dates, deterministic categories, source URLs, and checked_at. Use for counterparty monitoring, supplier due diligence, onboarding refreshes, corporate-event alerts, and registry change detection. Coverage is approximately one year.",
     environment: "mainnet",
   },
 };

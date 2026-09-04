@@ -41,7 +41,7 @@ describe("service root", () => {
       "default-src 'none'",
     );
     expect(html).toContain(
-      "Know who an agent will pay before its wallet signs.",
+      "Verify an Israeli company before an agent trusts or pays it.",
     );
     expect(html).toContain('href="#free-preview"');
     expect(html).toContain('action="/preview"');

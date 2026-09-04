@@ -43,8 +43,10 @@ export function renderLandingPage(options: LandingPageOptions): string {
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="An agent-native pre-sign payment firewall with structured Israeli company-registry evidence.">
-  <title>${providerName}</title>
+  <meta name="description" content="Official Israeli company registry verification, supplier due diligence, company-change monitoring, and vendor payment-risk intelligence for AI agents.">
+  <meta name="keywords" content="Israel company registry, verify Israeli company, Israeli supplier verification, Israel KYB, Israeli vendor payment risk">
+  <link rel="canonical" href="https://israel-counterparty-intelligence.vercel.app/">
+  <title>Israel Company Registry Verification for AI Agents · ${providerName}</title>
   <style>
     :root { color-scheme: dark; --bg: #07110f; --panel: #0d1c18; --line: #24433a; --text: #effbf6; --muted: #a9c3b8; --accent: #61e6ad; --accent-dark: #082119; }
     * { box-sizing: border-box; }
@@ -99,9 +101,9 @@ export function renderLandingPage(options: LandingPageOptions): string {
     </nav>
 
     <header class="hero">
-      <div class="eyebrow">Verified payee firewall</div>
-      <h1>Know who an agent will pay before its wallet signs.</h1>
-      <p class="lead">Bind an Israeli legal entity, service domain, signed payee manifest, destination wallet, and buyer mandate into one machine-enforceable decision.</p>
+      <div class="eyebrow">Official-source Israeli business intelligence</div>
+      <h1>Verify an Israeli company before an agent trusts or pays it.</h1>
+      <p class="lead">Search the Israeli company registry, verify a supplier, monitor corporate changes, or assess vendor payment risk. Structured evidence, exact source links, and deterministic decisions for AI agents.</p>
       <div class="actions">
         <a class="button primary" href="#free-preview">Run a free preview</a>
         <a class="button" href="/mcp.json">Inspect MCP metadata</a>
@@ -111,6 +113,11 @@ export function renderLandingPage(options: LandingPageOptions): string {
         <span>Company changes ${companyChangesPrice} USDC</span><span>Verification ${mcpPrice} USDC</span><span>Payment risk ${paymentRiskPrice} USDC</span><span>Base Mainnet</span><span>x402 v2</span><span>No API key</span>
       </div>
     </header>
+
+    <section aria-labelledby="why-number-one">
+      <h2 id="why-number-one">One Israel-specific toolchain, from identity to payment</h2>
+      <p class="section-copy">Start with a free registry preview, buy recent company changes for ${companyChangesPrice} USDC, unlock the full evidence report for ${mcpPrice} USDC, or run a pre-payment supplier decision for ${paymentRiskPrice} USDC. No subscription and no API key.</p>
+    </section>
 
     <section id="free-preview" aria-labelledby="free-preview-title">
       <div class="preview-panel">

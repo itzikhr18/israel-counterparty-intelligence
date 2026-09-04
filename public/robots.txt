@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://israel-counterparty-intelligence.vercel.app/sitemap.xml

@@ -44,7 +44,14 @@ describe("dual-network x402 configuration", () => {
     expect(challenge).toMatchObject({
       x402Version: 2,
       resource: {
-        serviceName: "Israel Company Verify",
+        serviceName: "Israel Company Registry",
+        tags: [
+          "israel",
+          "company-registry",
+          "company-verification",
+          "supplier-verification",
+          "kyb",
+        ],
       },
       accepts: [
         {
@@ -56,6 +63,7 @@ describe("dual-network x402 configuration", () => {
       ],
     });
     expect(challenge.resource?.url).toMatch(/\/v1\/verify\/mainnet$/);
+    expect(challenge.resource?.iconUrl).toMatch(/\/icon\.svg$/);
     expect(challenge.extensions?.bazaar).toBeTruthy();
     const bazaar = challenge.extensions?.bazaar as {
       info: { input: { method?: string } };
