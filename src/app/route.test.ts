@@ -44,7 +44,11 @@ describe("service root", () => {
     expect(html).toContain(
       "Stop a bad Israeli invoice before an agent pays it.",
     );
-    expect(html).toContain('href="#free-preview"');
+    expect(html).toContain('href="#invoice-preview"');
+    expect(html).toContain('action="/invoice-preview"');
+    expect(html).toContain('name="supplier_company_number"');
+    expect(html).toContain('name="allocation_number"');
+    expect(html).toContain("Check invoice free");
     expect(html).toContain('action="/preview"');
     expect(html).toContain('name="company_number"');
     expect(html).toContain("Free · no wallet required");

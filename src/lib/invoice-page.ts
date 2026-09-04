@@ -1,0 +1,143 @@
+export interface InvoicePreviewPageResult {
+  action: "PAY" | "HOLD" | "BLOCK";
+  score: number;
+  reasonCodes: string[];
+  explanation: string;
+  allocationRequired: boolean;
+  allocationThresholdIls: number;
+  invoiceDate: string;
+  amountBeforeVat: number;
+  vatAmount: number;
+  totalAmount: number;
+  checks: Array<{
+    code: string;
+    status: string;
+    claimed: unknown;
+    observed: unknown;
+  }>;
+  checkedAt: string;
+}
+
+function escapeHtml(value: string): string {
+  return value
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+}
+
+function formatValue(value: unknown): string {
+  if (value === null || value === undefined) return "—";
+  return escapeHtml(String(value));
+}
+
+const CHECK_LABELS: Record<string, string> = {
+  VAT_ARITHMETIC: "VAT calculation",
+  INVOICE_TOTAL_ARITHMETIC: "Invoice total",
+  ALLOCATION_NUMBER_PRESENT: "Allocation number",
+};
+
+const REASON_LABELS: Record<string, string> = {
+  INVOICE_ARITHMETIC_MISMATCH:
+    "One or more invoice amounts do not add up. Correct them before payment.",
+  ALLOCATION_NUMBER_REQUIRED:
+    "An allocation number is required for this invoice value and date.",
+  PAID_REGISTRY_GATE_REQUIRED:
+    "The figures passed. Supplier registry verification is still required before payment.",
+};
+
+export function renderInvoicePreviewPage(options: {
+  providerName: string;
+  result?: InvoicePreviewPageResult;
+  error?: string;
+}): string {
+  const providerName = escapeHtml(options.providerName);
+  const result = options.result;
+  const error = options.error ? escapeHtml(options.error) : null;
+  const statusClass = result?.action.toLocaleLowerCase("en") ?? "error";
+  const actionTitle =
+    result?.action === "BLOCK"
+      ? "Do not pay yet"
+      : result?.action === "HOLD"
+        ? "Hold for the next check"
+        : "Ready for the paid supplier gate";
+  const resultHtml = error
+    ? `<section class="result error" role="alert"><div class="eyebrow">Input problem</div><h1>We could not check this invoice</h1><p>${error}</p></section>`
+    : result
+      ? `<section class="result ${statusClass}" aria-live="polite">
+          <div class="eyebrow">Free invoice result · ${result.action}</div>
+          <h1>${actionTitle}</h1>
+          <p>${escapeHtml(result.explanation)}</p>
+          <div class="summary">
+            <div><span>Allocation required</span><strong>${result.allocationRequired ? "Yes" : "No"}</strong></div>
+            <div><span>Current threshold</span><strong>₪${result.allocationThresholdIls.toLocaleString("en-US")}</strong></div>
+            <div><span>Amount before VAT</span><strong>₪${result.amountBeforeVat.toLocaleString("en-US")}</strong></div>
+            <div><span>Invoice total</span><strong>₪${result.totalAmount.toLocaleString("en-US")}</strong></div>
+          </div>
+          <div class="checks"><h2>Checks performed</h2>${result.checks
+            .map(
+              (check) =>
+                `<div class="check"><span>${escapeHtml(CHECK_LABELS[check.code] ?? check.code)}</span><strong class="${check.status.toLocaleLowerCase("en")}">${escapeHtml(check.status)}</strong><small>Invoice: ${formatValue(check.claimed)} · Expected: ${formatValue(check.observed)}</small></div>`,
+            )
+            .join("")}</div>
+          <div class="reasons">${result.reasonCodes
+            .map((code) => `<p>${escapeHtml(REASON_LABELS[code] ?? code)}</p>`)
+            .join("")}</div>
+        </section>`
+      : "";
+
+  return `<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
+  <title>Free Israeli invoice check · ${providerName}</title>
+  <style>
+    :root { color-scheme: dark; --bg: #07110f; --panel: #0d1c18; --line: #24433a; --text: #effbf6; --muted: #a9c3b8; --accent: #61e6ad; --warn: #f3c96b; --danger: #ff8c7d; }
+    * { box-sizing: border-box; }
+    body { margin: 0; min-height: 100vh; background: radial-gradient(circle at 80% 0%, #153b2e 0, var(--bg) 38rem); color: var(--text); font: 16px/1.6 ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+    main { width: min(820px, calc(100% - 32px)); margin: 0 auto; padding: 28px 0 72px; }
+    nav { display: flex; justify-content: space-between; gap: 16px; margin-bottom: 48px; }
+    a { color: var(--accent); }
+    .brand { color: var(--text); font-weight: 720; text-decoration: none; }
+    .back { color: var(--muted); text-decoration: none; }
+    .result, .offer { padding: 28px; border: 1px solid var(--line); border-radius: 18px; background: rgba(13, 28, 24, .9); }
+    .result.hold { border-color: #6b5c35; }
+    .result.block, .result.error { border-color: #74443d; }
+    .eyebrow { color: var(--accent); font-size: 13px; font-weight: 760; letter-spacing: .1em; text-transform: uppercase; }
+    .block .eyebrow, .error .eyebrow { color: var(--danger); }
+    .hold .eyebrow { color: var(--warn); }
+    h1 { margin: 10px 0 12px; font-size: clamp(34px, 7vw, 54px); line-height: 1.08; letter-spacing: -.04em; }
+    h2 { margin: 26px 0 10px; font-size: 20px; }
+    p { color: var(--muted); }
+    .summary { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-top: 24px; }
+    .summary div, .check { padding: 15px; border: 1px solid var(--line); border-radius: 12px; background: #091612; }
+    .summary span, .check span, .check small { display: block; color: var(--muted); }
+    .summary strong { display: block; margin-top: 3px; font-size: 19px; }
+    .check { display: grid; grid-template-columns: 1fr auto; gap: 4px 14px; margin-top: 9px; }
+    .check small { grid-column: 1 / -1; overflow-wrap: anywhere; }
+    .match, .pass { color: var(--accent); }
+    .mismatch, .missing { color: var(--danger); }
+    .reasons { margin-top: 20px; }
+    .reasons p { margin: 8px 0; padding-left: 14px; border-left: 2px solid var(--line); }
+    .offer { margin-top: 18px; }
+    .offer h2 { margin-top: 0; }
+    .actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 18px; }
+    .button { display: inline-flex; align-items: center; min-height: 44px; padding: 0 16px; border: 1px solid var(--line); border-radius: 10px; color: var(--text); font-weight: 680; text-decoration: none; }
+    .button.primary { border-color: var(--accent); background: var(--accent); color: #04110c; }
+    .scope { margin-top: 18px; color: var(--muted); font-size: 13px; }
+    @media (max-width: 600px) { nav { margin-bottom: 34px; } .result, .offer { padding: 22px; } .summary { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+  <main>
+    <nav><a class="brand" href="/">${providerName}</a><a class="back" href="/#invoice-preview">← Check another invoice</a></nav>
+    ${resultHtml}
+    ${result ? `<section class="offer"><h2>${result.action === "BLOCK" ? "Correct the invoice first" : "Need the complete supplier decision?"}</h2><p>${result.action === "BLOCK" ? "Return to the invoice and correct the fields identified above before any further verification." : "The paid gate resolves the supplier against the Israeli company registry and combines the invoice with vendor-risk signals for $0.25 USDC."}</p><div class="actions"><a class="button primary" href="/mcp.json">Connect through MCP</a><a class="button" href="/README.md#israeli-invoice-payment-gate">View integration details</a></div></section>` : ""}
+    <p class="scope">This free structural check is not authorization to pay and does not contact the Israel Tax Authority. Direct official verification requires authorized access.</p>
+  </main>
+</body>
+</html>`;
+}

@@ -85,14 +85,24 @@ export function renderLandingPage(options: LandingPageOptions): string {
     .step { flex: 1 1 210px; padding: 20px; border-left: 2px solid var(--line); }
     .step::before { counter-increment: step; content: "0" counter(step); display: block; margin-bottom: 12px; color: var(--accent); font-size: 13px; font-weight: 760; }
     .scope { padding: 22px; border: 1px solid #5b4930; border-radius: 14px; background: #211a11; color: #ddcdb3; }
-    .preview-panel { max-width: 760px; padding: 28px; border: 1px solid var(--line); border-radius: 18px; background: rgba(13, 28, 24, .88); }
+    .preview-panel, .invoice-panel { max-width: 860px; padding: 28px; border: 1px solid var(--line); border-radius: 18px; background: rgba(13, 28, 24, .88); }
+    .invoice-panel { border-color: #41685b; }
+    .invoice-form { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; margin-top: 22px; }
+    .field { display: grid; gap: 6px; }
+    .field.full, .invoice-form .form-actions { grid-column: 1 / -1; }
+    .field label { font-weight: 680; }
+    .field small { color: var(--muted); font-size: 13px; }
+    .field input, .field select { width: 100%; min-height: 48px; padding: 0 14px; border: 1px solid #41685b; border-radius: 10px; background: #07110f; color: var(--text); font: inherit; }
+    .field input:focus, .field select:focus { outline: 2px solid var(--accent); outline-offset: 2px; }
+    .form-actions { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+    .form-note { margin: 0; color: var(--muted); font-size: 13px; }
     .preview-form { display: grid; grid-template-columns: 1fr auto; gap: 12px; margin-top: 20px; }
     .preview-form label { grid-column: 1 / -1; font-weight: 680; }
     .preview-form input { min-width: 0; min-height: 48px; padding: 0 14px; border: 1px solid #41685b; border-radius: 10px; background: #07110f; color: var(--text); font: inherit; }
     .preview-form input:focus { outline: 2px solid var(--accent); outline-offset: 2px; }
     .hint { grid-column: 1 / -1; margin: 0; color: var(--muted); font-size: 14px; }
     footer { display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin-top: 80px; padding-top: 24px; border-top: 1px solid var(--line); color: var(--muted); font-size: 14px; }
-    @media (max-width: 760px) { nav { margin-bottom: 48px; } .grid { grid-template-columns: 1fr; } section { margin-top: 64px; } .preview-panel { padding: 22px; } .preview-form { grid-template-columns: 1fr; } .preview-form label, .hint { grid-column: auto; } }
+    @media (max-width: 760px) { nav { margin-bottom: 48px; } .grid, .invoice-form { grid-template-columns: 1fr; } section { margin-top: 64px; } .preview-panel, .invoice-panel { padding: 22px; } .preview-form { grid-template-columns: 1fr; } .preview-form label, .hint, .field.full, .invoice-form .form-actions { grid-column: auto; } }
   </style>
 </head>
 <body>
@@ -107,11 +117,11 @@ export function renderLandingPage(options: LandingPageOptions): string {
       <h1>Stop a bad Israeli invoice before an agent pays it.</h1>
       <p class="lead">Check VAT arithmetic and allocation-number requirements, resolve the supplier, and return PAY, HOLD, or BLOCK. Structured evidence and deterministic decisions for AI agents.</p>
       <div class="actions">
-        <a class="button primary" href="#free-preview">Run a free preview</a>
+        <a class="button primary" href="#invoice-preview">Check an invoice free</a>
         <a class="button" href="/mcp.json">Inspect MCP metadata</a>
         <a class="button" href="/openapi.json">OpenAPI schema</a>
       </div>
-      <div class="contract" aria-label="Payment contract">
+      <div class="contract">
         <span>Invoice gate ${invoiceGatePrice} USDC</span><span>Company changes ${companyChangesPrice} USDC</span><span>Verification ${mcpPrice} USDC</span><span>Payment risk ${paymentRiskPrice} USDC</span><span>Base Mainnet</span><span>x402 v2</span><span>No API key</span>
       </div>
     </header>
@@ -119,6 +129,52 @@ export function renderLandingPage(options: LandingPageOptions): string {
     <section aria-labelledby="why-number-one">
       <h2 id="why-number-one">One Israel-specific toolchain, from identity to payment</h2>
       <p class="section-copy">Start with a free invoice or registry preview. Run the full invoice payment gate for ${invoiceGatePrice} USDC, recent company changes for ${companyChangesPrice}, full verification for ${mcpPrice}, or vendor-risk triage for ${paymentRiskPrice}. No subscription and no API key.</p>
+    </section>
+
+    <section id="invoice-preview" aria-labelledby="invoice-preview-title">
+      <div class="invoice-panel">
+        <div class="eyebrow">Free invoice check · no wallet required</div>
+        <h2 id="invoice-preview-title">Check an Israeli invoice before payment</h2>
+        <p class="section-copy">Enter the figures printed on the invoice. We check VAT arithmetic, the total, and whether an Israel Invoices allocation number is required for its date and value.</p>
+        <form class="invoice-form" action="/invoice-preview" method="post">
+          <div class="field">
+            <label for="supplier-company-number">Supplier company or VAT number</label>
+            <input id="supplier-company-number" name="supplier_company_number" type="text" inputmode="numeric" autocomplete="off" pattern="[0-9]{9}" minlength="9" maxlength="9" placeholder="514744887" required>
+          </div>
+          <div class="field">
+            <label for="invoice-number">Invoice number</label>
+            <input id="invoice-number" name="invoice_number" type="text" autocomplete="off" maxlength="100" placeholder="INV-2026-001" required>
+          </div>
+          <div class="field">
+            <label for="invoice-date">Invoice date</label>
+            <input id="invoice-date" name="invoice_date" type="date" min="2025-01-01" required>
+          </div>
+          <div class="field">
+            <label for="vat-rate">Expected VAT rate</label>
+            <select id="vat-rate" name="expected_vat_rate"><option value="18" selected>18%</option><option value="0">0% — exempt or zero-rated only</option></select>
+          </div>
+          <div class="field">
+            <label for="amount-before-vat">Amount before VAT (ILS)</label>
+            <input id="amount-before-vat" name="amount_before_vat" type="number" inputmode="decimal" min="0.01" max="1000000000" step="0.01" placeholder="6000.00" required>
+          </div>
+          <div class="field">
+            <label for="vat-amount">VAT amount (ILS)</label>
+            <input id="vat-amount" name="vat_amount" type="number" inputmode="decimal" min="0" max="1000000000" step="0.01" placeholder="1080.00" required>
+          </div>
+          <div class="field">
+            <label for="total-amount">Invoice total (ILS)</label>
+            <input id="total-amount" name="total_amount" type="number" inputmode="decimal" min="0.01" max="1000000000" step="0.01" placeholder="7080.00" required>
+          </div>
+          <div class="field">
+            <label for="allocation-number">Allocation number <small>(if shown)</small></label>
+            <input id="allocation-number" name="allocation_number" type="text" inputmode="numeric" autocomplete="off" pattern="[0-9]{9}" minlength="9" maxlength="9" placeholder="123456789">
+          </div>
+          <div class="form-actions">
+            <button class="button primary" type="submit">Check invoice free</button>
+            <p class="form-note">The free check never authorizes a payment or contacts the Tax Authority.</p>
+          </div>
+        </form>
+      </div>
     </section>
 
     <section id="free-preview" aria-labelledby="free-preview-title">
@@ -152,7 +208,7 @@ export function renderLandingPage(options: LandingPageOptions): string {
       <p class="section-copy">Start with <code>preview_israeli_invoice_payment_gate_free</code> for an invoice, then use <code>authorize_israeli_invoice_payment_paid</code>. Company verification, changes, vendor risk, and the <code>preview_agent_payment_trust</code> x402 pre-sign firewall remain available.</p>
       <div class="code-card" style="margin-top: 20px">
         <div class="code-title">One-command free preview · public source on GitHub</div>
-        <pre><code>npx --yes github:itzikhr18/israel-company-verify-buyer \\
+        <pre tabindex="0"><code>npx --yes github:itzikhr18/israel-company-verify-buyer \\
   --company-number 514744887</code></pre>
       </div>
       <p class="section-copy" style="margin-top: 12px"><a href="https://github.com/itzikhr18/israel-company-verify-buyer" style="color: var(--accent)">Inspect the buyer bridge source and release</a></p>
@@ -171,25 +227,25 @@ export function renderLandingPage(options: LandingPageOptions): string {
       <h2 id="rest">REST is available too</h2>
       <div class="code-card">
         <div class="code-title">Inspect the ${restPrice} Mainnet payment challenge without paying</div>
-        <pre><code>curl -i https://israel-counterparty-intelligence.vercel.app/v1/verify/mainnet \\
+        <pre tabindex="0"><code>curl -i https://israel-counterparty-intelligence.vercel.app/v1/verify/mainnet \\
   -H 'content-type: application/json' \\
   --data '{"company_number":"514744887","language":"en"}'</code></pre>
       </div>
       <div class="code-card" style="margin-top: 16px">
         <div class="code-title">Run the free invoice structural preview</div>
-        <pre><code>curl -X POST https://israel-counterparty-intelligence.vercel.app/v1/invoice-gate/preview \
+        <pre tabindex="0"><code>curl -X POST https://israel-counterparty-intelligence.vercel.app/v1/invoice-gate/preview \
   -H 'content-type: application/json' \
   --data '{"supplier_company_number":"514744887","invoice_number":"INV-1","invoice_date":"2026-09-04","amount_before_vat":6000,"vat_amount":1080,"total_amount":7080,"allocation_number":"123456789"}'</code></pre>
       </div>
       <div class="code-card" style="margin-top: 16px">
         <div class="code-title">Inspect the $${paymentRiskPrice} vendor payment-risk challenge</div>
-        <pre><code>curl -i https://israel-counterparty-intelligence.vercel.app/v1/payment-risk/mainnet \
+        <pre tabindex="0"><code>curl -i https://israel-counterparty-intelligence.vercel.app/v1/payment-risk/mainnet \
   -H 'content-type: application/json' \
   --data '{"company_number":"514744887","invoice_company_number":"514744887","invoice_company_name":"מנדיי. קום בעמ"}'</code></pre>
       </div>
       <div class="code-card" style="margin-top: 16px">
         <div class="code-title">Inspect the $${companyChangesPrice} recent company-changes challenge</div>
-        <pre><code>curl -i https://israel-counterparty-intelligence.vercel.app/v1/company-changes/mainnet \
+        <pre tabindex="0"><code>curl -i https://israel-counterparty-intelligence.vercel.app/v1/company-changes/mainnet \
   -H 'content-type: application/json' \
   --data '{"company_number":"514744887","lookback_days":366,"limit":25}'</code></pre>
       </div>
