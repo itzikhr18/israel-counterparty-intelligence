@@ -6,6 +6,8 @@ const expectedNetwork = process.env.EXPECTED_X402_NETWORK;
 const expectedAmount = process.env.EXPECTED_X402_AMOUNT ?? "50000";
 const expectedPaymentRiskAmount =
   process.env.EXPECTED_X402_PAYMENT_RISK_AMOUNT ?? "100000";
+const expectedCompanyChangesAmount =
+  process.env.EXPECTED_X402_COMPANY_CHANGES_AMOUNT ?? "10000";
 const expectedAsset = process.env.EXPECTED_X402_ASSET;
 const expectedPayTo = process.env.EXPECTED_X402_PAY_TO;
 
@@ -30,6 +32,7 @@ try {
       JSON.stringify([
         "assess_israeli_vendor_payment_risk_paid",
         "describe_service",
+        "get_israeli_company_changes_paid",
         "get_sample_verification_report",
         "get_schema",
         "preview_agent_payment_trust",
@@ -83,12 +86,12 @@ try {
     "preview_company returned full data",
   );
   assert(
-    preview.structuredContent?.next_action?.tool === "verify_company",
+    preview.structuredContent?.next_action?.tool === "company_changes",
     "preview_company did not recommend the paid next tool",
   );
   assert(
     preview.structuredContent?.next_action?.preferred_tool ===
-      "verify_israeli_company_paid",
+      "get_israeli_company_changes_paid",
     "preview did not identify the preferred paid tool",
   );
   assert(
@@ -191,6 +194,31 @@ try {
       `Unexpected payment-risk network ${paymentRiskRequirement?.network}`,
     );
 
+  const unpaidCompanyChanges = await client.callTool({
+    name: "get_israeli_company_changes_paid",
+    arguments: {
+      company_number: "514744887",
+      lookback_days: 366,
+      limit: 25,
+      language: "en",
+    },
+  });
+  assert(
+    unpaidCompanyChanges.isError === true,
+    "company-changes tool did not require payment",
+  );
+  const companyChangesRequirement =
+    unpaidCompanyChanges.structuredContent?.accepts?.[0];
+  assert(
+    companyChangesRequirement?.amount === expectedCompanyChangesAmount,
+    `Unexpected company-changes amount ${companyChangesRequirement?.amount}`,
+  );
+  if (expectedNetwork)
+    assert(
+      companyChangesRequirement?.network === expectedNetwork,
+      `Unexpected company-changes network ${companyChangesRequirement?.network}`,
+    );
+
   console.log(
     JSON.stringify({
       status: "ok",
@@ -209,6 +237,7 @@ try {
       previewNextAction: preview.structuredContent?.next_action,
       paymentRequired: requirement,
       paymentRiskRequired: paymentRiskRequirement,
+      companyChangesRequired: companyChangesRequirement,
     }),
   );
 } finally {

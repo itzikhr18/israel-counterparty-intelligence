@@ -6,6 +6,22 @@ interface LandingPageOptions {
   restPrice: string;
 }
 
+export interface PreviewPageResult {
+  resolutionStatus: "RESOLVED" | "AMBIGUOUS" | "NOT_FOUND";
+  company: {
+    legalName: string;
+    companyNumber: string;
+    status: string;
+  } | null;
+  candidates: Array<{
+    legalName: string;
+    companyNumber: string;
+    status: string;
+  }>;
+  confidence: number;
+  checkedAt: string;
+}
+
 function escapeHtml(value: string): string {
   return value
     .replaceAll("&", "&amp;")
@@ -48,7 +64,7 @@ export function renderLandingPage(options: LandingPageOptions): string {
     h3 { margin: 0 0 8px; font-size: 17px; }
     .lead { max-width: 730px; color: var(--muted); font-size: clamp(18px, 2.5vw, 22px); }
     .actions { margin: 30px 0 28px; }
-    .button { display: inline-flex; align-items: center; min-height: 46px; padding: 0 18px; border: 1px solid var(--line); border-radius: 10px; color: var(--text); font-weight: 680; text-decoration: none; }
+    .button { display: inline-flex; align-items: center; justify-content: center; min-height: 46px; padding: 0 18px; border: 1px solid var(--line); border-radius: 10px; color: var(--text); font: inherit; font-weight: 680; text-decoration: none; cursor: pointer; }
     .button.primary { border-color: var(--accent); background: var(--accent); color: #04110c; }
     .button:hover { transform: translateY(-1px); }
     .contract { color: var(--muted); font-size: 14px; }
@@ -65,8 +81,14 @@ export function renderLandingPage(options: LandingPageOptions): string {
     .step { flex: 1 1 210px; padding: 20px; border-left: 2px solid var(--line); }
     .step::before { counter-increment: step; content: "0" counter(step); display: block; margin-bottom: 12px; color: var(--accent); font-size: 13px; font-weight: 760; }
     .scope { padding: 22px; border: 1px solid #5b4930; border-radius: 14px; background: #211a11; color: #ddcdb3; }
+    .preview-panel { max-width: 760px; padding: 28px; border: 1px solid var(--line); border-radius: 18px; background: rgba(13, 28, 24, .88); }
+    .preview-form { display: grid; grid-template-columns: 1fr auto; gap: 12px; margin-top: 20px; }
+    .preview-form label { grid-column: 1 / -1; font-weight: 680; }
+    .preview-form input { min-width: 0; min-height: 48px; padding: 0 14px; border: 1px solid #41685b; border-radius: 10px; background: #07110f; color: var(--text); font: inherit; }
+    .preview-form input:focus { outline: 2px solid var(--accent); outline-offset: 2px; }
+    .hint { grid-column: 1 / -1; margin: 0; color: var(--muted); font-size: 14px; }
     footer { display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin-top: 80px; padding-top: 24px; border-top: 1px solid var(--line); color: var(--muted); font-size: 14px; }
-    @media (max-width: 760px) { nav { margin-bottom: 48px; } .grid { grid-template-columns: 1fr; } section { margin-top: 64px; } }
+    @media (max-width: 760px) { nav { margin-bottom: 48px; } .grid { grid-template-columns: 1fr; } section { margin-top: 64px; } .preview-panel { padding: 22px; } .preview-form { grid-template-columns: 1fr; } .preview-form label, .hint { grid-column: auto; } }
   </style>
 </head>
 <body>
@@ -81,7 +103,7 @@ export function renderLandingPage(options: LandingPageOptions): string {
       <h1>Know who an agent will pay before its wallet signs.</h1>
       <p class="lead">Bind an Israeli legal entity, service domain, signed payee manifest, destination wallet, and buyer mandate into one machine-enforceable decision.</p>
       <div class="actions">
-        <a class="button primary" href="/x402-buyer-quickstart.md">Run a free preview</a>
+        <a class="button primary" href="#free-preview">Run a free preview</a>
         <a class="button" href="/mcp.json">Inspect MCP metadata</a>
         <a class="button" href="/openapi.json">OpenAPI schema</a>
       </div>
@@ -89,6 +111,20 @@ export function renderLandingPage(options: LandingPageOptions): string {
         <span>Company changes ${companyChangesPrice} USDC</span><span>Verification ${mcpPrice} USDC</span><span>Payment risk ${paymentRiskPrice} USDC</span><span>Base Mainnet</span><span>x402 v2</span><span>No API key</span>
       </div>
     </header>
+
+    <section id="free-preview" aria-labelledby="free-preview-title">
+      <div class="preview-panel">
+        <div class="eyebrow">Free · no wallet required</div>
+        <h2 id="free-preview-title">Check an Israeli company now</h2>
+        <p class="section-copy">Enter a nine-digit Israeli company number. The free preview returns the matched legal name and current registry status without exposing the paid evidence report.</p>
+        <form class="preview-form" action="/preview" method="get">
+          <label for="company-number">Israeli company number</label>
+          <input id="company-number" name="company_number" type="text" inputmode="numeric" autocomplete="off" pattern="[0-9]{9}" minlength="9" maxlength="9" placeholder="514744887" aria-describedby="company-number-hint" required>
+          <button class="button primary" type="submit">Check company free</button>
+          <p class="hint" id="company-number-hint">Try 514744887 to preview a known public company record.</p>
+        </form>
+      </div>
+    </section>
 
     <section aria-labelledby="use-cases">
       <h2 id="use-cases">Built for real counterparty workflows</h2>
@@ -152,6 +188,102 @@ export function renderLandingPage(options: LandingPageOptions): string {
       <span>${providerName}</span>
       <span><a href="/?format=json">Machine-readable service manifest</a> · <a href="/health">Health</a> · <a href="/README.md">Documentation</a></span>
     </footer>
+  </main>
+</body>
+</html>`;
+}
+
+export function renderPreviewPage(options: {
+  providerName: string;
+  companyNumber: string;
+  result?: PreviewPageResult;
+  error?: string;
+}): string {
+  const providerName = escapeHtml(options.providerName);
+  const error = options.error ? escapeHtml(options.error) : null;
+  const result = options.result;
+  const resolved = result?.company;
+  const confidence = result ? `${Math.round(result.confidence * 100)}%` : null;
+  const checkedAt = result
+    ? escapeHtml(
+        new Date(result.checkedAt).toLocaleString("en-GB", {
+          timeZone: "Asia/Jerusalem",
+        }),
+      )
+    : null;
+
+  const candidates = result?.candidates.length
+    ? `<div class="candidates"><h2>Possible matches</h2>${result.candidates
+        .map(
+          (candidate) =>
+            `<article><strong>${escapeHtml(candidate.legalName)}</strong><span>${escapeHtml(candidate.companyNumber)} · ${escapeHtml(candidate.status)}</span></article>`,
+        )
+        .join("")}</div>`
+    : "";
+
+  const resultContent = error
+    ? `<div class="notice error" role="alert"><strong>We could not run this preview.</strong><span>${error}</span></div>`
+    : resolved && result
+      ? `<div class="result" aria-live="polite">
+          <div class="result-status">Company found</div>
+          <h1>${escapeHtml(resolved.legalName)}</h1>
+          <dl>
+            <div><dt>Company number</dt><dd>${escapeHtml(resolved.companyNumber)}</dd></div>
+            <div><dt>Registry status</dt><dd>${escapeHtml(resolved.status)}</dd></div>
+            <div><dt>Match confidence</dt><dd>${confidence}</dd></div>
+            <div><dt>Checked</dt><dd>${checkedAt}</dd></div>
+          </dl>
+        </div>`
+      : result
+        ? `<div class="notice" aria-live="polite"><strong>${result.resolutionStatus === "AMBIGUOUS" ? "More than one possible company was found." : "No reliable company match was found."}</strong><span>${result.resolutionStatus === "AMBIGUOUS" ? "Choose an exact company number from the possible matches below." : "Check the company number and try again."}</span></div>${candidates}`
+        : "";
+
+  return `<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
+  <title>Free company preview · ${providerName}</title>
+  <style>
+    :root { color-scheme: dark; --bg: #07110f; --panel: #0d1c18; --line: #24433a; --text: #effbf6; --muted: #a9c3b8; --accent: #61e6ad; }
+    * { box-sizing: border-box; }
+    body { margin: 0; min-height: 100vh; background: radial-gradient(circle at 80% 0%, #153b2e 0, var(--bg) 38rem); color: var(--text); font: 16px/1.6 ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+    main { width: min(760px, calc(100% - 32px)); margin: 0 auto; padding: 28px 0 72px; }
+    nav { display: flex; justify-content: space-between; gap: 16px; align-items: center; margin-bottom: 58px; }
+    a { color: var(--accent); }
+    .brand { color: var(--text); font-weight: 720; text-decoration: none; }
+    .back { color: var(--muted); text-decoration: none; }
+    .result, .notice, .candidates { padding: 28px; border: 1px solid var(--line); border-radius: 18px; background: rgba(13, 28, 24, .88); }
+    .result-status { color: var(--accent); font-size: 13px; font-weight: 760; letter-spacing: .12em; text-transform: uppercase; }
+    h1 { margin: 10px 0 24px; font-size: clamp(32px, 7vw, 52px); line-height: 1.08; letter-spacing: -.04em; }
+    h2 { margin: 0 0 14px; font-size: 22px; }
+    dl { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 0; }
+    dl div, .candidates article { padding: 16px; border: 1px solid var(--line); border-radius: 12px; background: #091612; }
+    dt { color: var(--muted); font-size: 13px; }
+    dd { margin: 4px 0 0; font-weight: 680; overflow-wrap: anywhere; }
+    .notice { display: grid; gap: 6px; }
+    .notice span { color: var(--muted); }
+    .notice.error { border-color: #74443d; background: #241411; }
+    .candidates { margin-top: 16px; }
+    .candidates article { display: grid; gap: 3px; margin-top: 10px; }
+    .candidates span { color: var(--muted); }
+    .offer { margin-top: 22px; padding: 24px; border: 1px solid #41685b; border-radius: 16px; background: rgba(20, 48, 39, .82); }
+    .offer h2 { margin-bottom: 6px; }
+    .offer p { margin: 0 0 18px; color: var(--muted); }
+    .actions { display: flex; gap: 10px; flex-wrap: wrap; }
+    .button { display: inline-flex; align-items: center; min-height: 44px; padding: 0 16px; border: 1px solid var(--line); border-radius: 10px; color: var(--text); font-weight: 680; text-decoration: none; }
+    .button.primary { border-color: var(--accent); background: var(--accent); color: #04110c; }
+    .scope { margin-top: 18px; color: var(--muted); font-size: 13px; }
+    @media (max-width: 560px) { nav { margin-bottom: 38px; } .result, .notice, .candidates { padding: 22px; } dl { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+  <main>
+    <nav><a class="brand" href="/">${providerName}</a><a class="back" href="/#free-preview">← New search</a></nav>
+    ${resultContent}
+    ${resolved ? `<section class="offer"><h2>Need the complete evidence?</h2><p>Unlock recent official company changes for $0.01 USDC or the complete field-level registry report for $0.05 USDC.</p><div class="actions"><a class="button primary" href="/x402-buyer-quickstart.md">Get the full report</a><a class="button" href="/openapi.json">API details</a></div></section>` : ""}
+    <p class="scope">Free preview only: legal identity, registry status, and match confidence. No address, source URLs, filing details, or full verification evidence are included. Not legal, credit, sanctions, or investment advice.</p>
   </main>
 </body>
 </html>`;

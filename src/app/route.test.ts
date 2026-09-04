@@ -43,7 +43,10 @@ describe("service root", () => {
     expect(html).toContain(
       "Know who an agent will pay before its wallet signs.",
     );
-    expect(html).toContain("/x402-buyer-quickstart.md");
+    expect(html).toContain('href="#free-preview"');
+    expect(html).toContain('action="/preview"');
+    expect(html).toContain('name="company_number"');
+    expect(html).toContain("Free · no wallet required");
     expect(html).toContain("github:itzikhr18/israel-company-verify-buyer");
     expect(html).toContain("preview_agent_payment_trust");
     expect(html).toContain("0.05 USDC");
@@ -51,6 +54,9 @@ describe("service root", () => {
     expect(html).toContain("0.01 USDC");
     expect(html).toContain("/v1/payment-risk/mainnet");
     expect(html).toContain("/v1/company-changes/mainnet");
+    expect(response.headers.get("content-security-policy")).toContain(
+      "form-action 'self'",
+    );
   });
 
   it("allows an explicit JSON view from a browser", async () => {
