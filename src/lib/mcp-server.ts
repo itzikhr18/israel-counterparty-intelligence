@@ -56,7 +56,7 @@ import {
 } from "@/lib/verification-schema";
 
 export const MCP_SERVER_NAME = "Israel Business Intelligence MCP";
-export const MCP_SERVER_VERSION = "1.5.2";
+export const MCP_SERVER_VERSION = "1.5.3";
 
 export const FREE_PREVIEW_TOOL = "preview_israeli_company_free";
 export const PAID_VERIFY_TOOL = "verify_israeli_company_paid";
@@ -83,7 +83,7 @@ function serverInstructions(accessMode: "paid" | "pilot"): string {
   if (accessMode === "pilot") {
     return "Use verify_company for invitation-only partner verification. Payment is waived only when this authenticated pilot endpoint is used. Use get_sample_verification_report to inspect the response shape without a live lookup.";
   }
-  return `Start with ${FREE_PREVIEW_TOOL} for a free identity and registry-status check. If it resolves the company, reuse the exact company number with ${PAID_COMPANY_CHANGES_TOOL} for recent official filing and status-change events, or use next_action.arguments with ${PAID_VERIFY_TOOL} for the complete evidence-backed result. Before an agent signs an x402 payment, use ${AGENT_PAYMENT_TRUST_TOOL} for a free dry-run that binds the legal entity, service domain, signed payee manifest, payment destination, and buyer mandate into an ALLOW, REVIEW, or DENY decision. For invoice and vendor-context risk, use ${FREE_PAYMENT_RISK_PREVIEW_TOOL}, then ${PAID_PAYMENT_RISK_TOOL}. Company changes cost $0.01 USDC, company verification costs $0.05 USDC, and payment-risk assessment costs $0.10 USDC on Base Mainnet. Use ${SAMPLE_REPORT_TOOL} to inspect a static full-report example without payment. Buyer bridge: ${X402_BUYER_BRIDGE_URL}`;
+  return `Start with ${FREE_PREVIEW_TOOL} for a free identity and registry-status check. If it resolves the company, follow next_action to get recent official filing and status-change events for $0.01, or use full_verification.recommended_arguments with ${PAID_VERIFY_TOOL} for the complete evidence-backed result. Before an agent signs an x402 payment, use ${AGENT_PAYMENT_TRUST_TOOL} for a free dry-run that binds the legal entity, service domain, signed payee manifest, payment destination, and buyer mandate into an ALLOW, REVIEW, or DENY decision. For invoice and vendor-context risk, use ${FREE_PAYMENT_RISK_PREVIEW_TOOL}, then ${PAID_PAYMENT_RISK_TOOL}. Company changes cost $0.01 USDC, company verification costs $0.05 USDC, and payment-risk assessment costs $0.10 USDC on Base Mainnet. Use ${SAMPLE_REPORT_TOOL} to inspect a static full-report example without payment. Buyer bridge: ${X402_BUYER_BRIDGE_URL}`;
 }
 
 const previewCandidateSchema = z.object({
@@ -95,8 +95,8 @@ const previewCandidateSchema = z.object({
 
 const nextActionSchema = z.object({
   recommended: z.boolean(),
-  tool: z.enum(["verify_company", "preview_company"]),
-  preferred_tool: z.enum([PAID_VERIFY_TOOL, FREE_PREVIEW_TOOL]),
+  tool: z.enum(["company_changes", "preview_company"]),
+  preferred_tool: z.enum([PAID_COMPANY_CHANGES_TOOL, FREE_PREVIEW_TOOL]),
   arguments: z.record(z.string(), z.unknown()),
   reason: z.string(),
   requires_payment: z.boolean(),
@@ -552,7 +552,6 @@ async function runCompanyPreview(
         depth: "standard",
       }
     : {};
-  const shouldBuy = Boolean(resolved);
   const paidActions = resolved
     ? [
         {
@@ -580,16 +579,21 @@ async function runCompanyPreview(
         },
       ]
     : [];
-  const nextAction = shouldBuy
+  const nextAction = resolved
     ? {
         recommended: true,
-        tool: "verify_company" as const,
-        preferred_tool: PAID_VERIFY_TOOL,
-        arguments: recommendedArguments,
+        tool: "company_changes" as const,
+        preferred_tool: PAID_COMPANY_CHANGES_TOOL,
+        arguments: {
+          company_number: resolved.company_number,
+          lookback_days: 366,
+          limit: 25,
+          language: args.language,
+        },
         reason:
-          "Identity is resolved. Call verify_company with these exact arguments to unlock field-level public-registry evidence and source URLs.",
+          "Identity is resolved. Start with the low-cost company-changes call to retrieve recent official filing and status-change events; use full_verification when the complete field-level report is needed.",
         requires_payment: true,
-        price: mcpPrice(environmentName),
+        price: mcpCompanyChangesPrice(environmentName),
         network: paymentEnvironments[environmentName].network,
         asset: "USDC" as const,
         buyer_quickstart: X402_BUYER_QUICKSTART_URL,
@@ -635,7 +639,7 @@ async function runCompanyPreview(
     preview_limitations: [
       "No field-level evidence is included",
       "No source URLs, address, incorporation, annual-report, or law-violation fields are included",
-      "Use verify_company for the complete evidence-backed result",
+      "Use company changes for recent official events or full verification for complete field-level evidence",
     ],
     full_verification: verificationOffer(environmentName, recommendedArguments),
     paid_actions: paidActions,
