@@ -3,12 +3,46 @@
 Use this guide to run a free preview or pay for one complete verification with a buyer-controlled
 wallet. The service never asks for an API key or custody of the buyer's private key.
 
-## Fastest path: one-command buyer bridge
+## Invoice gate: from free check to one paid report
+
+Start at [the free invoice form](https://israel-counterparty-intelligence.vercel.app/#invoice-preview).
+Complete the invoice and buyer answers, then download `invoice-request.json` from the result.
+Keep this file private: it contains your invoice data. Requires Node.js 20.9+.
+
+In the download folder, run the invoice preview for free, with no wallet:
+
+```bash
+npx --yes https://israel-counterparty-intelligence.vercel.app/israel-company-verify-buyer-0.4.0.tgz --invoice-file invoice-request.json
+```
+
+When the buyer has already configured its wallet in its own secret environment, explicitly
+authorize one invoice report, capped at **0.25 USDC**:
+
+```bash
+npx --yes https://israel-counterparty-intelligence.vercel.app/israel-company-verify-buyer-0.4.0.tgz --invoice-file invoice-request.json --pay
+```
+
+This pays for the report, **not the supplier invoice**. The bridge first runs the free structural
+check and resolves the supplier for free; it refuses to sign if the invoice is blocked, buyer
+conditions are unknown, or the supplier cannot be resolved.
+The same invoice JSON is passed to the paid tool without retyping.
+
+The paid result is decision support and can still be HOLD or BLOCK. If official allocation
+verification is required but missing, the gate will still HOLD after purchase. Buyer-provided
+official results are not independently authenticated. Bank ownership is not verified.
+This is an agent/CLI flow, not a browser-wallet or card checkout.
+
+For a buyer-managed automation, provision `BUYER_PRIVATE_KEY` using your existing local secret
+manager; the bridge reads it locally to sign and never sends the key to this service.
+Do not paste keys into chat, forms, source code, or invoice JSON. No wallet is needed for free checks.
+Source: [versioned bridge in the main repository](https://github.com/itzikhr18/israel-counterparty-intelligence/tree/main/buyer-bridge).
+
+## Company verification: one-command buyer bridge
 
 Run a free live identity/status preview without a wallet:
 
 ```bash
-npx --yes https://israel-counterparty-intelligence.vercel.app/israel-company-verify-buyer-0.3.0.tgz \
+npx --yes https://israel-counterparty-intelligence.vercel.app/israel-company-verify-buyer-0.4.0.tgz \
   --company-number 514744887
 ```
 
@@ -16,7 +50,7 @@ When `BUYER_PRIVATE_KEY` is already configured in the buyer's secret environment
 authorize one payment capped at 0.05 USDC:
 
 ```bash
-npx --yes https://israel-counterparty-intelligence.vercel.app/israel-company-verify-buyer-0.3.0.tgz \
+npx --yes https://israel-counterparty-intelligence.vercel.app/israel-company-verify-buyer-0.4.0.tgz \
   --company-number 514744887 --pay
 ```
 
@@ -28,7 +62,7 @@ or payment.
 For a free vendor payment-risk preview, add transaction context:
 
 ```bash
-npx --yes https://israel-counterparty-intelligence.vercel.app/israel-company-verify-buyer-0.3.0.tgz \
+npx --yes https://israel-counterparty-intelligence.vercel.app/israel-company-verify-buyer-0.4.0.tgz \
   --payment-risk --company-number 514744887 --invoice-company-number 514744887
 ```
 
@@ -43,7 +77,7 @@ the exact `PaymentRequired` terms. Version 0.3 exits with status `0` only for `A
 for `REVIEW` or `DENY`. The command never signs or submits the third-party payment.
 
 ```bash
-npx --yes https://israel-counterparty-intelligence.vercel.app/israel-company-verify-buyer-0.3.0.tgz \
+npx --yes https://israel-counterparty-intelligence.vercel.app/israel-company-verify-buyer-0.4.0.tgz \
   --agent-payment-trust \
   --company-number 514744887 \
   --service-url https://merchant.example/pay \
@@ -69,12 +103,12 @@ ownership. Manifest specification: `/agent-payee-manifest-v0.1.md`.
 - Price: `0.05 USDC` per successful `verify_company` call
 - Payment-risk price: `0.10 USDC` per successful `assess_israeli_vendor_payment_risk_paid` call
 - Company-changes price: `0.01 USDC` per successful `get_israeli_company_changes_paid` call
+- Invoice-gate price: `0.25 USDC` per successful `authorize_israeli_invoice_payment_paid` call (including a valid HOLD/BLOCK report)
 - Protocol: x402 v2, exact EVM payment
 - Authentication: none
 
-The buyer needs its own Base Mainnet wallet and enough native USDC for the call. PayAI currently
-covers the x402 settlement network fee, so this exact flow should not require the buyer to hold ETH;
-an external wallet or account provider may still impose its own unrelated fees. Do not paste a
+The buyer needs its own Base Mainnet wallet and enough native USDC for the call.
+An external wallet or account provider may impose its own fees. Do not paste a
 private key into a website or send it to this service.
 
 ## MCP: automatic payment and retry

@@ -52,7 +52,8 @@ describe("service root", () => {
     expect(html).toContain('action="/preview"');
     expect(html).toContain('name="company_number"');
     expect(html).toContain("Free · no wallet required");
-    expect(html).toContain("github:itzikhr18/israel-company-verify-buyer");
+    expect(html).toContain("israel-company-verify-buyer-0.4.0.tgz");
+    expect(html).toContain("--invoice-file invoice-request.json");
     expect(html).toContain("preview_agent_payment_trust");
     expect(html).toContain("0.05 USDC");
     expect(html).toContain("0.10 USDC");

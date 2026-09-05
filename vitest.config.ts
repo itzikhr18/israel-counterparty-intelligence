@@ -9,6 +9,6 @@ export default defineConfig({
     },
   },
   test: {
-    include: ["src/**/*.test.ts"],
+    include: ["src/**/*.test.ts", "buyer-bridge/test/pre-sign-policy.test.mjs"],
   },
 });

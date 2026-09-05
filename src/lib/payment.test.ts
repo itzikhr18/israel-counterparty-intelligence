@@ -138,7 +138,7 @@ describe("dual-network x402 configuration", () => {
       },
       next_action: {
         buyer_bridge: expect.stringMatching(
-          /israel-company-verify-buyer-0\.3\.0\.tgz$/,
+          /israel-company-verify-buyer-0\.4\.0\.tgz$/,
         ),
       },
     });

@@ -1,5 +1,8 @@
 #!/usr/bin/env node
 
+import { pathToFileURL } from "node:url";
+import { realpathSync } from "node:fs";
+
 import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 import { StreamableHTTPClientTransport } from "@modelcontextprotocol/sdk/client/streamableHttp.js";
 import { ExactEvmScheme } from "@x402/evm/exact/client";
@@ -7,10 +10,17 @@ import { createx402MCPClient } from "@x402/mcp";
 import { privateKeyToAccount } from "viem/accounts";
 
 import { enforceAgentPaymentTrust } from "../lib/pre-sign-policy.mjs";
+import {
+  acceptsCappedPayment,
+  enforceInvoicePreview,
+  readInvoiceFile,
+  INVOICE_PREVIEW_TOOL,
+  INVOICE_PAID_TOOL,
+  INVOICE_MAX_AMOUNT,
+} from "../lib/invoice-flow.mjs";
 
 const ENDPOINT = "https://israel-counterparty-intelligence.vercel.app/mcp";
 const NETWORK = "eip155:8453";
-const USDC = "0x833589fcd6edb6e08f4c7c32d4f71b54bda02913";
 const MAX_VERIFY_AMOUNT = 50_000n;
 const MAX_PAYMENT_RISK_AMOUNT = 100_000n;
 const PREVIEW_TOOL = "preview_israeli_company_free";
@@ -22,6 +32,12 @@ const SAMPLE_TOOL = "get_sample_verification_report";
 
 function usage() {
   return `Israel Company Verify Buyer
+
+Invoice gate: download invoice-request.json from the free website check first.
+  israel-company-verify-buyer --invoice-file invoice-request.json
+  israel-company-verify-buyer --invoice-file invoice-request.json --pay
+  Free by default. --pay authorizes one report, capped at 0.25 USDC on Base.
+  This purchases decision support, not a supplier payment or guaranteed PAY result.
 
 Free live preview:
   israel-company-verify-buyer --company-number 514744887
@@ -51,6 +67,7 @@ Paid vendor payment-risk decision, fixed maximum 0.10 USDC on Base Mainnet:
     --company-number 514744887 --invoice-company-number 514744887 --pay
 
 Options:
+  --invoice-file <path>      Use a local invoice JSON file (not a company lookup)
   --company-number <number>  Israeli company number
   --company-name <name>      Israeli legal or trading name
   --language <en|he>         Summary language, default en
@@ -82,7 +99,8 @@ Security:
   The private key is accepted only through BUYER_PRIVATE_KEY. It is never printed.
   The payment policy rejects every network except Base Mainnet, every asset except
   native Base USDC. It caps verification at 50,000 atomic units (0.05 USDC)
-  and payment-risk assessment at 100,000 atomic units (0.10 USDC).`;
+  payment-risk assessment at 100,000 atomic units (0.10 USDC),
+  and the invoice gate at 250,000 atomic units (0.25 USDC).`;
 }
 
 function parseArgs(argv) {
@@ -98,6 +116,7 @@ function parseArgs(argv) {
     firstTimeVendor: false,
   };
   const values = new Set([
+    "--invoice-file",
     "--company-number",
     "--company-name",
     "--language",
@@ -155,6 +174,7 @@ function parseArgs(argv) {
     if (!value || value.startsWith("--"))
       throw new Error(`Missing value for ${argument}`);
     index += 1;
+    if (argument === "--invoice-file") parsed.invoiceFile = value;
     if (argument === "--company-number") parsed.companyNumber = value;
     if (argument === "--company-name") parsed.companyName = value;
     if (argument === "--language") parsed.language = value;
@@ -238,7 +258,24 @@ function parseArgs(argv) {
       throw new Error("--manifest-mode must be fetch or none");
     }
   }
-  if (!parsed.sample && !parsed.companyNumber && !parsed.companyName) {
+  if (
+    parsed.invoiceFile &&
+    (parsed.sample ||
+      parsed.paymentRisk ||
+      parsed.agentPaymentTrust ||
+      parsed.companyNumber ||
+      parsed.companyName)
+  ) {
+    throw new Error(
+      "--invoice-file cannot be combined with company, sample, payment-risk, or trust modes",
+    );
+  }
+  if (
+    !parsed.invoiceFile &&
+    !parsed.sample &&
+    !parsed.companyNumber &&
+    !parsed.companyName
+  ) {
     throw new Error("Provide --company-number, --company-name, or --sample");
   }
   if (
@@ -288,18 +325,6 @@ function agentPaymentTrustArguments(options) {
   };
 }
 
-function acceptableRequirement(requirement, maxAmount) {
-  return (
-    requirement &&
-    typeof requirement === "object" &&
-    "amount" in requirement &&
-    requirement.network === NETWORK &&
-    typeof requirement.asset === "string" &&
-    requirement.asset.toLowerCase() === USDC &&
-    BigInt(requirement.amount) <= maxAmount
-  );
-}
-
 function paymentRiskArguments(options) {
   return {
     ...requestArguments(options),
@@ -342,13 +367,20 @@ function structuredResult(result) {
 
 function transport() {
   return new StreamableHTTPClientTransport(new URL(ENDPOINT), {
-    requestInit: { headers: { "x-discovery-source": "public-buyer-bridge" } },
+    requestInit: {
+      headers: {
+        "x-discovery-source":
+          process.env.BUYER_INTERNAL_SMOKE === "1"
+            ? "internal-post-deploy-smoke"
+            : "public-buyer-bridge",
+      },
+    },
   });
 }
 
 async function freeCall(tool, args) {
   const client = new Client(
-    { name: "israel-company-verify-buyer", version: "0.3.0" },
+    { name: "israel-company-verify-buyer", version: "0.4.0" },
     { capabilities: {} },
   );
   try {
@@ -367,15 +399,17 @@ async function paidCall(options, preview) {
     );
   }
 
-  const maxAmount = options.paymentRisk
-    ? MAX_PAYMENT_RISK_AMOUNT
-    : MAX_VERIFY_AMOUNT;
+  const maxAmount = options.invoiceFile
+    ? INVOICE_MAX_AMOUNT
+    : options.paymentRisk
+      ? MAX_PAYMENT_RISK_AMOUNT
+      : MAX_VERIFY_AMOUNT;
   const accepted = (requirement) =>
-    acceptableRequirement(requirement, maxAmount);
+    acceptsCappedPayment(requirement, maxAmount);
   const account = privateKeyToAccount(privateKey);
   const client = createx402MCPClient({
     name: "israel-company-verify-buyer",
-    version: "0.3.0",
+    version: "0.4.0",
     schemes: [{ network: NETWORK, client: new ExactEvmScheme(account) }],
     policies: [(_version, requirements) => requirements.filter(accepted)],
     autoPayment: true,
@@ -387,15 +421,20 @@ async function paidCall(options, preview) {
   const recommended = options.paymentRisk
     ? preview?.paid_assessment?.recommended_arguments
     : preview?.next_action?.arguments;
-  const args =
-    recommended && typeof recommended === "object"
+  const args = options.invoiceFile
+    ? options.invoiceQuery
+    : recommended && typeof recommended === "object"
       ? options.paymentRisk
         ? recommended
         : { ...recommended, depth: options.depth }
       : options.paymentRisk
         ? paymentRiskArguments(options)
         : requestArguments(options, true);
-  const tool = options.paymentRisk ? PAYMENT_RISK_PAID_TOOL : PAID_TOOL;
+  const tool = options.invoiceFile
+    ? INVOICE_PAID_TOOL
+    : options.paymentRisk
+      ? PAYMENT_RISK_PAID_TOOL
+      : PAID_TOOL;
 
   try {
     await client.connect(transport());
@@ -405,10 +444,70 @@ async function paidCall(options, preview) {
   }
 }
 
-async function main() {
-  const options = parseArgs(process.argv.slice(2));
+export async function main(
+  argv = process.argv.slice(2),
+  calls = { free: freeCall, paid: paidCall },
+) {
+  const options = parseArgs(argv);
   if (options.help) {
     console.log(usage());
+    return;
+  }
+
+  if (options.invoiceFile) {
+    options.invoiceQuery = await readInvoiceFile(options.invoiceFile);
+    const result = await calls.free(INVOICE_PREVIEW_TOOL, options.invoiceQuery);
+    if (result.isError)
+      throw new Error(
+        "The free invoice preview rejected the request; check the JSON fields",
+      );
+    const preview = structuredResult(result);
+    if (!options.pay) {
+      console.log(
+        JSON.stringify(
+          { mode: "free_invoice_preview", result: preview },
+          null,
+          2,
+        ),
+      );
+      return;
+    }
+    enforceInvoicePreview(preview);
+    // Resolve the supplier for free before any signing or paid invocation.
+    const supplier = await calls.free(PREVIEW_TOOL, {
+      company_number: options.invoiceQuery.supplier_company_number,
+    });
+    if (
+      supplier.isError ||
+      structuredResult(supplier)?.resolution_status !== "RESOLVED"
+    ) {
+      throw new Error(
+        "Payment blocked: supplier did not resolve in the free company preview",
+      );
+    }
+    if (
+      preview.policy.allocation_applicability === "REQUIRED" &&
+      options.invoiceQuery.official_verification?.status !== "MATCH"
+    ) {
+      console.error(
+        "The paid report can still return HOLD: official allocation verification is not supplied. The service does not independently authenticate Tax Authority results.",
+      );
+    }
+    const paid = await calls.paid(options, preview);
+    if (paid.isError)
+      throw new Error("The paid invoice tool returned an error");
+    console.log(
+      JSON.stringify(
+        {
+          mode: "paid_invoice_gate",
+          payment_made: paid.paymentMade,
+          settlement: paid.paymentResponse ?? null,
+          result: structuredResult(paid),
+        },
+        null,
+        2,
+      ),
+    );
     return;
   }
 
@@ -496,9 +595,13 @@ async function main() {
   );
 }
 
-main().catch((error) => {
-  console.error(
-    `Error: ${error instanceof Error ? error.message : String(error)}`,
-  );
-  process.exitCode = 1;
-});
+if (
+  process.argv[1] &&
+  import.meta.url === pathToFileURL(realpathSync(process.argv[1])).href
+)
+  main().catch((error) => {
+    console.error(
+      `Error: ${error instanceof Error ? error.message : String(error)}`,
+    );
+    process.exitCode = 1;
+  });

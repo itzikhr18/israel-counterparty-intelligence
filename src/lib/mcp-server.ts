@@ -83,7 +83,7 @@ const DESCRIPTION =
   "Israeli invoice payment gates and paid company verification. Checks invoice arithmetic and allocation-number rules, resolves records in the Israeli Companies Registry, and returns structured public-registry evidence. Tax Authority access requires buyer authorization. Not Full Regulatory KYB.";
 
 export const X402_BUYER_QUICKSTART_URL = `${config.PUBLIC_BASE_URL}/x402-buyer-quickstart.md`;
-export const X402_BUYER_BRIDGE_URL = `${config.PUBLIC_BASE_URL}/israel-company-verify-buyer-0.3.0.tgz`;
+export const X402_BUYER_BRIDGE_URL = `${config.PUBLIC_BASE_URL}/israel-company-verify-buyer-0.4.0.tgz`;
 
 const LIMITATIONS = [
   "Public-registry evidence only; coverage depends on source availability and freshness.",

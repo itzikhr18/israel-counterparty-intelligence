@@ -4,11 +4,11 @@ One agent-native gate to check an Israeli supplier invoice before payment, with 
 
 Public source: <https://github.com/itzikhr18/israel-counterparty-intelligence>
 
-Run a free live preview in one command, without an account, API key, wallet, or payment:
+Start with the [free invoice check](https://israel-counterparty-intelligence.vercel.app/#invoice-preview),
+download the validated `invoice-request.json`, and continue with the same invoice:
 
 ```bash
-npx --yes github:itzikhr18/israel-company-verify-buyer \
-  --company-number 514744887
+npx --yes https://israel-counterparty-intelligence.vercel.app/israel-company-verify-buyer-0.4.0.tgz --invoice-file invoice-request.json
 ```
 
 Public agent metadata is available at `/.well-known/x402`, `/llms.txt`, and `/README.md` in the

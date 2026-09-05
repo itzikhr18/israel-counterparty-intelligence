@@ -204,7 +204,7 @@ export function buildPaymentRequired(
 export function buildPaymentRequiredBody(paymentRequired: PaymentRequired) {
   const requirement = paymentRequired.accepts[0];
   const buyerQuickstart = `${config.PUBLIC_BASE_URL}/x402-buyer-quickstart.md`;
-  const buyerBridge = `${config.PUBLIC_BASE_URL}/israel-company-verify-buyer-0.3.0.tgz`;
+  const buyerBridge = `${config.PUBLIC_BASE_URL}/israel-company-verify-buyer-0.4.0.tgz`;
 
   return {
     error: "Payment required",

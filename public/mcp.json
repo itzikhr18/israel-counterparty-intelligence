@@ -10,7 +10,7 @@
   "icon_url": "https://israel-counterparty-intelligence.vercel.app/icon.svg",
   "agent_skill": "https://israel-counterparty-intelligence.vercel.app/SKILL.md",
   "instructions": "For an Israeli tax invoice, start with preview_israeli_invoice_payment_gate_free, then authorize_israeli_invoice_payment_paid. Official Tax Authority verification requires buyer authorization. For company intelligence start with preview_israeli_company_free. Before signing x402, call preview_agent_payment_trust.",
-  "buyer_bridge": "https://israel-counterparty-intelligence.vercel.app/israel-company-verify-buyer-0.3.0.tgz",
+  "buyer_bridge": "https://israel-counterparty-intelligence.vercel.app/israel-company-verify-buyer-0.4.0.tgz",
   "buyer_bridge_github": "https://github.com/itzikhr18/israel-company-verify-buyer",
   "source_repository": "https://github.com/itzikhr18/israel-counterparty-intelligence",
   "tools": [

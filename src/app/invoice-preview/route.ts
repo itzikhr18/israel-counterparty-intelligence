@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 
 import { config } from "@/lib/config";
 import { invoiceGateQuerySchema } from "@/lib/invoice-gate-schema";
+import { logInvoiceFunnel } from "@/lib/invoice-funnel-telemetry";
 import {
   renderInvoicePreviewPage,
   type InvoicePreviewPageResult,
@@ -40,28 +41,42 @@ function optionalBoolean(form: FormData, name: string): boolean | undefined {
 export async function POST(request: NextRequest) {
   try {
     const form = await request.formData();
-    const parsed = invoiceGateQuerySchema.safeParse({
-      supplier_company_number: optionalText(form, "supplier_company_number"),
-      buyer_is_authorized_dealer: optionalBoolean(
-        form,
-        "buyer_is_authorized_dealer",
-      ),
-      buyer_requested_allocation_number: optionalBoolean(
-        form,
-        "buyer_requested_allocation_number",
-      ),
-      invoice_number: optionalText(form, "invoice_number"),
-      invoice_date: optionalText(form, "invoice_date"),
-      amount_before_vat: Number(optionalText(form, "amount_before_vat")),
-      vat_amount: Number(optionalText(form, "vat_amount")),
-      total_amount: Number(optionalText(form, "total_amount")),
-      allocation_number: optionalText(form, "allocation_number"),
-      expected_vat_rate: Number(optionalText(form, "expected_vat_rate") ?? 18),
-      currency: "ILS",
-      language: "en",
-    });
+    const download = form.get("action") === "download";
+    const requestJson = optionalText(form, "invoice_request");
+    if (requestJson && requestJson.length > 65_536)
+      throw new Error("Request too large");
+    const parsed = invoiceGateQuerySchema.safeParse(
+      download
+        ? JSON.parse(requestJson ?? "null")
+        : {
+            supplier_company_number: optionalText(
+              form,
+              "supplier_company_number",
+            ),
+            buyer_is_authorized_dealer: optionalBoolean(
+              form,
+              "buyer_is_authorized_dealer",
+            ),
+            buyer_requested_allocation_number: optionalBoolean(
+              form,
+              "buyer_requested_allocation_number",
+            ),
+            invoice_number: optionalText(form, "invoice_number"),
+            invoice_date: optionalText(form, "invoice_date"),
+            amount_before_vat: Number(optionalText(form, "amount_before_vat")),
+            vat_amount: Number(optionalText(form, "vat_amount")),
+            total_amount: Number(optionalText(form, "total_amount")),
+            allocation_number: optionalText(form, "allocation_number"),
+            expected_vat_rate: Number(
+              optionalText(form, "expected_vat_rate") ?? 18,
+            ),
+            currency: "ILS",
+            language: "en",
+          },
+    );
 
     if (!parsed.success) {
+      logInvoiceFunnel(request, "invoice_preview_invalid");
       return html(
         renderInvoicePreviewPage({
           providerName: config.PROVIDER_NAME,
@@ -73,6 +88,36 @@ export async function POST(request: NextRequest) {
     }
 
     const preview = previewInvoiceGate(parsed.data);
+    const outcome = {
+      action: preview.decision.action,
+      allocationApplicability: preview.policy.allocation_applicability,
+    };
+    if (download) {
+      if (
+        preview.decision.action === "BLOCK" ||
+        preview.policy.allocation_applicability === "UNKNOWN"
+      ) {
+        logInvoiceFunnel(request, "invoice_download_blocked", outcome);
+        return html(
+          renderInvoicePreviewPage({
+            providerName: config.PROVIDER_NAME,
+            error:
+              "Correct the invoice and complete buyer answers before continuing to the paid gate.",
+          }),
+          409,
+        );
+      }
+      logInvoiceFunnel(request, "invoice_request_downloaded", outcome);
+      return new NextResponse(JSON.stringify(parsed.data, null, 2), {
+        headers: {
+          "Content-Type": "application/json; charset=utf-8",
+          "Content-Disposition": 'attachment; filename="invoice-request.json"',
+          "Cache-Control": "no-store",
+          "X-Content-Type-Options": "nosniff",
+        },
+      });
+    }
+    logInvoiceFunnel(request, "invoice_preview_delivered", outcome);
     const result: InvoicePreviewPageResult = {
       action: preview.decision.action,
       score: preview.decision.score,
@@ -99,9 +144,11 @@ export async function POST(request: NextRequest) {
       renderInvoicePreviewPage({
         providerName: config.PROVIDER_NAME,
         result,
+        invoiceRequest: parsed.data,
       }),
     );
   } catch {
+    logInvoiceFunnel(request, "invoice_preview_invalid");
     return html(
       renderInvoicePreviewPage({
         providerName: config.PROVIDER_NAME,

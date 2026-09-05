@@ -148,7 +148,7 @@ https://israel-counterparty-intelligence.vercel.app/x402-buyer-quickstart.md
 One-command buyer bridge:
 
 ```bash
-npx --yes https://israel-counterparty-intelligence.vercel.app/israel-company-verify-buyer-0.3.0.tgz \
+npx --yes https://israel-counterparty-intelligence.vercel.app/israel-company-verify-buyer-0.4.0.tgz \
   --company-number 514744887
 ```
 

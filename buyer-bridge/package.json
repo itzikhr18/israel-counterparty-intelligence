@@ -1,7 +1,7 @@
 {
   "name": "israel-company-verify-buyer",
-  "version": "0.3.0",
-  "description": "Payment-aware MCP buyer bridge with an agent pre-sign payment firewall",
+  "version": "0.4.0",
+  "description": "Capped x402 buyer for Israeli invoice gates, company evidence, and pre-sign checks",
   "keywords": [
     "mcp",
     "x402",
@@ -15,10 +15,11 @@
   "homepage": "https://israel-counterparty-intelligence.vercel.app",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/itzikhr18/israel-company-verify-buyer.git"
+    "url": "git+https://github.com/itzikhr18/israel-counterparty-intelligence.git",
+    "directory": "buyer-bridge"
   },
   "bugs": {
-    "url": "https://github.com/itzikhr18/israel-company-verify-buyer/issues"
+    "url": "https://github.com/itzikhr18/israel-counterparty-intelligence/issues"
   },
   "type": "module",
   "bin": {

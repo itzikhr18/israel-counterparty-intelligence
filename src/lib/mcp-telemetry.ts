@@ -29,12 +29,14 @@ type JsonRpcResponse = {
 };
 
 const PREVIEW_TOOLS = new Set([
+  "preview_israeli_invoice_payment_gate_free",
   "preview_company",
   "preview_israeli_company_free",
   "preview_israeli_vendor_payment_risk_free",
   "preview_agent_payment_trust",
 ]);
 const VERIFY_TOOLS = new Set([
+  "authorize_israeli_invoice_payment_paid",
   "verify_company",
   "verify_israeli_company_paid",
   "assess_israeli_vendor_payment_risk_paid",

@@ -32,7 +32,7 @@
 - Service icon: https://israel-counterparty-intelligence.vercel.app/icon.svg
 - Free x402 pre-sign firewall: https://israel-counterparty-intelligence.vercel.app/v1/agent-payment-trust
 - Agent Payee Manifest schema: https://israel-counterparty-intelligence.vercel.app/.well-known/agent-payee-schema.json
-- One-command buyer bridge: https://israel-counterparty-intelligence.vercel.app/israel-company-verify-buyer-0.3.0.tgz
+- One-command buyer bridge: https://israel-counterparty-intelligence.vercel.app/israel-company-verify-buyer-0.4.0.tgz
 - Public buyer bridge: https://github.com/itzikhr18/israel-company-verify-buyer
 - Public service source: https://github.com/itzikhr18/israel-counterparty-intelligence
 - Free preview command: npx --yes github:itzikhr18/israel-company-verify-buyer --company-number 514744887

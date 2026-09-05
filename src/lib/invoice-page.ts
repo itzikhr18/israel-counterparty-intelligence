@@ -57,10 +57,21 @@ export function renderInvoicePreviewPage(options: {
   providerName: string;
   result?: InvoicePreviewPageResult;
   error?: string;
+  invoiceRequest?: Record<string, unknown>;
 }): string {
   const providerName = escapeHtml(options.providerName);
   const result = options.result;
   const error = options.error ? escapeHtml(options.error) : null;
+  const purchaseSteps = options.invoiceRequest
+    ? `<form action="/invoice-preview" method="post"><input type="hidden" name="invoice_request" value="${escapeHtml(JSON.stringify(options.invoiceRequest))}"><button class="button primary" type="submit" name="action" value="download">1. Download this invoice request</button></form>
+    <p>2. In the folder containing the download, run this free check with Node.js 20.9+:</p>
+    <pre tabindex="0"><code>npx --yes https://israel-counterparty-intelligence.vercel.app/israel-company-verify-buyer-0.4.0.tgz --invoice-file invoice-request.json</code></pre>
+    <p>3. Only when ready, add <code>--pay</code> to authorize one report, capped at 0.25 USDC. Your agent needs its own Base USDC wallet configured in its secret environment. Never share its private key here.</p>
+    <p>The bridge checks invoice structure and resolves the supplier for free before signing. A paid report may still return HOLD or BLOCK; the fee buys evidence, not a guaranteed approval. We do not independently verify Tax Authority results or bank ownership.</p>
+    ${result?.allocationRequired ? "<p><strong>Official allocation verification is still needed.</strong> Without it, the full gate will hold payment even after you purchase the supplier evidence.</p>" : ""}
+    <p>This is an agent/CLI purchase flow, not browser-wallet or card checkout. The downloaded JSON contains your invoice data; keep it private.</p>
+    <a class="button" href="/x402-buyer-quickstart.md">Wallet setup and integration guide</a>`
+    : "";
   const statusClass = result?.action.toLocaleLowerCase("en") ?? "error";
   const actionTitle =
     result?.action === "BLOCK"
@@ -136,6 +147,8 @@ export function renderInvoicePreviewPage(options: {
     .button { display: inline-flex; align-items: center; min-height: 44px; padding: 0 16px; border: 1px solid var(--line); border-radius: 10px; color: var(--text); font-weight: 680; text-decoration: none; }
     .button.primary { border-color: var(--accent); background: var(--accent); color: #04110c; }
     .scope { margin-top: 18px; color: var(--muted); font-size: 13px; }
+    pre { overflow-x: auto; white-space: pre-wrap; overflow-wrap: anywhere; background: #07110f; padding: 16px; border-radius: 10px; }
+    button { font: inherit; cursor: pointer; }
     @media (max-width: 600px) { nav { margin-bottom: 34px; } .result, .offer { padding: 22px; } .summary { grid-template-columns: 1fr; } }
   </style>
 </head>
@@ -143,7 +156,7 @@ export function renderInvoicePreviewPage(options: {
   <main>
     <nav><a class="brand" href="/">${providerName}</a><a class="back" href="/#invoice-preview">← Check another invoice</a></nav>
     ${resultHtml}
-    ${result ? `<section class="offer"><h2>${result.action === "BLOCK" ? "Correct the invoice first" : result.allocationApplicability === "UNKNOWN" ? "Complete the buyer answers first" : "Need the complete supplier decision?"}</h2><p>${result.action === "BLOCK" ? "Return to the invoice and correct the fields identified above before any further verification." : result.allocationApplicability === "UNKNOWN" ? "Confirm whether the buyer is an authorized dealer and requested an allocation number. Paying for the full gate before that would only return HOLD." : "The paid gate resolves the supplier against the Israeli company registry and combines the invoice with vendor-risk signals for $0.25 USDC."}</p><div class="actions">${result.action === "BLOCK" || result.allocationApplicability === "UNKNOWN" ? `<a class="button primary" href="/#invoice-preview">Return to invoice form</a>` : `<a class="button primary" href="/mcp.json">Connect through MCP</a><a class="button" href="/README.md#israeli-invoice-payment-gate">View integration details</a>`}</div></section>` : ""}
+    ${result ? `<section class="offer"><h2>${result.action === "BLOCK" ? "Correct the invoice first" : result.allocationApplicability === "UNKNOWN" ? "Complete the buyer answers first" : "Continue with this invoice · 0.25 USDC"}</h2><p>${result.action === "BLOCK" ? "Return to the invoice and correct the fields identified above before any further verification." : result.allocationApplicability === "UNKNOWN" ? "Confirm whether the buyer is an authorized dealer and requested an allocation number. Paying for the full gate before that would only return HOLD." : "The paid gate resolves the supplier against the Israeli company registry and combines the invoice with vendor-risk signals for $0.25 USDC. No subscription or API key."}</p>${result.action === "BLOCK" || result.allocationApplicability === "UNKNOWN" ? `<a class="button primary" href="/#invoice-preview">Return to invoice form</a>` : purchaseSteps}</section>` : ""}
     <p class="scope">This free structural check is not authorization to pay and does not contact the Israel Tax Authority. Direct official verification requires authorized access.</p>
   </main>
 </body>

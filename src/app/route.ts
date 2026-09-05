@@ -80,7 +80,7 @@ export function serviceManifest() {
         ],
       },
       metadata: "/mcp.json",
-      buyer_bridge: "/israel-company-verify-buyer-0.3.0.tgz",
+      buyer_bridge: "/israel-company-verify-buyer-0.4.0.tgz",
       buyer_bridge_github:
         "https://github.com/itzikhr18/israel-company-verify-buyer",
     },

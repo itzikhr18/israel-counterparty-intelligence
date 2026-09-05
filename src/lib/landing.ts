@@ -217,11 +217,10 @@ export function renderLandingPage(options: LandingPageOptions): string {
       <h2 id="connect">Connect over MCP</h2>
       <p class="section-copy">Start with <code>preview_israeli_invoice_payment_gate_free</code> for an invoice, then use <code>authorize_israeli_invoice_payment_paid</code>. Company verification, changes, vendor risk, and the <code>preview_agent_payment_trust</code> x402 pre-sign firewall remain available.</p>
       <div class="code-card" style="margin-top: 20px">
-        <div class="code-title">One-command free preview · public source on GitHub</div>
-        <pre tabindex="0"><code>npx --yes github:itzikhr18/israel-company-verify-buyer \\
-  --company-number 514744887</code></pre>
+        <div class="code-title">Continue with the invoice JSON downloaded after the free check</div>
+        <pre tabindex="0"><code>npx --yes https://israel-counterparty-intelligence.vercel.app/israel-company-verify-buyer-0.4.0.tgz --invoice-file invoice-request.json</code></pre>
       </div>
-      <p class="section-copy" style="margin-top: 12px"><a href="https://github.com/itzikhr18/israel-company-verify-buyer" style="color: var(--accent)">Inspect the buyer bridge source and release</a></p>
+      <p class="section-copy" style="margin-top: 12px">Free by default. Add <code>--pay</code> only to authorize one invoice report, capped at 0.25 USDC, using your agent's own wallet. The fee buys evidence; the decision may still be HOLD or BLOCK. <a href="/x402-buyer-quickstart.md" style="color: var(--accent)">Purchase and wallet guide</a> · <a href="https://github.com/itzikhr18/israel-counterparty-intelligence/tree/main/buyer-bridge" style="color: var(--accent)">Inspect buyer source</a></p>
     </section>
 
     <section aria-labelledby="flow">

@@ -1,0 +1,11 @@
+{
+  "supplier_company_number": "514744887",
+  "invoice_number": "SAMPLE-NOT-A-REAL-INVOICE",
+  "invoice_date": "2026-09-04",
+  "amount_before_vat": 1000,
+  "vat_amount": 180,
+  "total_amount": 1180,
+  "currency": "ILS",
+  "expected_vat_rate": 18,
+  "language": "en"
+}
