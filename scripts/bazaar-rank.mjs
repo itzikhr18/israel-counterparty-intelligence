@@ -1,3 +1,5 @@
+import { matchesServiceOrigin } from "./bazaar-rank-match.mjs";
+
 const bazaarMcp = "https://api.cdp.coinbase.com/platform/v2/x402/discovery/mcp";
 const serviceOrigin = "https://israel-counterparty-intelligence.vercel.app";
 
@@ -51,12 +53,13 @@ const results = await Promise.all(
     const result = await searchResources(query);
     const tools = result.tools ?? [];
     const rank = tools.findIndex((tool) =>
-      JSON.stringify(tool).includes(serviceOrigin),
+      matchesServiceOrigin(tool, serviceOrigin),
     );
     const leader = tools[0]?._meta?.["x402/service"]?.name ?? null;
     return {
       query,
       rank: rank === -1 ? null : rank + 1,
+      rankStatus: rank === -1 ? "not_matched_in_returned_results" : "matched",
       returned: tools.length,
       searchMethod: result.searchMethod ?? null,
       leader,
@@ -71,7 +74,7 @@ if (process.env.GITHUB_STEP_SUMMARY) {
   const rows = results
     .map(
       (item) =>
-        `| ${item.query} | ${item.rank ?? "Not indexed"} | ${item.returned} | ${item.leader ?? "—"} |`,
+        `| ${item.query} | ${item.rank ?? "Not matched in returned results"} | ${item.returned} | ${item.leader ?? "—"} |`,
     )
     .join("\n");
   await appendFile(

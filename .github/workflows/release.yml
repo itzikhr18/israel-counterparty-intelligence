@@ -1,0 +1,67 @@
+name: Verified release
+
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: write
+      id-token: write
+      attestations: write
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5
+        with:
+          node-version: 24
+          cache: npm
+      - name: Install locked dependencies
+        run: npm ci --ignore-scripts
+      - name: Verify source and production build
+        run: npm run check
+      - name: Package tracked source and buyer bridge
+        env:
+          RELEASE_TAG: ${{ github.ref_name }}
+        run: |
+          set -euo pipefail
+          [[ "$RELEASE_TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]
+          mkdir release-artifacts
+          git archive --format=tar.gz --prefix="israel-counterparty-intelligence-${RELEASE_TAG}/" --output="release-artifacts/israel-counterparty-intelligence-${RELEASE_TAG}-source.tar.gz" HEAD
+          npm pack ./buyer-bridge --pack-destination release-artifacts
+          (cd release-artifacts && sha256sum *.tar.gz *.tgz > SHA256SUMS)
+      - name: Attest release artifacts with Sigstore
+        id: attest
+        uses: actions/attest@1e69f48acb82d1966a394da916b4c1698aa569d6 # v4
+        with:
+          subject-path: release-artifacts/*
+          create-storage-record: false
+      - name: Verify signatures before publication
+        env:
+          GH_TOKEN: ${{ github.token }}
+          ATTESTATION_BUNDLE: ${{ steps.attest.outputs.bundle-path }}
+          RELEASE_REF: ${{ github.ref }}
+          RELEASE_COMMIT: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+          for artifact in release-artifacts/*; do
+            gh attestation verify "$artifact" --bundle "$ATTESTATION_BUNDLE" --repo "$GITHUB_REPOSITORY" --signer-workflow "$GITHUB_REPOSITORY/.github/workflows/release.yml" --source-ref "$RELEASE_REF" --source-digest "$RELEASE_COMMIT" --deny-self-hosted-runners
+          done
+          cp "$ATTESTATION_BUNDLE" release-artifacts/attestation.sigstore.json
+      - name: Publish verified release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ github.ref_name }}
+        run: |
+          gh release create "$RELEASE_TAG" release-artifacts/* --verify-tag --title "Israel Counterparty Intelligence ${RELEASE_TAG}" --notes-file docs/RELEASE_NOTES.md
