@@ -1,7 +1,13 @@
 import { NextRequest } from "next/server";
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { POST } from "@/app/invoice-preview/route";
+import {
+  entityResolutionService,
+  EntityResolutionService,
+} from "@/lib/services/entity-resolution";
+
+afterEach(() => vi.restoreAllMocks());
 
 function request(fields: Record<string, string>) {
   return new NextRequest("https://service.example/invoice-preview", {
@@ -40,6 +46,8 @@ describe("free browser invoice preview", () => {
     expect(html).toContain("--invoice-file invoice-request.json");
     expect(html).toContain("will hold payment even after");
     expect(html).toContain('name="invoice_request"');
+    expect(html).toContain("Prepare request for my own wallet — free");
+    expect(html).toContain("Downloading does not authorize or make a payment.");
     expect(html).not.toContain('href="/mcp.json"');
   });
 
@@ -166,5 +174,96 @@ describe("free browser invoice preview", () => {
       request({ action: "download", invoice_request: "bad json" }),
     );
     expect(response.status).toBe(400);
+  });
+
+  it("prepares a private wallet handoff only after a free supplier match", async () => {
+    const resolution = new EntityResolutionService({
+      findByCompanyNumber: async () => ({
+        ok: true,
+        retrieved_at: "2026-09-06T10:00:00Z",
+        cache_hit: false,
+        data: {
+          records: [
+            {
+              _id: "1",
+              "מספר חברה": "514744887",
+              "שם חברה": "Example Ltd",
+              "סטטוס חברה": "פעילה",
+            },
+          ],
+          sourceUrl: "https://data.gov.il/example",
+        },
+      }),
+      findByName: async () => {
+        throw new Error("Exact lookup only");
+      },
+    });
+    const resolve = vi
+      .spyOn(entityResolutionService, "resolve")
+      .mockImplementation((query) => resolution.resolve(query));
+    const response = await POST(
+      request({
+        action: "wallet-handoff",
+        invoice_request: JSON.stringify({
+          ...invoice,
+          url: "https://attacker.invalid",
+          payment_authorized: true,
+          private_key: "FAKE-UNWANTED-FIELD",
+        }),
+      }),
+    );
+    expect(response.status).toBe(200);
+    expect(response.headers.get("content-disposition")).toBe(
+      'attachment; filename="invoice-wallet-request.json"',
+    );
+    expect(response.headers.get("cache-control")).toBe("no-store");
+    const handoff = await response.json();
+    expect(handoff.payment_authorized).toBe(false);
+    expect(handoff.free_preflight.supplier_resolution).toBe("RESOLVED");
+    expect(handoff.request.body).toMatchObject(invoice);
+    expect(handoff.request.body).not.toHaveProperty("private_key");
+    expect(handoff.request.url).not.toContain("attacker");
+    expect(resolve).toHaveBeenCalledOnce();
+  });
+
+  it("does not prepare a wallet request when the supplier is unknown or unavailable", async () => {
+    const resolve = vi.spyOn(entityResolutionService, "resolve");
+    resolve.mockResolvedValueOnce({
+      status: "NOT_FOUND",
+      entity: null,
+      candidates: [],
+      confidence: 0,
+      evidence: [],
+      missing_data: ["registered_entity"],
+    });
+    resolve.mockRejectedValueOnce(new Error("Source unavailable"));
+    for (const status of [409, 503]) {
+      const response = await POST(
+        request({
+          action: "wallet-handoff",
+          invoice_request: JSON.stringify(invoice),
+        }),
+      );
+      expect(response.status).toBe(status);
+      expect(response.headers.get("content-disposition")).toBeNull();
+      expect(await response.text()).toContain("No payment was made.");
+    }
+  });
+
+  it("cannot bypass invoice checks through the wallet action", async () => {
+    const resolve = vi.spyOn(entityResolutionService, "resolve");
+    for (const change of [
+      { total_amount: 999 },
+      { amount_before_vat: 6000, vat_amount: 1080, total_amount: 7080 },
+    ]) {
+      const response = await POST(
+        request({
+          action: "wallet-handoff",
+          invoice_request: JSON.stringify({ ...invoice, ...change }),
+        }),
+      );
+      expect(response.status).toBe(409);
+    }
+    expect(resolve).not.toHaveBeenCalled();
   });
 });

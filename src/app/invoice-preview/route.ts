@@ -2,6 +2,8 @@ import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 
 import { config } from "@/lib/config";
+import { counterpartyQuerySchema } from "@/lib/domain";
+import { createInvoiceWalletHandoff } from "@/lib/invoice-wallet-handoff";
 import { invoiceGateQuerySchema } from "@/lib/invoice-gate-schema";
 import { logInvoiceFunnel } from "@/lib/invoice-funnel-telemetry";
 import {
@@ -9,6 +11,7 @@ import {
   type InvoicePreviewPageResult,
 } from "@/lib/invoice-page";
 import { previewInvoiceGate } from "@/lib/services/invoice-gate";
+import { entityResolutionService } from "@/lib/services/entity-resolution";
 
 export const runtime = "nodejs";
 
@@ -41,7 +44,8 @@ function optionalBoolean(form: FormData, name: string): boolean | undefined {
 export async function POST(request: NextRequest) {
   try {
     const form = await request.formData();
-    const download = form.get("action") === "download";
+    const walletHandoff = form.get("action") === "wallet-handoff";
+    const download = form.get("action") === "download" || walletHandoff;
     const requestJson = optionalText(form, "invoice_request");
     if (requestJson && requestJson.length > 65_536)
       throw new Error("Request too large");
@@ -107,11 +111,67 @@ export async function POST(request: NextRequest) {
           409,
         );
       }
-      logInvoiceFunnel(request, "invoice_request_downloaded", outcome);
-      return new NextResponse(JSON.stringify(parsed.data, null, 2), {
+      let payload: unknown = parsed.data;
+      if (walletHandoff) {
+        try {
+          const supplier = await entityResolutionService.resolve(
+            counterpartyQuerySchema.parse({
+              company_number: parsed.data.supplier_company_number,
+            }),
+          );
+          if (supplier.status !== "RESOLVED" || !supplier.entity) {
+            logInvoiceFunnel(
+              request,
+              "invoice_wallet_handoff_blocked",
+              outcome,
+            );
+            return html(
+              renderInvoicePreviewPage({
+                providerName: config.PROVIDER_NAME,
+                error:
+                  "The supplier could not be resolved in the company registry. Check the company number before buying a report. No payment was made.",
+              }),
+              409,
+            );
+          }
+          payload = createInvoiceWalletHandoff({
+            invoice: parsed.data,
+            ...outcome,
+            supplier: {
+              companyNumber: supplier.entity.company_number,
+              legalName: supplier.entity.legal_name,
+              status: supplier.entity.status,
+            },
+          });
+        } catch {
+          logInvoiceFunnel(
+            request,
+            "invoice_wallet_handoff_unavailable",
+            outcome,
+          );
+          return html(
+            renderInvoicePreviewPage({
+              providerName: config.PROVIDER_NAME,
+              error:
+                "The free supplier check or purchase terms are unavailable. Try again later. No payment was made.",
+            }),
+            503,
+          );
+        }
+      }
+      logInvoiceFunnel(
+        request,
+        walletHandoff
+          ? "invoice_wallet_handoff_downloaded"
+          : "invoice_request_downloaded",
+        outcome,
+      );
+      return new NextResponse(JSON.stringify(payload, null, 2), {
         headers: {
           "Content-Type": "application/json; charset=utf-8",
-          "Content-Disposition": 'attachment; filename="invoice-request.json"',
+          "Content-Disposition": walletHandoff
+            ? 'attachment; filename="invoice-wallet-request.json"'
+            : 'attachment; filename="invoice-request.json"',
           "Cache-Control": "no-store",
           "X-Content-Type-Options": "nosniff",
         },

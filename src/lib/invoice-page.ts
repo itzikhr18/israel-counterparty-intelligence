@@ -63,14 +63,22 @@ export function renderInvoicePreviewPage(options: {
   const result = options.result;
   const error = options.error ? escapeHtml(options.error) : null;
   const purchaseSteps = options.invoiceRequest
-    ? `<form action="/invoice-preview" method="post"><input type="hidden" name="invoice_request" value="${escapeHtml(JSON.stringify(options.invoiceRequest))}"><button class="button primary" type="submit" name="action" value="download">1. Download this invoice request</button></form>
+    ? `<h3>Use a wallet you already trust</h3>
+    <p>Keep signing and spending controls in your own x402 wallet. No seller-provided wallet software or private-key setup is required for this route.</p>
+    <form action="/invoice-preview" method="post"><input type="hidden" name="invoice_request" value="${escapeHtml(JSON.stringify(options.invoiceRequest))}"><button class="button primary" type="submit" name="action" value="wallet-handoff">Prepare request for my own wallet — free</button></form>
+    <p>We first resolve the supplier for free. The download includes the invoice, exact endpoint, recipient, and a 0.25 USDC maximum for one report. <strong>Downloading does not authorize or make a payment.</strong> Your trusted wallet must enforce the limits and ask for your approval.</p>
+    <p><a href="/trusted-wallet-guide.md">Independent-wallet instructions</a> · The fee buys evidence, not approval to pay the supplier. The report can still return HOLD or BLOCK.</p>
+    ${result?.allocationRequired ? "<p><strong>Official allocation verification is still needed.</strong> Without it, the full gate will hold payment even after you purchase the supplier evidence.</p>" : ""}
+    <details><summary>Alternative: inspect and use our open-source buyer bridge</summary>
+    <form action="/invoice-preview" method="post"><input type="hidden" name="invoice_request" value="${escapeHtml(JSON.stringify(options.invoiceRequest))}"><button class="button" type="submit" name="action" value="download">1. Download this invoice request</button></form>
     <p>2. In the folder containing the download, run this free check with Node.js 20.9+:</p>
     <pre tabindex="0"><code>npx --yes https://israel-counterparty-intelligence.vercel.app/israel-company-verify-buyer-0.4.0.tgz --invoice-file invoice-request.json</code></pre>
     <p>3. Only when ready, add <code>--pay</code> to authorize one report, capped at 0.25 USDC. Your agent needs its own Base USDC wallet configured in its secret environment. Never share its private key here.</p>
     <p>The bridge checks invoice structure and resolves the supplier for free before signing. A paid report may still return HOLD or BLOCK; the fee buys evidence, not a guaranteed approval. We do not independently verify Tax Authority results or bank ownership.</p>
     ${result?.allocationRequired ? "<p><strong>Official allocation verification is still needed.</strong> Without it, the full gate will hold payment even after you purchase the supplier evidence.</p>" : ""}
     <p>This is an agent/CLI purchase flow, not browser-wallet or card checkout. The downloaded JSON contains your invoice data; keep it private.</p>
-    <a class="button" href="/x402-buyer-quickstart.md">Wallet setup and integration guide</a>`
+    <a class="button" href="/x402-buyer-quickstart.md">Wallet setup and integration guide</a></details>
+    <p>The downloaded JSON contains your invoice data; keep it private. This is an agent-wallet flow, not a card or browser-wallet checkout.</p>`
     : "";
   const statusClass = result?.action.toLocaleLowerCase("en") ?? "error";
   const actionTitle =

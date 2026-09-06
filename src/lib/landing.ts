@@ -215,6 +215,7 @@ export function renderLandingPage(options: LandingPageOptions): string {
 
     <section aria-labelledby="connect">
       <h2 id="connect">Connect over MCP</h2>
+      <p class="section-copy">Already use an x402 wallet you trust? The free invoice result can prepare a private request for that wallet, after a free supplier match. No seller wallet software is required. Downloading does not make or authorize payment. <a href="/trusted-wallet-guide.md" style="color: var(--accent)">Use my own wallet</a></p>
       <p class="section-copy">Start with <code>preview_israeli_invoice_payment_gate_free</code> for an invoice, then use <code>authorize_israeli_invoice_payment_paid</code>. Company verification, changes, vendor risk, and the <code>preview_agent_payment_trust</code> x402 pre-sign firewall remain available.</p>
       <div class="code-card" style="margin-top: 20px">
         <div class="code-title">Continue with the invoice JSON downloaded after the free check</div>

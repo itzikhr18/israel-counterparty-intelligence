@@ -7,6 +7,9 @@ export function logInvoiceFunnel(
     | "invoice_preview_invalid"
     | "invoice_preview_delivered"
     | "invoice_request_downloaded"
+    | "invoice_wallet_handoff_downloaded"
+    | "invoice_wallet_handoff_blocked"
+    | "invoice_wallet_handoff_unavailable"
     | "invoice_download_blocked",
   outcome?: {
     action: "PAY" | "HOLD" | "BLOCK";

@@ -4,6 +4,11 @@ One agent-native gate to check an Israeli supplier invoice before payment, with 
 
 Public source: <https://github.com/itzikhr18/israel-counterparty-intelligence>
 
+**Bring your own trusted wallet:** the free invoice result can prepare a private, validated request
+for an existing x402 client, with a free supplier match and a 0.25 USDC proposed cap.
+No seller wallet package is required. Downloading is not payment approval; the buyer's wallet must
+enforce the live terms. [Independent-wallet guide](https://israel-counterparty-intelligence.vercel.app/trusted-wallet-guide.md).
+
 Start with the [free invoice check](https://israel-counterparty-intelligence.vercel.app/#invoice-preview),
 download the validated `invoice-request.json`, and continue with the same invoice:
 

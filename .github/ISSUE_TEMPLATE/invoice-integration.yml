@@ -1,0 +1,40 @@
+name: Real invoice-workflow feedback
+description: Share whether the service helped an actual Israeli-supplier workflow. No payment or sales call required.
+title: "[Invoice integration] "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        This is PUBLIC. Do not include invoices, company/customer identifiers, personal data, wallet addresses, transaction hashes, keys, passwords, or login codes.
+        We want useful product evidence, not manufactured purchases. Do not pay merely to test us or unlock a directory listing.
+  - type: dropdown
+    id: stage
+    attributes:
+      label: What did you actually do?
+      options:
+        - Evaluated documentation only
+        - Used a free preview for a real workflow
+        - Tried a paid request but did not receive a report
+        - Purchased a report for a real workflow
+        - Used paid reports repeatedly in a real workflow
+    validations:
+      required: true
+  - type: textarea
+    id: workflow
+    attributes:
+      label: What real task did you need to complete?
+      description: Describe your role and workflow generally, without naming customers or sharing invoices. What did you use before?
+    validations:
+      required: true
+  - type: textarea
+    id: outcome
+    attributes:
+      label: What was useful or missing?
+      description: What changed in your workflow? If you did not buy, what prevented it? A free alternative being sufficient is useful feedback too.
+    validations:
+      required: true
+  - type: input
+    id: client
+    attributes:
+      label: Integration type (optional)
+      placeholder: Existing x402 client, accounting agent, MCP, browser preview

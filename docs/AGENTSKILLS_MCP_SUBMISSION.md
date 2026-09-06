@@ -11,6 +11,7 @@ Use this package on `https://agentskills.co.il/he/mcp/submit`. The listing is fo
 - Metadata: `https://israel-counterparty-intelligence.vercel.app/mcp.json`
 - Transport: `Streamable HTTP`
 - Authentication: `No API key for discovery and free tools; paid tools use x402 v2`
+- Independent-wallet guide: `https://israel-counterparty-intelligence.vercel.app/trusted-wallet-guide.md` (buyer may use its own trusted x402 client; seller wallet package is optional)
 - Category: `Accounting` (secondary: `Government Services`, `Tax and Finance`)
 - License: `MIT`
 - Language: `English API and structured output; Israeli/Hebrew company records are preserved`
@@ -30,7 +31,8 @@ Pre-payment gate for Israeli supplier invoices and AI agents. Checks VAT arithme
 ## Recommended first call
 
 1. Call `preview_israeli_invoice_payment_gate_free` with the invoice figures and buyer allocation conditions.
-2. If the structural preview is not `BLOCK`, call `authorize_israeli_invoice_payment_paid` for the registry-backed decision.
+2. If the structural preview is `BLOCK` or allocation applicability is `UNKNOWN`, stop and complete the inputs. Resolve the supplier with the free company preview before purchase.
+3. Only with a real need for the evidence and buyer approval of one 0.25 USDC report, use `authorize_israeli_invoice_payment_paid` or the equivalent REST route with the buyer's trusted wallet. The wallet must enforce its own payment policy. A paid report can still be HOLD or BLOCK.
 
 ## Evidence and safety boundary
 
@@ -56,3 +58,4 @@ Pre-payment gate for Israeli supplier invoices and AI agents. Checks VAT arithme
 - Connect to the MCP endpoint and list tools.
 - Call `describe_service` and `preview_israeli_invoice_payment_gate_free` without payment.
 - An unpaid paid-tool call must return a structured x402 v2 payment requirement, not a result.
+- The free browser result offers a private independent-wallet request download, after a free exact supplier match. Downloading is not payment approval. No funded reviewer test is requested.

@@ -5,6 +5,11 @@ wallet. The service never asks for an API key or custody of the buyer's private 
 
 ## Invoice gate: from free check to one paid report
 
+**Already have a wallet you trust?** Use the [independent-wallet route](https://israel-counterparty-intelligence.vercel.app/trusted-wallet-guide.md).
+The invoice result can prepare a private request for your own x402 client, after a free supplier match.
+It does not authorize payment and does not require installing our buyer bridge. Your wallet must enforce the terms and the 0.25 USDC cap.
+The bridge below remains an optional, inspectable implementation.
+
 Start at [the free invoice form](https://israel-counterparty-intelligence.vercel.app/#invoice-preview).
 Complete the invoice and buyer answers, then download `invoice-request.json` from the result.
 Keep this file private: it contains your invoice data. Requires Node.js 20.9+.

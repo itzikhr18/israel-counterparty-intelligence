@@ -29,6 +29,7 @@
 - MCP testnet: https://israel-counterparty-intelligence.vercel.app/mcp/testnet
 - MCP metadata: https://israel-counterparty-intelligence.vercel.app/mcp.json
 - Agent skill: https://israel-counterparty-intelligence.vercel.app/SKILL.md
+- Independent-wallet purchase guide: https://israel-counterparty-intelligence.vercel.app/trusted-wallet-guide.md (no seller wallet package required; prepare a private request after free invoice and supplier checks; buyer wallet must enforce terms and approve one purchase)
 - Service icon: https://israel-counterparty-intelligence.vercel.app/icon.svg
 - Free x402 pre-sign firewall: https://israel-counterparty-intelligence.vercel.app/v1/agent-payment-trust
 - Agent Payee Manifest schema: https://israel-counterparty-intelligence.vercel.app/.well-known/agent-payee-schema.json
