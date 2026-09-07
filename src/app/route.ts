@@ -4,12 +4,22 @@ import { NextResponse } from "next/server";
 import { config, paidRouteConfig } from "@/lib/config";
 import { API_VERSION } from "@/lib/domain";
 import { renderLandingPage } from "@/lib/landing";
+import {
+  PAID_SERVICE_NOTICE,
+  PAID_SERVICE_SUSPENDED,
+} from "@/lib/service-availability";
 
 export function serviceManifest() {
   return {
     service: config.PROVIDER_NAME,
     version: API_VERSION,
-    status: "MAINNET LIVE - AWAITING FIRST EXTERNAL PAID CALL",
+    status: PAID_SERVICE_SUSPENDED
+      ? "PAID SERVICES SUSPENDED - FREE PREVIEWS AVAILABLE"
+      : "MAINNET LIVE - AWAITING FIRST EXTERNAL PAID CALL",
+    paid_service: {
+      suspended: PAID_SERVICE_SUSPENDED,
+      notice: PAID_SERVICE_SUSPENDED ? PAID_SERVICE_NOTICE : undefined,
+    },
     purpose:
       "Evidence-backed public intelligence for Israeli business counterparties",
     endpoints: Object.values(paidRouteConfig).map(
@@ -113,6 +123,9 @@ export async function GET(request?: NextRequest) {
   return new NextResponse(
     renderLandingPage({
       providerName: config.PROVIDER_NAME,
+      paidServiceNotice: PAID_SERVICE_SUSPENDED
+        ? PAID_SERVICE_NOTICE
+        : undefined,
       mcpPrice: config.X402_MCP_MAINNET_VERIFY_PRICE.replace("$", ""),
       paymentRiskPrice: config.X402_MCP_MAINNET_PAYMENT_RISK_PRICE.replace(
         "$",
@@ -129,7 +142,7 @@ export async function GET(request?: NextRequest) {
     {
       headers: {
         "Content-Type": "text/html; charset=utf-8",
-        "Cache-Control": "public, max-age=300, s-maxage=3600",
+        "Cache-Control": "no-store",
         Vary: "Accept",
         "X-Content-Type-Options": "nosniff",
         "Referrer-Policy": "strict-origin-when-cross-origin",

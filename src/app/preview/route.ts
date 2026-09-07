@@ -5,6 +5,8 @@ import { config } from "@/lib/config";
 import { previewCompanyQuerySchema } from "@/lib/domain";
 import { renderPreviewPage, type PreviewPageResult } from "@/lib/landing";
 import { counterpartyOrchestrator } from "@/lib/services/orchestrator";
+import { rateLimitClientKey } from "@/lib/http/client-key";
+import { checkRateLimit } from "@/lib/http/rate-limit";
 
 export const runtime = "nodejs";
 
@@ -22,6 +24,12 @@ function html(body: string, status = 200) {
 }
 
 export async function GET(request: NextRequest) {
+  const rate = checkRateLimit(rateLimitClientKey(request));
+  if (!rate.allowed) {
+    const response = html("Too many requests. Please try again later.", 429);
+    response.headers.set("retry-after", String(rate.retryAfterSeconds));
+    return response;
+  }
   const companyNumber =
     request.nextUrl.searchParams.get("company_number")?.trim() ?? "";
   const parsed = previewCompanyQuerySchema.safeParse({

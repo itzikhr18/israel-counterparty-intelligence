@@ -1,6 +1,7 @@
 import { randomBytes } from "node:crypto";
 
 import { HTTPFacilitatorClient } from "@x402/core/server";
+import { SettleError } from "@x402/core/types";
 import { SignJWT, importJWK, importPKCS8, type CryptoKey } from "jose";
 
 import {
@@ -11,6 +12,16 @@ import {
 
 const CDP_HOST = "api.cdp.coinbase.com";
 const CDP_BASE_PATH = "/platform/v2/x402";
+
+// MCP's after-handler wrapper only withholds reports when settlement throws.
+// Some facilitators return HTTP 200 with success:false; normalize that failure here.
+class StrictSettlementFacilitatorClient extends HTTPFacilitatorClient {
+  override async settle(...args: Parameters<HTTPFacilitatorClient["settle"]>) {
+    const result = await super.settle(...args);
+    if (!result.success) throw new SettleError(402, result);
+    return result;
+  }
+}
 
 type CdpJwtInput = {
   apiKeyId: string;
@@ -102,7 +113,7 @@ export function createPaymentFacilitatorClient(
 ): HTTPFacilitatorClient {
   const environment = paymentEnvironments[environmentName];
   if (environment.facilitatorProvider === "coinbase-cdp") {
-    return new HTTPFacilitatorClient({
+    return new StrictSettlementFacilitatorClient({
       url: environment.facilitatorUrl,
       createAuthHeaders: async () => ({
         verify: await cdpHeaders("POST", `${CDP_BASE_PATH}/verify`),
@@ -111,5 +122,7 @@ export function createPaymentFacilitatorClient(
       }),
     });
   }
-  return new HTTPFacilitatorClient({ url: environment.facilitatorUrl });
+  return new StrictSettlementFacilitatorClient({
+    url: environment.facilitatorUrl,
+  });
 }

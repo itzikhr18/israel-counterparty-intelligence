@@ -79,8 +79,10 @@ describe("free browser preview", () => {
     expect(html).toContain("מנדיי. קום בעמ");
     expect(html).toContain("514744887");
     expect(html).toContain("99%");
-    expect(html).toContain("$0.01 USDC");
-    expect(html).toContain("$0.05 USDC");
+    expect(html).toContain("Paid services temporarily suspended");
+    expect(html).toContain("Do not sign or send a payment.");
+    expect(html).not.toContain("$0.01 USDC");
+    expect(html).not.toContain("$0.05 USDC");
     expect(html).not.toContain("paid-evidence.example");
     expect(html).not.toContain("יצחק שדה");
   });

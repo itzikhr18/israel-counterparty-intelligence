@@ -26,6 +26,10 @@ import {
 } from "@/lib/payment-challenge";
 import { paymentOptionFor, priceToAtomicUsdc } from "@/lib/payment-config";
 import { createExternalPaidCallEvent } from "@/lib/payment-telemetry";
+import {
+  PAID_SERVICE_SUSPENDED,
+  paidServiceUnavailableResponse,
+} from "@/lib/service-availability";
 
 type RouteHandler = (request: NextRequest) => Promise<NextResponse>;
 
@@ -319,6 +323,7 @@ function getServer(
 export function createLocalPaymentRequiredResponse(
   routeName: PaidRouteName,
 ): NextResponse {
+  if (PAID_SERVICE_SUSPENDED) return paidServiceUnavailableResponse();
   const paymentRequired = buildPaymentRequired(routeName);
   const buyerQuickstart = `${config.PUBLIC_BASE_URL}/x402-buyer-quickstart.md`;
 
@@ -337,6 +342,9 @@ export function protectWithX402(
   handler: RouteHandler,
   routeName: PaidRouteName,
 ): RouteHandler {
+  if (PAID_SERVICE_SUSPENDED) {
+    return async () => paidServiceUnavailableResponse();
+  }
   const route = paidRouteConfig[routeName];
   const environment = paymentEnvironments[route.environment];
   if (!environment.enabled) return handler;

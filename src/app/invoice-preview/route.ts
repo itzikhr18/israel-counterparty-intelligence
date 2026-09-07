@@ -2,7 +2,10 @@ import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 
 import { config } from "@/lib/config";
-import { counterpartyQuerySchema } from "@/lib/domain";
+import { ApiError, counterpartyQuerySchema } from "@/lib/domain";
+import { readBoundedFormData } from "@/lib/http/body";
+import { rateLimitClientKey } from "@/lib/http/client-key";
+import { checkRateLimit } from "@/lib/http/rate-limit";
 import { createInvoiceWalletHandoff } from "@/lib/invoice-wallet-handoff";
 import { invoiceGateQuerySchema } from "@/lib/invoice-gate-schema";
 import { logInvoiceFunnel } from "@/lib/invoice-funnel-telemetry";
@@ -12,6 +15,10 @@ import {
 } from "@/lib/invoice-page";
 import { previewInvoiceGate } from "@/lib/services/invoice-gate";
 import { entityResolutionService } from "@/lib/services/entity-resolution";
+import {
+  PAID_SERVICE_SUSPENDED,
+  paidServiceUnavailableResponse,
+} from "@/lib/service-availability";
 
 export const runtime = "nodejs";
 
@@ -42,9 +49,18 @@ function optionalBoolean(form: FormData, name: string): boolean | undefined {
 }
 
 export async function POST(request: NextRequest) {
+  const rate = checkRateLimit(rateLimitClientKey(request));
+  if (!rate.allowed) {
+    const response = html("Too many requests. Please try again later.", 429);
+    response.headers.set("retry-after", String(rate.retryAfterSeconds));
+    return response;
+  }
   try {
-    const form = await request.formData();
+    const form = await readBoundedFormData(request);
     const walletHandoff = form.get("action") === "wallet-handoff";
+    if (walletHandoff && PAID_SERVICE_SUSPENDED) {
+      return paidServiceUnavailableResponse();
+    }
     const download = form.get("action") === "download" || walletHandoff;
     const requestJson = optionalText(form, "invoice_request");
     if (requestJson && requestJson.length > 65_536)
@@ -207,7 +223,7 @@ export async function POST(request: NextRequest) {
         invoiceRequest: parsed.data,
       }),
     );
-  } catch {
+  } catch (error) {
     logInvoiceFunnel(request, "invoice_preview_invalid");
     return html(
       renderInvoicePreviewPage({
@@ -215,7 +231,7 @@ export async function POST(request: NextRequest) {
         error:
           "The invoice form could not be read. Please return and try again.",
       }),
-      400,
+      error instanceof ApiError ? error.status : 400,
     );
   }
 }

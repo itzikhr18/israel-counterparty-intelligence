@@ -3,6 +3,10 @@ import {
   agentPaymentTrustOutputJsonSchema,
 } from "@/lib/agent-payment-trust-schema";
 import { config, paidRouteConfig } from "@/lib/config";
+import {
+  PAID_SERVICE_NOTICE,
+  PAID_SERVICE_SUSPENDED,
+} from "@/lib/service-availability";
 import { API_VERSION } from "@/lib/domain";
 import {
   paymentRiskInputJsonSchema,
@@ -47,13 +51,36 @@ function paidPost(
 ) {
   return {
     summary,
-    description: `${description} Price: ${price} per successful call through x402 when enabled.`,
+    description: `${PAID_SERVICE_SUSPENDED ? `${PAID_SERVICE_NOTICE} ` : ""}${description} Reference price: ${price} per successful call through x402 when available.`,
+    "x-paid-service-suspended": PAID_SERVICE_SUSPENDED,
     operationId: summary.toLocaleLowerCase("en").replace(/[^a-z0-9]+/g, "_"),
     requestBody: {
       required: true,
       content: { "application/json": { schema: inputSchema } },
     },
     responses: {
+      "503": {
+        description:
+          "Paid service suspended; no payment attempted and no report delivered. Do not sign or send payment.",
+        content: {
+          "application/json": {
+            schema: {
+              type: "object",
+              properties: {
+                error: {
+                  type: "object",
+                  properties: {
+                    code: { type: "string", const: "PAID_SERVICE_SUSPENDED" },
+                    message: { type: "string" },
+                  },
+                },
+                payment_attempted: { type: "boolean", const: false },
+              },
+              required: ["error", "payment_attempted"],
+            },
+          },
+        },
+      },
       "200": {
         description: "Evidence-backed result",
         content: {

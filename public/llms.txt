@@ -2,7 +2,9 @@
 
 > Israeli invoice payment gates, company changes, verification, and vendor payment-risk intelligence with public-registry evidence. Official Tax Authority verification requires buyer authorization.
 
-- Status: PRODUCTION LIVE
+- Status: PAID SERVICES SUSPENDED; FREE PREVIEWS AVAILABLE
+- Do not sign or send payment. Paid endpoints return PAID_SERVICE_SUSPENDED. Prices below are reference information only.
+- Current availability: https://israel-counterparty-intelligence.vercel.app/health
 
 - Production endpoint: https://israel-counterparty-intelligence.vercel.app/v1/verify/mainnet
 - Method: POST

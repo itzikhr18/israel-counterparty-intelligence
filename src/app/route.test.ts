@@ -29,7 +29,7 @@ describe("service root", () => {
     });
   });
 
-  it("returns a conversion-focused page to a browser", async () => {
+  it("keeps free checks visible while clearly suspending browser purchase instructions", async () => {
     const response = await GET(
       new NextRequest("https://service.example/", {
         headers: { accept: "text/html,application/xhtml+xml" },
@@ -52,9 +52,12 @@ describe("service root", () => {
     expect(html).toContain('action="/preview"');
     expect(html).toContain('name="company_number"');
     expect(html).toContain("Free · no wallet required");
-    expect(html).toContain("israel-company-verify-buyer-0.4.0.tgz");
-    expect(html).toContain("--invoice-file invoice-request.json");
-    expect(html).toContain("preview_agent_payment_trust");
+    expect(html).toContain("Paid services temporarily suspended");
+    expect(html).toContain("preview_israeli_invoice_payment_gate_free");
+    expect(html).toContain("preview_israeli_company_free");
+    expect(html).not.toContain("israel-company-verify-buyer-0.4.0.tgz");
+    expect(html).not.toContain("--pay");
+    expect(html).not.toContain("Approve payment");
     expect(html).toContain("0.05 USDC");
     expect(html).toContain("0.10 USDC");
     expect(html).toContain("0.01 USDC");

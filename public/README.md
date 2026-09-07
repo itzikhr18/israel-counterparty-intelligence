@@ -4,7 +4,9 @@ Check an Israeli supplier invoice before payment, return `PAY`, `HOLD`, or `BLOC
 
 Already use a trusted x402 wallet? Start with the [free invoice form](https://israel-counterparty-intelligence.vercel.app/#invoice-preview), then prepare a private wallet request after a free supplier match. [Independent-wallet guide](https://israel-counterparty-intelligence.vercel.app/trusted-wallet-guide.md). No seller wallet package is required; the buyer must approve the report and enforce the payment policy in its own wallet.
 
-Status: **MAINNET LIVE - AWAITING FIRST EXTERNAL PAID CALL**
+Status: **PAID SERVICES SUSPENDED — FREE PREVIEWS AVAILABLE**
+
+Do not sign or send payment. Paid reports, wallet handoff and x402 payments are temporarily suspended. Purchase instructions and prices below are reference material only. Check [current service status](https://israel-counterparty-intelligence.vercel.app/health).
 
 This x402 v2 service has a production Base Mainnet resource and a separate Base Sepolia test resource. It is designed for agents searching for:
 

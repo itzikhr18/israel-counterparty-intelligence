@@ -6,10 +6,13 @@ import type { ZodType } from "zod";
 import { config } from "@/lib/config";
 import { ApiError } from "@/lib/domain";
 import { checkRateLimit } from "@/lib/http/rate-limit";
+import { readBoundedJson } from "@/lib/http/body";
+import { rateLimitClientKey } from "@/lib/http/client-key";
 
 type Operation<TInput> = (query: TInput) => Promise<Record<string, unknown>>;
 
 interface JsonHandlerOptions {
+  maxBodyBytes?: number;
   clientClass?: "pilot";
   paymentStatus?: "pilot_waived";
   rateLimitKey?: (request: NextRequest, fingerprint: string) => string;
@@ -93,7 +96,8 @@ export function createJsonHandler<TInput>(
           ? "missing"
           : "disabled");
     const rate = checkRateLimit(
-      options.rateLimitKey?.(request, clientFingerprint) ?? clientFingerprint,
+      options.rateLimitKey?.(request, clientFingerprint) ??
+        rateLimitClientKey(request),
     );
     if (!rate.allowed) {
       logRequest({
@@ -113,7 +117,11 @@ export function createJsonHandler<TInput>(
         },
         {
           status: 429,
-          headers: { "retry-after": String(rate.retryAfterSeconds) },
+          headers: {
+            "retry-after": String(rate.retryAfterSeconds),
+            "cache-control": "no-store",
+            "x-request-id": requestId,
+          },
         },
       );
     }
@@ -121,8 +129,9 @@ export function createJsonHandler<TInput>(
     try {
       let body: unknown;
       try {
-        body = await request.json();
-      } catch {
+        body = await readBoundedJson(request, options.maxBodyBytes);
+      } catch (error) {
+        if (error instanceof ApiError) throw error;
         throw new ApiError(
           400,
           "INVALID_JSON",

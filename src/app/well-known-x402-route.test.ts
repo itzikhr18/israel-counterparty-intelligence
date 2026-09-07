@@ -1,4 +1,11 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
+
+// Retain the active-service discovery contract. The real suspension default is
+// tested separately in service-suspension.integration.test.ts.
+vi.mock("@/lib/service-availability", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("@/lib/service-availability")>()),
+  PAID_SERVICE_SUSPENDED: false,
+}));
 
 import { GET } from "@/app/.well-known/x402/route";
 
@@ -9,7 +16,7 @@ describe("x402 well-known discovery", () => {
 
     expect(response.status).toBe(200);
     expect(response.headers.get("content-type")).toContain("application/json");
-    expect(response.headers.get("cache-control")).toContain("s-maxage=3600");
+    expect(response.headers.get("cache-control")).toContain("no-store");
     expect(manifest).toMatchObject({
       x402Version: 2,
       name: "Israel Counterparty Intelligence",

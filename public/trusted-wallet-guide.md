@@ -1,5 +1,7 @@
 # Israeli invoice report: bring your own trusted wallet
 
+**Paid services temporarily suspended. Do not sign or send payment.** Free previews remain available; wallet handoff and purchase steps below are unavailable reference material. Check [current service status](https://israel-counterparty-intelligence.vercel.app/health).
+
 For an accounts-payable automation that already has an x402-capable wallet and needs evidence about an Israeli supplier before paying an invoice.
 
 No seller wallet package, seller API key, subscription, or sales call is required. Signing stays in the wallet/client you choose. This is not card checkout and does not remove the need for a funded buyer wallet.

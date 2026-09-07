@@ -2,6 +2,13 @@ import { NextRequest } from "next/server";
 import { parsePaymentRequired } from "@x402/core/schemas";
 import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 
+// Preserve the legacy active-payment contract test without changing deployment's
+// suspension default. service-suspension.integration.test.ts covers that default.
+vi.mock("@/lib/service-availability", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("@/lib/service-availability")>()),
+  PAID_SERVICE_SUSPENDED: false,
+}));
+
 type RouteHandler = (request: NextRequest) => Promise<Response>;
 
 let post: RouteHandler;

@@ -56,6 +56,11 @@ import {
 } from "@/lib/invoice-gate-schema";
 import { previewInvoiceGate } from "@/lib/services/invoice-gate";
 import { pilotMetadata, runPilotVerification } from "@/lib/pilot";
+import {
+  PAID_SERVICE_NOTICE,
+  PAID_SERVICE_SUSPENDED,
+  paidServiceUnavailableBody,
+} from "@/lib/service-availability";
 import { counterpartyOrchestrator } from "@/lib/services/orchestrator";
 import { x402DiscoverySchema } from "@/lib/x402-discovery-schema";
 import {
@@ -95,6 +100,7 @@ function serverInstructions(accessMode: "paid" | "pilot"): string {
   if (accessMode === "pilot") {
     return "Use verify_company for invitation-only partner verification. Payment is waived only when this authenticated pilot endpoint is used. Use get_sample_verification_report to inspect the response shape without a live lookup.";
   }
+  if (PAID_SERVICE_SUSPENDED) return PAID_SERVICE_NOTICE;
   return `For an Israeli tax invoice, start with ${FREE_INVOICE_GATE_PREVIEW_TOOL}, then use ${PAID_INVOICE_GATE_TOOL} for the PAY, HOLD, or BLOCK gate. Official Tax Authority verification requires buyer authorization and buyer-attested results are never presented as independently authenticated. For company intelligence, start with ${FREE_PREVIEW_TOOL}, then use ${PAID_VERIFY_TOOL}; company changes cost $0.01 USDC, full verification $0.05, vendor payment risk through ${PAID_PAYMENT_RISK_TOOL} costs $0.10, and the invoice gate $0.25 on Base Mainnet. Before signing an x402 payment, use ${AGENT_PAYMENT_TRUST_TOOL}. Buyer bridge: ${X402_BUYER_BRIDGE_URL}`;
 }
 
@@ -879,7 +885,13 @@ export async function createIsraelMcpServer(
       },
     },
     async () =>
-      textAndStructured(serviceDescription(environmentName, accessMode)),
+      textAndStructured({
+        ...serviceDescription(environmentName, accessMode),
+        paid_service: {
+          suspended: PAID_SERVICE_SUSPENDED,
+          notice: PAID_SERVICE_SUSPENDED ? PAID_SERVICE_NOTICE : undefined,
+        },
+      }),
   );
 
   server.registerTool(
@@ -898,6 +910,7 @@ export async function createIsraelMcpServer(
     async () =>
       textAndStructured({
         tool: "verify_company",
+        paid_service_suspended: PAID_SERVICE_SUSPENDED,
         tools: [
           "verify_company",
           PAID_INVOICE_GATE_TOOL,
@@ -1214,6 +1227,43 @@ export async function createIsraelMcpServer(
       }
     },
   );
+
+  // Fail closed before either the free-development fallback or facilitator setup.
+  // Retain tool names and input contracts so existing clients get an explicit
+  // suspension result, never a purchasable challenge or a full report.
+  if (PAID_SERVICE_SUSPENDED) {
+    const suspendedTools = [
+      ["verify_company", counterpartyQuerySchema],
+      [PAID_VERIFY_TOOL, counterpartyQuerySchema],
+      [PAID_PAYMENT_RISK_TOOL, paymentRiskQuerySchema],
+      [PAID_INVOICE_GATE_TOOL, invoiceGateQuerySchema],
+      [PAID_COMPANY_CHANGES_TOOL, companyChangesQuerySchema],
+    ] as const;
+    for (const [name, inputSchema] of suspendedTools) {
+      server.registerTool(
+        name,
+        {
+          description: PAID_SERVICE_NOTICE,
+          inputSchema,
+          annotations: {
+            readOnlyHint: true,
+            destructiveHint: false,
+            idempotentHint: true,
+          },
+        },
+        async () => ({
+          isError: true,
+          content: [
+            {
+              type: "text" as const,
+              text: JSON.stringify(paidServiceUnavailableBody()),
+            },
+          ],
+        }),
+      );
+    }
+    return server;
+  }
 
   if (!environment.enabled) {
     const verifyWithoutPayment = async (

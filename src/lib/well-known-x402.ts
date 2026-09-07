@@ -5,6 +5,10 @@ import {
 } from "@/lib/company-changes-schema";
 import { buildPaymentRequired } from "@/lib/payment-challenge";
 import {
+  PAID_SERVICE_NOTICE,
+  PAID_SERVICE_SUSPENDED,
+} from "@/lib/service-availability";
+import {
   paymentRiskInputJsonSchema,
   paymentRiskOutputJsonSchema,
 } from "@/lib/payment-risk-schema";
@@ -80,9 +84,13 @@ export function wellKnownX402Manifest() {
   return {
     x402Version: 2,
     name: config.PROVIDER_NAME,
-    status: config.X402_MAINNET_ENABLED
-      ? "MAINNET LIVE - AWAITING FIRST EXTERNAL PAID CALL"
-      : "MAINNET DISABLED",
+    paid_service_suspended: PAID_SERVICE_SUSPENDED,
+    notice: PAID_SERVICE_SUSPENDED ? PAID_SERVICE_NOTICE : undefined,
+    status: PAID_SERVICE_SUSPENDED
+      ? "PAID SERVICES SUSPENDED - FREE PREVIEWS AVAILABLE"
+      : config.X402_MAINNET_ENABLED
+        ? "MAINNET LIVE - AWAITING FIRST EXTERNAL PAID CALL"
+        : "MAINNET DISABLED",
     description:
       "Pre-payment intelligence for Israeli supplier invoices: allocation-number applicability, PAY/HOLD/BLOCK decisions, company verification, company changes, and vendor-risk checks with field-level public-registry evidence. Missing buyer context fails safely. Official Tax Authority verification requires buyer authorization; buyer-attested results are not independently authenticated.",
     category: "business-intelligence",
@@ -124,6 +132,8 @@ export function wellKnownX402Manifest() {
       x402scanResourceId: "e9b83616-3c3e-483a-81a2-a93c2b85dd7e",
       index402ResourceId: "fa0902ac-90a7-431a-8979-97da22a12911",
     },
-    endpoints: discoveryRoutes.map(discoveryEndpoint),
+    endpoints: PAID_SERVICE_SUSPENDED
+      ? []
+      : discoveryRoutes.map(discoveryEndpoint),
   };
 }

@@ -1,5 +1,7 @@
 # x402 v2 Buyer Quickstart
 
+**Paid services temporarily suspended. Do not sign or send payment or use `--pay`.** Free previews remain available; paid steps below are reference material only. Check [current service status](https://israel-counterparty-intelligence.vercel.app/health).
+
 Use this guide to run a free preview or pay for one complete verification with a buyer-controlled
 wallet. The service never asks for an API key or custody of the buyer's private key.
 

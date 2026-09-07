@@ -1,5 +1,11 @@
+import {
+  PAID_SERVICE_NOTICE,
+  PAID_SERVICE_SUSPENDED,
+} from "@/lib/service-availability";
+
 interface LandingPageOptions {
   providerName: string;
+  paidServiceNotice?: string;
   mcpPrice: string;
   paymentRiskPrice: string;
   companyChangesPrice: string;
@@ -109,8 +115,9 @@ export function renderLandingPage(options: LandingPageOptions): string {
   <main>
     <nav aria-label="Primary navigation">
       <span class="brand">Israel Business Intelligence MCP</span>
-      <span class="status">Production live</span>
+      <span class="status">${options.paidServiceNotice ? "Free previews available · Paid services paused" : "Production live"}</span>
     </nav>
+    ${options.paidServiceNotice ? `<aside class="scope" role="status"><strong>Paid services temporarily suspended</strong><p>${escapeHtml(options.paidServiceNotice)}</p><p>Listed prices and integration examples are reference information, not an invitation to pay. <a href="/service-status.md">Service status and limits</a></p></aside>` : ""}
 
     <header class="hero">
       <div class="eyebrow">Official-source Israeli business intelligence</div>
@@ -128,7 +135,7 @@ export function renderLandingPage(options: LandingPageOptions): string {
 
     <section aria-labelledby="why-number-one">
       <h2 id="why-number-one">One Israel-specific toolchain, from identity to payment</h2>
-      <p class="section-copy">Start with a free invoice or registry preview. Run the full invoice payment gate for ${invoiceGatePrice} USDC, recent company changes for ${companyChangesPrice}, full verification for ${mcpPrice}, or vendor-risk triage for ${paymentRiskPrice}. No subscription and no API key.</p>
+      <p class="section-copy">${PAID_SERVICE_SUSPENDED ? "Start with a free invoice or registry preview. Full reports are currently suspended; listed prices are reference information only." : `Start with a free invoice or registry preview. Run the full invoice payment gate for ${invoiceGatePrice} USDC, recent company changes for ${companyChangesPrice}, full verification for ${mcpPrice}, or vendor-risk triage for ${paymentRiskPrice}. No subscription and no API key.`}</p>
     </section>
 
     <section id="invoice-preview" aria-labelledby="invoice-preview-title">
@@ -215,28 +222,31 @@ export function renderLandingPage(options: LandingPageOptions): string {
 
     <section aria-labelledby="connect">
       <h2 id="connect">Connect over MCP</h2>
-      <p class="section-copy">Already use an x402 wallet you trust? The free invoice result can prepare a private request for that wallet, after a free supplier match. No seller wallet software is required. Downloading does not make or authorize payment. <a href="/trusted-wallet-guide.md" style="color: var(--accent)">Use my own wallet</a></p>
+      ${
+        PAID_SERVICE_SUSPENDED
+          ? `<p class="section-copy">Connect to <code>https://israel-counterparty-intelligence.vercel.app/mcp</code> and use <code>preview_israeli_invoice_payment_gate_free</code> or <code>preview_israeli_company_free</code>. Paid reports and wallet handoff are suspended. Do not sign or send payment.</p>`
+          : `<p class="section-copy">Already use an x402 wallet you trust? The free invoice result can prepare a private request for that wallet, after a free supplier match. No seller wallet software is required. Downloading does not make or authorize payment. <a href="/trusted-wallet-guide.md" style="color: var(--accent)">Use my own wallet</a></p>
       <p class="section-copy">Start with <code>preview_israeli_invoice_payment_gate_free</code> for an invoice, then use <code>authorize_israeli_invoice_payment_paid</code>. Company verification, changes, vendor risk, and the <code>preview_agent_payment_trust</code> x402 pre-sign firewall remain available.</p>
       <div class="code-card" style="margin-top: 20px">
         <div class="code-title">Continue with the invoice JSON downloaded after the free check</div>
         <pre tabindex="0"><code>npx --yes https://israel-counterparty-intelligence.vercel.app/israel-company-verify-buyer-0.4.0.tgz --invoice-file invoice-request.json</code></pre>
       </div>
-      <p class="section-copy" style="margin-top: 12px">Free by default. Add <code>--pay</code> only to authorize one invoice report, capped at 0.25 USDC, using your agent's own wallet. The fee buys evidence; the decision may still be HOLD or BLOCK. <a href="/x402-buyer-quickstart.md" style="color: var(--accent)">Purchase and wallet guide</a> · <a href="https://github.com/itzikhr18/israel-counterparty-intelligence/tree/main/buyer-bridge" style="color: var(--accent)">Inspect buyer source</a></p>
+      <p class="section-copy" style="margin-top: 12px">Free by default. Add <code>--pay</code> only to authorize one invoice report, capped at 0.25 USDC, using your agent's own wallet. The fee buys evidence; the decision may still be HOLD or BLOCK. <a href="/x402-buyer-quickstart.md" style="color: var(--accent)">Purchase and wallet guide</a> · <a href="https://github.com/itzikhr18/israel-counterparty-intelligence/tree/main/buyer-bridge" style="color: var(--accent)">Inspect buyer source</a></p>`
+      }
     </section>
 
     <section aria-labelledby="flow">
       <h2 id="flow">From request to evidence</h2>
       <div class="steps">
         <div class="step"><h3>Submit identity</h3><p class="section-copy">Use an Israeli company number or a legal name with optional context.</p></div>
-        <div class="step"><h3>Approve payment</h3><p class="section-copy">Your buyer-controlled wallet validates the fixed x402 contract.</p></div>
-        <div class="step"><h3>Receive evidence</h3><p class="section-copy">Get structured registry fields, sources, confidence, and missing-data disclosure.</p></div>
+        ${PAID_SERVICE_SUSPENDED ? `<div class="step"><h3>Run free checks</h3><p class="section-copy">Inspect invoice structure or a limited company preview without a wallet.</p></div><div class="step"><h3>Review the limits</h3><p class="section-copy">A preview is not payment authorization. Full reports remain suspended.</p></div>` : `<div class="step"><h3>Approve payment</h3><p class="section-copy">Your buyer-controlled wallet validates the fixed x402 contract.</p></div><div class="step"><h3>Receive evidence</h3><p class="section-copy">Get structured registry fields, sources, confidence, and missing-data disclosure.</p></div>`}
       </div>
     </section>
 
     <section aria-labelledby="rest">
       <h2 id="rest">REST is available too</h2>
       <div class="code-card">
-        <div class="code-title">Inspect the ${restPrice} Mainnet payment challenge without paying</div>
+        <div class="code-title">${PAID_SERVICE_SUSPENDED ? "Confirm the paid verification route returns 503 (suspended)" : `Inspect the ${restPrice} Mainnet payment challenge without paying`}</div>
         <pre tabindex="0"><code>curl -i https://israel-counterparty-intelligence.vercel.app/v1/verify/mainnet \\
   -H 'content-type: application/json' \\
   --data '{"company_number":"514744887","language":"en"}'</code></pre>
@@ -248,13 +258,13 @@ export function renderLandingPage(options: LandingPageOptions): string {
   --data '{"supplier_company_number":"514744887","invoice_number":"INV-1","invoice_date":"2026-09-04","amount_before_vat":6000,"vat_amount":1080,"total_amount":7080,"buyer_is_authorized_dealer":true,"buyer_requested_allocation_number":true,"allocation_number":"123456789"}'</code></pre>
       </div>
       <div class="code-card" style="margin-top: 16px">
-        <div class="code-title">Inspect the $${paymentRiskPrice} vendor payment-risk challenge</div>
+        <div class="code-title">${PAID_SERVICE_SUSPENDED ? "Vendor payment-risk reports return 503 (suspended)" : `Inspect the $${paymentRiskPrice} vendor payment-risk challenge`}</div>
         <pre tabindex="0"><code>curl -i https://israel-counterparty-intelligence.vercel.app/v1/payment-risk/mainnet \
   -H 'content-type: application/json' \
   --data '{"company_number":"514744887","invoice_company_number":"514744887","invoice_company_name":"מנדיי. קום בעמ"}'</code></pre>
       </div>
       <div class="code-card" style="margin-top: 16px">
-        <div class="code-title">Inspect the $${companyChangesPrice} recent company-changes challenge</div>
+        <div class="code-title">${PAID_SERVICE_SUSPENDED ? "Company-change reports return 503 (suspended)" : `Inspect the $${companyChangesPrice} recent company-changes challenge`}</div>
         <pre tabindex="0"><code>curl -i https://israel-counterparty-intelligence.vercel.app/v1/company-changes/mainnet \
   -H 'content-type: application/json' \
   --data '{"company_number":"514744887","lookback_days":366,"limit":25}'</code></pre>
@@ -364,7 +374,7 @@ export function renderPreviewPage(options: {
   <main>
     <nav><a class="brand" href="/">${providerName}</a><a class="back" href="/#free-preview">← New search</a></nav>
     ${resultContent}
-    ${resolved ? `<section class="offer"><h2>Need the complete evidence?</h2><p>Unlock recent official company changes for $0.01 USDC or the complete field-level registry report for $0.05 USDC.</p><div class="actions"><a class="button primary" href="/x402-buyer-quickstart.md">Get the full report</a><a class="button" href="/openapi.json">API details</a></div></section>` : ""}
+    ${PAID_SERVICE_SUSPENDED ? `<section class="offer" role="status"><h2>Paid services temporarily suspended</h2><p>${escapeHtml(PAID_SERVICE_NOTICE)}</p></section>` : resolved ? `<section class="offer"><h2>Need the complete evidence?</h2><p>Unlock recent official company changes for $0.01 USDC or the complete field-level registry report for $0.05 USDC.</p><div class="actions"><a class="button primary" href="/x402-buyer-quickstart.md">Get the full report</a><a class="button" href="/openapi.json">API details</a></div></section>` : ""}
     <p class="scope">Free preview only: legal identity, registry status, and match confidence. No address, source URLs, filing details, or full verification evidence are included. Not legal, credit, sanctions, or investment advice.</p>
   </main>
 </body>

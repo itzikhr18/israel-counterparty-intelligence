@@ -1,3 +1,8 @@
+import {
+  PAID_SERVICE_NOTICE,
+  PAID_SERVICE_SUSPENDED,
+} from "@/lib/service-availability";
+
 export interface InvoicePreviewPageResult {
   action: "PAY" | "HOLD" | "BLOCK";
   score: number;
@@ -62,8 +67,9 @@ export function renderInvoicePreviewPage(options: {
   const providerName = escapeHtml(options.providerName);
   const result = options.result;
   const error = options.error ? escapeHtml(options.error) : null;
-  const purchaseSteps = options.invoiceRequest
-    ? `<h3>Use a wallet you already trust</h3>
+  const purchaseSteps =
+    options.invoiceRequest && !PAID_SERVICE_SUSPENDED
+      ? `<h3>Use a wallet you already trust</h3>
     <p>Keep signing and spending controls in your own x402 wallet. No seller-provided wallet software or private-key setup is required for this route.</p>
     <form action="/invoice-preview" method="post"><input type="hidden" name="invoice_request" value="${escapeHtml(JSON.stringify(options.invoiceRequest))}"><button class="button primary" type="submit" name="action" value="wallet-handoff">Prepare request for my own wallet — free</button></form>
     <p>We first resolve the supplier for free. The download includes the invoice, exact endpoint, recipient, and a 0.25 USDC maximum for one report. <strong>Downloading does not authorize or make a payment.</strong> Your trusted wallet must enforce the limits and ask for your approval.</p>
@@ -79,7 +85,7 @@ export function renderInvoicePreviewPage(options: {
     <p>This is an agent/CLI purchase flow, not browser-wallet or card checkout. The downloaded JSON contains your invoice data; keep it private.</p>
     <a class="button" href="/x402-buyer-quickstart.md">Wallet setup and integration guide</a></details>
     <p>The downloaded JSON contains your invoice data; keep it private. This is an agent-wallet flow, not a card or browser-wallet checkout.</p>`
-    : "";
+      : "";
   const statusClass = result?.action.toLocaleLowerCase("en") ?? "error";
   const actionTitle =
     result?.action === "BLOCK"
@@ -88,7 +94,9 @@ export function renderInvoicePreviewPage(options: {
         ? "Confirm the buyer conditions"
         : result?.action === "HOLD"
           ? "Hold for the next check"
-          : "Ready for the paid supplier gate";
+          : PAID_SERVICE_SUSPENDED
+            ? "Free checks complete; paid supplier gate suspended"
+            : "Ready for the paid supplier gate";
   const resultHtml = error
     ? `<section class="result error" role="alert"><div class="eyebrow">Input problem</div><h1>We could not check this invoice</h1><p>${error}</p></section>`
     : result
@@ -164,7 +172,7 @@ export function renderInvoicePreviewPage(options: {
   <main>
     <nav><a class="brand" href="/">${providerName}</a><a class="back" href="/#invoice-preview">← Check another invoice</a></nav>
     ${resultHtml}
-    ${result ? `<section class="offer"><h2>${result.action === "BLOCK" ? "Correct the invoice first" : result.allocationApplicability === "UNKNOWN" ? "Complete the buyer answers first" : "Continue with this invoice · 0.25 USDC"}</h2><p>${result.action === "BLOCK" ? "Return to the invoice and correct the fields identified above before any further verification." : result.allocationApplicability === "UNKNOWN" ? "Confirm whether the buyer is an authorized dealer and requested an allocation number. Paying for the full gate before that would only return HOLD." : "The paid gate resolves the supplier against the Israeli company registry and combines the invoice with vendor-risk signals for $0.25 USDC. No subscription or API key."}</p>${result.action === "BLOCK" || result.allocationApplicability === "UNKNOWN" ? `<a class="button primary" href="/#invoice-preview">Return to invoice form</a>` : purchaseSteps}</section>` : ""}
+    ${PAID_SERVICE_SUSPENDED ? `<section class="offer" role="status"><h2>Paid services temporarily suspended</h2><p>${escapeHtml(PAID_SERVICE_NOTICE)}</p><a class="button" href="/#invoice-preview">Return to free invoice form</a></section>` : result ? `<section class="offer"><h2>${result.action === "BLOCK" ? "Correct the invoice first" : result.allocationApplicability === "UNKNOWN" ? "Complete the buyer answers first" : "Continue with this invoice · 0.25 USDC"}</h2><p>${result.action === "BLOCK" ? "Return to the invoice and correct the fields identified above before any further verification." : result.allocationApplicability === "UNKNOWN" ? "Confirm whether the buyer is an authorized dealer and requested an allocation number. Paying for the full gate before that would only return HOLD." : "The paid gate resolves the supplier against the Israeli company registry and combines the invoice with vendor-risk signals for $0.25 USDC. No subscription or API key."}</p>${result.action === "BLOCK" || result.allocationApplicability === "UNKNOWN" ? `<a class="button primary" href="/#invoice-preview">Return to invoice form</a>` : purchaseSteps}</section>` : ""}
     <p class="scope">This free structural check is not authorization to pay and does not contact the Israel Tax Authority. Direct official verification requires authorized access.</p>
   </main>
 </body>

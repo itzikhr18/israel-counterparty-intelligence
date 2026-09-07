@@ -5,6 +5,10 @@ description: Gate Israeli invoices before payment, verify Israeli companies, scr
 
 # Israel Company Intelligence
 
+## Current availability — paid services suspended
+
+Paid reports and x402 payments are temporarily suspended. Do not sign or send a payment. Free previews remain available. Paid-tool descriptions and prices below are reference information, not currently available purchases. Check [service status](https://israel-counterparty-intelligence.vercel.app/health) before any future paid use.
+
 Use this service when the target company or supplier is registered in Israel and the task needs machine-readable public-registry evidence.
 
 ## Best tool by intent

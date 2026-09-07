@@ -6,6 +6,10 @@ import { config } from "@/lib/config";
 import { createIsraelMcpServer } from "@/lib/mcp-server";
 import { logMcpRequest, logMcpResponse } from "@/lib/mcp-telemetry";
 import { authorizePilotRequest, pilotResponseHeaders } from "@/lib/pilot";
+import { ApiError } from "@/lib/domain";
+import { readBoundedJson, MCP_JSON_BODY_BYTES } from "@/lib/http/body";
+import { rateLimitClientKey } from "@/lib/http/client-key";
+import { checkRateLimit } from "@/lib/http/rate-limit";
 
 const CORS_HEADERS = {
   "access-control-allow-origin": "*",
@@ -48,16 +52,42 @@ export function createMcpRoute(
 
     let parsedBody: unknown;
     if (request.method === "POST") {
+      const rate = checkRateLimit(rateLimitClientKey(request));
+      if (!rate.allowed) {
+        return withHeaders(
+          NextResponse.json(
+            {
+              jsonrpc: "2.0",
+              id: null,
+              error: { code: -32000, message: "Too many requests" },
+            },
+            {
+              status: 429,
+              headers: { "retry-after": String(rate.retryAfterSeconds) },
+            },
+          ),
+          responseHeaders,
+        );
+      }
       try {
-        parsedBody = await request.json();
-      } catch {
-        return NextResponse.json(
-          {
-            jsonrpc: "2.0",
-            id: null,
-            error: { code: -32700, message: "Parse error" },
-          },
-          { status: 400, headers: CORS_HEADERS },
+        parsedBody = await readBoundedJson(request, MCP_JSON_BODY_BYTES);
+      } catch (error) {
+        const tooLarge = error instanceof ApiError && error.status === 413;
+        return withHeaders(
+          NextResponse.json(
+            {
+              jsonrpc: "2.0",
+              id: null,
+              error: {
+                code: tooLarge ? -32600 : -32700,
+                message: tooLarge
+                  ? "Request body exceeds the size limit"
+                  : "Parse error",
+              },
+            },
+            { status: tooLarge ? 413 : 400, headers: CORS_HEADERS },
+          ),
+          responseHeaders,
         );
       }
       logMcpRequest(

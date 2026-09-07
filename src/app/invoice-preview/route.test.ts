@@ -1,5 +1,13 @@
 import { NextRequest } from "next/server";
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+
+const availability = vi.hoisted(() => ({ suspended: true }));
+vi.mock("@/lib/service-availability", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("@/lib/service-availability")>()),
+  get PAID_SERVICE_SUSPENDED() {
+    return availability.suspended;
+  },
+}));
 
 import { POST } from "@/app/invoice-preview/route";
 import {
@@ -7,6 +15,11 @@ import {
   EntityResolutionService,
 } from "@/lib/services/entity-resolution";
 
+// Only legacy purchase/handoff assertions opt into active service explicitly.
+// Validation and free-download tests keep the actual suspended default.
+beforeEach(() => {
+  availability.suspended = true;
+});
 afterEach(() => vi.restoreAllMocks());
 
 function request(fields: Record<string, string>) {
@@ -19,6 +32,7 @@ function request(fields: Record<string, string>) {
 
 describe("free browser invoice preview", () => {
   it("renders a clear hold result when the structure passes", async () => {
+    availability.suspended = false;
     const response = await POST(
       request({
         supplier_company_number: "514744887",
@@ -95,9 +109,8 @@ describe("free browser invoice preview", () => {
     expect(html).toContain(
       "Buyer status or allocation-request information is missing.",
     );
-    expect(html).toContain(
-      "Paying for the full gate before that would only return HOLD.",
-    );
+    expect(html).toContain("Paid services temporarily suspended");
+    expect(html).not.toContain("--pay");
     expect(html).not.toContain("Connect through MCP");
   });
 
@@ -141,6 +154,7 @@ describe("free browser invoice preview", () => {
   });
 
   it("escapes invoice data carried through the hidden download form", async () => {
+    availability.suspended = false;
     const response = await POST(
       request(
         Object.fromEntries(
@@ -177,6 +191,7 @@ describe("free browser invoice preview", () => {
   });
 
   it("prepares a private wallet handoff only after a free supplier match", async () => {
+    availability.suspended = false;
     const resolution = new EntityResolutionService({
       findByCompanyNumber: async () => ({
         ok: true,
@@ -227,6 +242,7 @@ describe("free browser invoice preview", () => {
   });
 
   it("does not prepare a wallet request when the supplier is unknown or unavailable", async () => {
+    availability.suspended = false;
     const resolve = vi.spyOn(entityResolutionService, "resolve");
     resolve.mockResolvedValueOnce({
       status: "NOT_FOUND",
@@ -251,6 +267,7 @@ describe("free browser invoice preview", () => {
   });
 
   it("cannot bypass invoice checks through the wallet action", async () => {
+    availability.suspended = false;
     const resolve = vi.spyOn(entityResolutionService, "resolve");
     for (const change of [
       { total_amount: 999 },

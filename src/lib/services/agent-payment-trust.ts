@@ -1,6 +1,4 @@
 import { createHash } from "node:crypto";
-import { isIP } from "node:net";
-import { lookup } from "node:dns/promises";
 
 import { recoverMessageAddress, type Hex } from "viem";
 
@@ -11,6 +9,10 @@ import {
 } from "@/lib/agent-payment-trust-schema";
 import type { EntityResolution } from "@/lib/domain";
 import { normalizeCompanyNumber } from "@/lib/normalize";
+import {
+  fetchPublicJson,
+  UnsafePublicUrlError,
+} from "@/lib/http/safe-public-json";
 
 export const AGENT_PAYMENT_TRUST_VERSION = "0.1.0";
 export const AGENT_PAYEE_MANIFEST_PATH = "/.well-known/agent-payee.json";
@@ -45,40 +47,7 @@ function normalizedOrigin(value: string): string | null {
   }
 }
 
-function isPrivateAddress(address: string): boolean {
-  if (address.includes(":")) {
-    const lower = address.toLocaleLowerCase("en");
-    return (
-      lower === "::" ||
-      lower === "::1" ||
-      lower.startsWith("fc") ||
-      lower.startsWith("fd") ||
-      lower.startsWith("fe8") ||
-      lower.startsWith("fe9") ||
-      lower.startsWith("fea") ||
-      lower.startsWith("feb") ||
-      lower.startsWith("::ffff:10.") ||
-      lower.startsWith("::ffff:127.") ||
-      lower.startsWith("::ffff:169.254.") ||
-      lower.startsWith("::ffff:192.168.")
-    );
-  }
-  const parts = address.split(".").map(Number);
-  if (parts.length !== 4 || parts.some((part) => !Number.isInteger(part)))
-    return true;
-  const [a = 0, b = 0] = parts;
-  return (
-    a === 0 ||
-    a === 10 ||
-    a === 127 ||
-    (a === 169 && b === 254) ||
-    (a === 172 && b >= 16 && b <= 31) ||
-    (a === 192 && b === 168) ||
-    a >= 224
-  );
-}
-
-async function safeManifestUrl(serviceUrl: string): Promise<URL | null> {
+function safeManifestUrl(serviceUrl: string): URL | null {
   const service = new URL(serviceUrl);
   const hostname = service.hostname.toLocaleLowerCase("en");
   if (
@@ -92,17 +61,6 @@ async function safeManifestUrl(serviceUrl: string): Promise<URL | null> {
     hostname.endsWith(".internal")
   ) {
     return null;
-  }
-  if (isIP(hostname)) {
-    if (isPrivateAddress(hostname)) return null;
-  } else {
-    const addresses = await lookup(hostname, { all: true, verbatim: true });
-    if (
-      addresses.length === 0 ||
-      addresses.some(({ address }) => isPrivateAddress(address))
-    ) {
-      return null;
-    }
   }
   return new URL(AGENT_PAYEE_MANIFEST_PATH, service.origin);
 }
@@ -181,23 +139,9 @@ async function fetchManifest(
   }
 
   try {
-    const response = await fetch(url, {
-      headers: {
-        accept: "application/json",
-        "user-agent": "IsraelCounterpartyIntelligence/1.4",
-      },
-      redirect: "error",
-      signal: AbortSignal.timeout(3_500),
-      cache: "no-store",
-    });
-    if (!response.ok) throw new Error(`HTTP ${response.status}`);
-    const declaredLength = Number(
-      response.headers.get("content-length") ?? "0",
+    const parsed = agentPayeeManifestSchema.safeParse(
+      await fetchPublicJson(url),
     );
-    if (declaredLength > 65_536) throw new Error("Manifest is too large");
-    const text = await response.text();
-    if (text.length > 65_536) throw new Error("Manifest is too large");
-    const parsed = agentPayeeManifestSchema.safeParse(JSON.parse(text));
     if (!parsed.success) throw new Error("Manifest schema validation failed");
     return {
       manifest: parsed.data,
@@ -206,13 +150,16 @@ async function fetchManifest(
       fetchedFromServiceDomain: true,
       errorCode: null,
     };
-  } catch {
+  } catch (error) {
     return {
       manifest: null,
       mode: "fetch",
       sourceUrl: url.toString(),
       fetchedFromServiceDomain: false,
-      errorCode: "MANIFEST_UNAVAILABLE",
+      errorCode:
+        error instanceof UnsafePublicUrlError
+          ? "UNSAFE_MANIFEST_URL"
+          : "MANIFEST_UNAVAILABLE",
     };
   }
 }
