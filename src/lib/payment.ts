@@ -347,7 +347,10 @@ export function protectWithX402(
   }
   const route = paidRouteConfig[routeName];
   const environment = paymentEnvironments[route.environment];
-  if (!environment.enabled) return handler;
+  // A disabled verifier is not authorization for a free full report. The
+  // separately authenticated pilot is the only payment-waived full-report path.
+  if (!environment.enabled)
+    return async () => paidServiceUnavailableResponse("disabled");
 
   // The unsigned price-discovery path is fully local. Avoid starting a facilitator
   // request in the background for crawlers, health checks, and MCP discovery calls.

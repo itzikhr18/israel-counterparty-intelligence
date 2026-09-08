@@ -19,6 +19,27 @@ class StrictSettlementFacilitatorClient extends HTTPFacilitatorClient {
   override async settle(...args: Parameters<HTTPFacilitatorClient["settle"]>) {
     const result = await super.settle(...args);
     if (!result.success) throw new SettleError(402, result);
+    const [, requirements] = args;
+    // The SDK validates JSON types, not receipt consistency. This service only
+    // supports exact EVM USDC payments. A success flag with a missing/invalid
+    // transaction, wrong chain or contradictory amount must not release a report.
+    // This is NOT independent on-chain confirmation. An inconsistent receipt may
+    // describe a payment that already moved: fail closed and never retry here.
+    if (
+      !/^0x[a-fA-F0-9]{64}$/.test(result.transaction) ||
+      /^0x0{64}$/i.test(result.transaction) ||
+      result.network !== requirements.network ||
+      (result.amount !== undefined && result.amount !== requirements.amount) ||
+      (result.payer !== undefined && !/^0x[a-fA-F0-9]{40}$/.test(result.payer))
+    ) {
+      throw new SettleError(502, {
+        ...result,
+        success: false,
+        errorReason: "settlement_receipt_inconsistent",
+        errorMessage:
+          "Settlement outcome requires reconciliation. Do not automatically retry payment.",
+      });
+    }
     return result;
   }
 }

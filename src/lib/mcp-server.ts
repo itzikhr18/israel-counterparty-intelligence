@@ -1228,10 +1228,14 @@ export async function createIsraelMcpServer(
     },
   );
 
-  // Fail closed before either the free-development fallback or facilitator setup.
+  // Fail closed before facilitator setup, including after a future reviewed
+  // resumption if payment verification is disabled. Pilot access is separate.
   // Retain tool names and input contracts so existing clients get an explicit
   // suspension result, never a purchasable challenge or a full report.
-  if (PAID_SERVICE_SUSPENDED) {
+  if (PAID_SERVICE_SUSPENDED || !environment.enabled) {
+    const unavailable = paidServiceUnavailableBody(
+      PAID_SERVICE_SUSPENDED ? "suspended" : "disabled",
+    );
     const suspendedTools = [
       ["verify_company", counterpartyQuerySchema],
       [PAID_VERIFY_TOOL, counterpartyQuerySchema],
@@ -1243,7 +1247,7 @@ export async function createIsraelMcpServer(
       server.registerTool(
         name,
         {
-          description: PAID_SERVICE_NOTICE,
+          description: unavailable.error.message,
           inputSchema,
           annotations: {
             readOnlyHint: true,
@@ -1256,104 +1260,12 @@ export async function createIsraelMcpServer(
           content: [
             {
               type: "text" as const,
-              text: JSON.stringify(paidServiceUnavailableBody()),
+              text: JSON.stringify(unavailable),
             },
           ],
         }),
       );
     }
-    return server;
-  }
-
-  if (!environment.enabled) {
-    const verifyWithoutPayment = async (
-      args: z.infer<typeof counterpartyQuerySchema>,
-    ) => {
-      const result = await counterpartyOrchestrator.verify(args);
-      return textAndStructured({ request_id: randomUUID(), ...result });
-    };
-    server.registerTool(
-      "verify_company",
-      {
-        title: "Verify Israeli company",
-        description: `${DESCRIPTION} Payment is disabled in this environment.`,
-        inputSchema: counterpartyQuerySchema,
-        annotations: {
-          readOnlyHint: true,
-          destructiveHint: false,
-          idempotentHint: true,
-        },
-      },
-      verifyWithoutPayment,
-    );
-    server.registerTool(
-      PAID_VERIFY_TOOL,
-      {
-        title: "Verify an Israeli company - full report",
-        description: `${DESCRIPTION} Payment is disabled in this environment.`,
-        inputSchema: counterpartyQuerySchema,
-        annotations: {
-          readOnlyHint: true,
-          destructiveHint: false,
-          idempotentHint: true,
-        },
-      },
-      verifyWithoutPayment,
-    );
-    server.registerTool(
-      PAID_PAYMENT_RISK_TOOL,
-      {
-        title: "Assess Israeli vendor payment risk",
-        description:
-          "Registry-backed pre-payment triage with invoice consistency checks and a PROCEED, REVIEW, or BLOCK result. Payment is disabled in this environment.",
-        inputSchema: paymentRiskQuerySchema,
-        annotations: {
-          readOnlyHint: true,
-          destructiveHint: false,
-          idempotentHint: true,
-        },
-      },
-      async (args) => {
-        const result = await counterpartyOrchestrator.paymentRisk(args);
-        return textAndStructured({ request_id: randomUUID(), ...result });
-      },
-    );
-    server.registerTool(
-      PAID_INVOICE_GATE_TOOL,
-      {
-        title: "Authorize an Israeli invoice payment",
-        description:
-          "Registry-backed Israeli invoice payment gate with VAT, allocation-number, and supplier-risk checks. Payment is disabled in this environment.",
-        inputSchema: invoiceGateQuerySchema,
-        annotations: {
-          readOnlyHint: true,
-          destructiveHint: false,
-          idempotentHint: true,
-        },
-      },
-      async (args) => {
-        const result = await counterpartyOrchestrator.invoiceGate(args);
-        return textAndStructured({ request_id: randomUUID(), ...result });
-      },
-    );
-    server.registerTool(
-      PAID_COMPANY_CHANGES_TOOL,
-      {
-        title: "Get recent Israeli company changes",
-        description:
-          "Recent official Israeli company filing and status-change events with source evidence. Payment is disabled in this environment.",
-        inputSchema: companyChangesQuerySchema,
-        annotations: {
-          readOnlyHint: true,
-          destructiveHint: false,
-          idempotentHint: true,
-        },
-      },
-      async (args) => {
-        const result = await counterpartyOrchestrator.companyChanges(args);
-        return textAndStructured({ request_id: randomUUID(), ...result });
-      },
-    );
     return server;
   }
 

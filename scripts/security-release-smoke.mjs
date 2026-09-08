@@ -20,17 +20,31 @@ const invoice = {
 let id = 0;
 async function request(path, options = {}) {
   const started = performance.now();
-  const response = await fetch(new URL(path, base), {
-    ...options,
-    redirect: "error",
-    signal: AbortSignal.timeout(20_000),
-    headers: {
-      "x-discovery-source": "internal-conversion-audit",
-      "user-agent": "ICI-Security-Containment-Smoke/1.0",
-      ...options.headers,
-    },
-  });
-  const raw = await response.text();
+  let response;
+  let raw;
+  try {
+    response = await fetch(new URL(path, base), {
+      ...options,
+      redirect: "error",
+      signal: AbortSignal.timeout(20_000),
+      headers: {
+        "x-discovery-source": "internal-conversion-audit",
+        "user-agent": "ICI-Security-Containment-Smoke/1.0",
+        ...options.headers,
+      },
+    });
+    raw = await response.text();
+  } catch (error) {
+    // Keep the failed boundary in the evidence too. Do not turn a timeout into
+    // PASS or silently repeat potentially stateful operations.
+    evidence.push({
+      path,
+      status: response?.status ?? null,
+      elapsed_ms: Math.round(performance.now() - started),
+      error: error.name,
+    });
+    throw new Error(`${path}: ${error.message}`, { cause: error });
+  }
   let body;
   try {
     body = JSON.parse(raw);
