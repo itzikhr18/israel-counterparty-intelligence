@@ -6,15 +6,15 @@
 
 ## Current posture
 
-| Signal | Value |
-| --- | --- |
-| Commercial status | **MAINNET LIVE — awaiting first EXTERNAL paid call** |
-| Paid service suspended | `false` (confirm live `/health`) |
-| Facilitator | Authenticated Coinbase CDP (`api.cdp.coinbase.com/platform/v2/x402`) |
-| Network | Base Mainnet `eip155:8453` |
-| Asset | USDC `0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913` |
-| Receiving wallet | `0xa0A3BB49eA4AC723Bcf4d2d1ecde2EE01BA03C82` |
-| Protocol | x402 v2 |
+| Signal                 | Value                                                                |
+| ---------------------- | -------------------------------------------------------------------- |
+| Commercial status      | **MAINNET LIVE — awaiting first EXTERNAL paid call**                 |
+| Paid service suspended | `false` (confirm live `/health`)                                     |
+| Facilitator            | Authenticated Coinbase CDP (`api.cdp.coinbase.com/platform/v2/x402`) |
+| Network                | Base Mainnet `eip155:8453`                                           |
+| Asset                  | USDC `0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913`                    |
+| Receiving wallet       | `0xa0A3BB49eA4AC723Bcf4d2d1ecde2EE01BA03C82`                         |
+| Protocol               | x402 v2                                                              |
 
 Machine-readable checks:
 
@@ -28,12 +28,12 @@ Unpaid POSTs to paid Mainnet routes must return **HTTP 402** with `PAYMENT-REQUI
 
 ## Live prices (Base Mainnet USDC)
 
-| Product | Endpoint | Price |
-| --- | --- | --- |
+| Product                    | Endpoint                           | Price     |
+| -------------------------- | ---------------------------------- | --------- |
 | Company changes (cheapest) | `POST /v1/company-changes/mainnet` | **$0.01** |
-| Company verification | `POST /v1/verify/mainnet` | **$0.05** |
-| Vendor payment risk | `POST /v1/payment-risk/mainnet` | **$0.10** |
-| Invoice payment gate | `POST /v1/invoice-gate/mainnet` | **$0.25** |
+| Company verification       | `POST /v1/verify/mainnet`          | **$0.05** |
+| Vendor payment risk        | `POST /v1/payment-risk/mainnet`    | **$0.10** |
+| Invoice payment gate       | `POST /v1/invoice-gate/mainnet`    | **$0.25** |
 
 Free (no wallet): invoice structural preview, company identity preview, `preview_agent_payment_trust`.
 

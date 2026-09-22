@@ -4,7 +4,7 @@
 **Live MCP:** `https://israel-counterparty-intelligence.vercel.app/mcp`  
 **Repo:** `https://github.com/itzikhr18/israel-counterparty-intelligence`  
 **Metadata:** `https://israel-counterparty-intelligence.vercel.app/mcp.json`  
-**Status page:** `https://israel-counterparty-intelligence.vercel.app/STATUS.md`  
+**Status page:** `https://israel-counterparty-intelligence.vercel.app/STATUS.md`
 
 Automation cannot finish these listings without human captcha / OAuth. Drafts below are ready to paste. Prefer **Free** plans; do not buy Premium unless you choose to.
 
@@ -88,13 +88,13 @@ Note: Glama historically prefers stdio for some hosted runners; the **Connector*
 
 ## 4) Already published / do not duplicate
 
-| Surface | ID / URL | Notes |
-| --- | --- | --- |
-| Official MCP registry name | `io.github.itzikhr18/israel-business-intelligence` | See repo `server.json` |
-| Agent Tools | `israel-counterparty-intelligence-vercel-app-sub393` | Linked from llms.txt |
-| x402scan | `e9b83616-3c3e-483a-81a2-a93c2b85dd7e` | |
-| 402 Index | `fa0902ac-90a7-431a-8979-97da22a12911` | Index DOWN / payment-requirements fix owned by another agent — do not fight |
-| agentskills.co.il | See `docs/AGENTSKILLS_MCP_SUBMISSION.md` | Separate form |
+| Surface                    | ID / URL                                             | Notes                                                                       |
+| -------------------------- | ---------------------------------------------------- | --------------------------------------------------------------------------- |
+| Official MCP registry name | `io.github.itzikhr18/israel-business-intelligence`   | See repo `server.json`                                                      |
+| Agent Tools                | `israel-counterparty-intelligence-vercel-app-sub393` | Linked from llms.txt                                                        |
+| x402scan                   | `e9b83616-3c3e-483a-81a2-a93c2b85dd7e`               |                                                                             |
+| 402 Index                  | `fa0902ac-90a7-431a-8979-97da22a12911`               | Index DOWN / payment-requirements fix owned by another agent — do not fight |
+| agentskills.co.il          | See `docs/AGENTSKILLS_MCP_SUBMISSION.md`             | Separate form                                                               |
 
 ---
 
@@ -102,9 +102,9 @@ Note: Glama historically prefers stdio for some hosted runners; the **Connector*
 
 Update this table when done (date in Asia/Jerusalem):
 
-| Directory | Submitted? | Listing URL | Notes |
-| --- | --- | --- | --- |
-| mcpservers.org | | | |
-| Smithery | | | |
-| Glama server | | | |
-| Glama connector | | | |
+| Directory       | Submitted? | Listing URL | Notes |
+| --------------- | ---------- | ----------- | ----- |
+| mcpservers.org  |            |             |       |
+| Smithery        |            |             |       |
+| Glama server    |            |             |       |
+| Glama connector |            |             |       |
