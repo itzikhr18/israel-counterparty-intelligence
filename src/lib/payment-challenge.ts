@@ -34,6 +34,16 @@ import {
 } from "@/lib/invoice-gate-schema";
 import { x402DiscoverySchema } from "@/lib/x402-discovery-schema";
 
+/** CDP facilitator /verify rejects echoed resource.description over 500 chars. */
+export const X402_RESOURCE_DESCRIPTION_MAX_CHARS = 500;
+
+export function clipResourceDescription(description: string): string {
+  if (description.length <= X402_RESOURCE_DESCRIPTION_MAX_CHARS) {
+    return description;
+  }
+  return `${description.slice(0, X402_RESOURCE_DESCRIPTION_MAX_CHARS - 1).trimEnd()}…`;
+}
+
 export function paymentOutputExample(
   route: PaidRouteName,
 ): Record<string, unknown> {
@@ -190,7 +200,7 @@ export function buildPaymentRequired(
     error: "Payment required",
     resource: {
       url: `${config.PUBLIC_BASE_URL}${route.path}`,
-      description: route.description,
+      description: clipResourceDescription(route.description),
       mimeType: "application/json",
       serviceName: serviceMetadata.serviceName,
       tags: serviceMetadata.tags,
