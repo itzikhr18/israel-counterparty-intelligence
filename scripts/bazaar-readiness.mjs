@@ -115,9 +115,8 @@ const suspended = summary.every(
   (item) =>
     item.liveStatus === 503 && item.liveErrorCode === "PAID_SERVICE_SUSPENDED",
 );
-const missing402 = summary.some(
-  (item) =>
-    item.failedRequiredPreflight.some((check) => check.check === "returns_402"),
+const missing402 = summary.some((item) =>
+  item.failedRequiredPreflight.some((check) => check.check === "returns_402"),
 );
 
 if (suspended) {
