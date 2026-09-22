@@ -115,7 +115,7 @@ export function renderLandingPage(options: LandingPageOptions): string {
   <main>
     <nav aria-label="Primary navigation">
       <span class="brand">Israel Business Intelligence MCP</span>
-      <span class="status">${options.paidServiceNotice ? "Free previews available · Paid services paused" : "Production live"}</span>
+      <span class="status">${options.paidServiceNotice ? "Free previews available · Paid services paused" : "Mainnet live · awaiting first external paid call"}</span>
     </nav>
     ${options.paidServiceNotice ? `<aside class="scope" role="status"><strong>Paid services temporarily suspended</strong><p>${escapeHtml(options.paidServiceNotice)}</p><p>Listed prices and integration examples are reference information, not an invitation to pay. <a href="/service-status.md">Service status and limits</a></p></aside>` : ""}
 

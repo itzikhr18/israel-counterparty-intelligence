@@ -3,6 +3,8 @@ import { describe, expect, it } from "vitest";
 import {
   buildPaymentRequired,
   buildPaymentRequiredBody,
+  clipResourceDescription,
+  X402_RESOURCE_DESCRIPTION_MAX_CHARS,
 } from "@/lib/payment-challenge";
 import { paymentOptionFor, priceToAtomicUsdc } from "@/lib/payment-config";
 
@@ -142,5 +144,31 @@ describe("dual-network x402 configuration", () => {
         ),
       },
     });
+  });
+
+  it("keeps every paid-route resource.description within the CDP 500-character limit", () => {
+    const routes = [
+      "verify",
+      "verify-mainnet",
+      "payment-risk-mainnet",
+      "invoice-gate-mainnet",
+      "company-changes-mainnet",
+      "government-footprint",
+      "counterparty-risk",
+    ] as const;
+
+    for (const route of routes) {
+      const challenge = buildPaymentRequired(route);
+      const description = challenge.resource?.description ?? "";
+      expect(description.length).toBeLessThanOrEqual(
+        X402_RESOURCE_DESCRIPTION_MAX_CHARS,
+      );
+      expect(description).toBe(clipResourceDescription(description));
+    }
+
+    const overlong = "x".repeat(X402_RESOURCE_DESCRIPTION_MAX_CHARS + 25);
+    const clipped = clipResourceDescription(overlong);
+    expect(clipped.length).toBe(X402_RESOURCE_DESCRIPTION_MAX_CHARS);
+    expect(clipped.endsWith("…")).toBe(true);
   });
 });
