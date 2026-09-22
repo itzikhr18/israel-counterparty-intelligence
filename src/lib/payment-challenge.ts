@@ -44,7 +44,6 @@ export function clipResourceDescription(description: string): string {
   return `${description.slice(0, X402_RESOURCE_DESCRIPTION_MAX_CHARS - 1).trimEnd()}…`;
 }
 
-
 export function paymentOutputExample(
   route: PaidRouteName,
 ): Record<string, unknown> {
