@@ -91,6 +91,9 @@ export function renderLandingPage(options: LandingPageOptions): string {
     .step { flex: 1 1 210px; padding: 20px; border-left: 2px solid var(--line); }
     .step::before { counter-increment: step; content: "0" counter(step); display: block; margin-bottom: 12px; color: var(--accent); font-size: 13px; font-weight: 760; }
     .scope { padding: 22px; border: 1px solid #5b4930; border-radius: 14px; background: #211a11; color: #ddcdb3; }
+    .status-live { margin: 0 0 28px; padding: 18px 22px; border: 1px solid #2f6b55; border-radius: 14px; background: rgba(13, 40, 32, .92); color: var(--muted); }
+    .status-live strong { color: var(--accent); }
+    .status-live a { color: var(--accent); }
     .preview-panel, .invoice-panel { max-width: 860px; padding: 28px; border: 1px solid var(--line); border-radius: 18px; background: rgba(13, 28, 24, .88); }
     .invoice-panel { border-color: #41685b; }
     .invoice-form { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; margin-top: 22px; }
@@ -115,9 +118,9 @@ export function renderLandingPage(options: LandingPageOptions): string {
   <main>
     <nav aria-label="Primary navigation">
       <span class="brand">Israel Business Intelligence MCP</span>
-      <span class="status">${options.paidServiceNotice ? "Free previews available · Paid services paused" : "Production live"}</span>
+      <span class="status">${options.paidServiceNotice ? "Free previews available · Paid services paused" : "Mainnet live · awaiting first external paid call"}</span>
     </nav>
-    ${options.paidServiceNotice ? `<aside class="scope" role="status"><strong>Paid services temporarily suspended</strong><p>${escapeHtml(options.paidServiceNotice)}</p><p>Listed prices and integration examples are reference information, not an invitation to pay. <a href="/service-status.md">Service status and limits</a></p></aside>` : ""}
+    ${options.paidServiceNotice ? `<aside class="scope" role="status"><strong>Paid services temporarily suspended</strong><p>${escapeHtml(options.paidServiceNotice)}</p><p>Listed prices and integration examples are reference information, not an invitation to pay. <a href="/STATUS.md">Service status</a></p></aside>` : `<aside class="status-live" role="status"><strong>Honest status:</strong> Base Mainnet x402 is live (facilitator: Coinbase CDP). No customer logos and no claimed paid volume. Awaiting the first <em>external</em> paid call. <a href="/STATUS.md">STATUS</a> · <a href="/health">/health</a> · cheapest inspect: company-changes <strong>$0.01</strong> USDC (returns HTTP 402 until paid).</aside>`}
 
     <header class="hero">
       <div class="eyebrow">Official-source Israeli business intelligence</div>
@@ -278,7 +281,7 @@ export function renderLandingPage(options: LandingPageOptions): string {
 
     <footer>
       <span>${providerName}</span>
-      <span><a href="/?format=json">Machine-readable service manifest</a> · <a href="/health">Health</a> · <a href="/README.md">Documentation</a></span>
+      <span><a href="/?format=json">Machine-readable service manifest</a> · <a href="/health">Health</a> · <a href="/STATUS.md">Status</a> · <a href="/README.md">Documentation</a></span>
     </footer>
   </main>
 </body>

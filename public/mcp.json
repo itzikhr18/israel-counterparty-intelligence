@@ -2,8 +2,9 @@
   "name": "Israel Business Intelligence MCP",
   "paid_service": {
     "status": "live",
-    "notice": "Paid Mainnet x402 reports are available. Free previews remain available. Confirm /health and /.well-known/x402 before paying.",
-    "status_url": "https://israel-counterparty-intelligence.vercel.app/health"
+    "notice": "MAINNET LIVE — awaiting first EXTERNAL paid call. Paid Mainnet x402 reports are available; free previews remain available. No customer logos. Confirm /STATUS.md, /health, and /.well-known/x402 before paying.",
+    "status_url": "https://israel-counterparty-intelligence.vercel.app/STATUS.md",
+    "health_url": "https://israel-counterparty-intelligence.vercel.app/health"
   },
   "description": "Israeli supplier-invoice payment gate for AI agents: VAT arithmetic, allocation-number applicability, PAY/HOLD/BLOCK decisions, company verification, changes, and public-registry evidence.",
   "transport": "streamable-http",

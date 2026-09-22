@@ -53,6 +53,9 @@ describe("service root", () => {
     expect(html).toContain('name="company_number"');
     expect(html).toContain("Free · no wallet required");
     expect(html).not.toContain("Paid services temporarily suspended");
+    expect(html).toContain("Mainnet live · awaiting first external paid call");
+    expect(html).toContain("/STATUS.md");
+    expect(html).not.toContain("Production live");
     expect(html).toContain("preview_israeli_invoice_payment_gate_free");
     expect(html).toContain("Approve payment");
     expect(html).toContain("--pay");
