@@ -1,13 +1,11 @@
-# Service status — 7 September 2026
+# Service status — 23 September 2026
 
-Paid reports and x402 payments are temporarily suspended pending commercial-readiness review. Free previews remain available. Do not sign or send a payment.
+Paid reports and x402 Mainnet payments are **available** again after commercial-readiness / Bazaar resume approval. Free previews remain available.
 
-- All seven paid REST routes return HTTP 503 with `PAID_SERVICE_SUSPENDED`, without payment requirements or report data. This applies to mainnet and testnet, unsigned requests and requests carrying payment headers.
-- All five paid MCP tool names, including the `verify_company` alias, return an error without a payment challenge. The mainnet and testnet tool lists retain all 13 names.
-- Free invoice checks, limited previews, sample reports and schemas remain available. An invitation-only pilot remains separately authenticated; suspension does not grant pilot access.
-- Published prices, schemas and buyer examples are reference material while service is suspended. They do not mean that purchases are available.
-- The suspension is independent of x402 environment flags. Resumption requires a separately reviewed release after the outstanding hosting, legal/accounting, security and payment-record requirements are closed.
+- Unpaid requests to paid Mainnet routes return HTTP **402** with an x402 v2 `PAYMENT-REQUIRED` challenge (not 503).
+- Paid MCP tools again advertise payment metadata when a purchase is required.
+- Wallet handoff preparation is available again for buyer-controlled wallets.
+- Security hardenings from the 7 September 2026 containment release remain in place (bounded JSON, public-manifest SSRF controls, facilitator settlement checks, rate-limit identity hardening). See `docs/SECURITY_CONTAINMENT_2026-09-07.md`.
+- Published prices and buyer examples describe live purchasable routes. Confirm live status before paying.
 
-The application cannot prevent a person from transferring funds directly on a blockchain. Do not transfer funds to a previously advertised address. No successful settlement or commercial readiness is claimed by this status page.
-
-Machine-readable current status: [/health](/health) and [service manifest](/?format=json).
+Do not send funds outside the x402 challenge flow. Machine-readable status: [/health](/health) and [x402 discovery](/.well-known/x402).

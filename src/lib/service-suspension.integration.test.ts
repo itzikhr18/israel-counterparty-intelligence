@@ -1,6 +1,13 @@
 import { NextRequest } from "next/server";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
+// Containment-path coverage: mock suspension ON so rollback/re-suspend behavior
+// stays verified after the resume release sets the production default to false.
+vi.mock("@/lib/service-availability", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("@/lib/service-availability")>()),
+  PAID_SERVICE_SUSPENDED: true,
+}));
+
 const dependencies = vi.hoisted(() => ({
   facilitator: vi.fn(),
   httpResourceServer: vi.fn(),
@@ -87,7 +94,7 @@ function setPaymentFlags(enabled: "true" | "false") {
   vi.stubEnv("PUBLIC_BASE_URL", "http://localhost:3000");
 }
 
-describe("temporary paid-service suspension (actual production default)", () => {
+describe("paid-service suspension containment path (mocked suspended=true)", () => {
   beforeEach(() => {
     vi.resetModules();
     vi.clearAllMocks();
@@ -109,7 +116,7 @@ describe("temporary paid-service suspension (actual production default)", () => 
     vi.unstubAllEnvs();
   });
 
-  it("is fail-closed in the actual production default and has a machine-readable body", async () => {
+  it("is fail-closed when suspended and has a machine-readable body", async () => {
     const availability = await import("@/lib/service-availability");
     expect(availability.PAID_SERVICE_SUSPENDED).toBe(true);
     expect(availability.paidServiceUnavailableBody()).toMatchObject({

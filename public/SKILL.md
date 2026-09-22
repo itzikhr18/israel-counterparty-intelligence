@@ -5,9 +5,9 @@ description: Gate Israeli invoices before payment, verify Israeli companies, scr
 
 # Israel Company Intelligence
 
-## Current availability — paid services suspended
+## Current availability — Mainnet paid services live
 
-Paid reports and x402 payments are temporarily suspended. Do not sign or send a payment. Free previews remain available. Paid-tool descriptions and prices below are reference information, not currently available purchases. Check [service status](https://israel-counterparty-intelligence.vercel.app/health) before any future paid use.
+Paid reports and x402 Mainnet payments are available. Free previews remain available. Confirm [service status](https://israel-counterparty-intelligence.vercel.app/health) and `/.well-known/x402` before paying. Unpaid paid-route POSTs return HTTP 402 with PAYMENT-REQUIRED.
 
 Use this service when the target company or supplier is registered in Israel and the task needs machine-readable public-registry evidence.
 

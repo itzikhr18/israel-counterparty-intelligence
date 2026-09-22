@@ -21,6 +21,8 @@ Remaining launch gates include commercial hosting permission, required legal/acc
 
 ## Resumption and rollback
 
-Do not resume by changing x402 flags. Keep `PAID_SERVICE_SUSPENDED = true` until separate written launch approval and closure evidence exist. Before resumption, explicitly test accounting, payment failure/uncertain settlement, replay, delivery and refunds using an authorized independent real buyer—not a self-payment.
+Resume release (23 September 2026): commercial-readiness / Bazaar resume approval was given by the operator. A separate reviewed PR sets `PAID_SERVICE_SUSPENDED = false` while retaining the security hardenings in this document. See `docs/BAZAAR_RESUME_CHECKLIST.md`.
+
+Do not resume by changing x402 flags alone. Keep `PAID_SERVICE_SUSPENDED = true` until separate written launch approval and closure evidence exist (historical gate; satisfied for the 23 September 2026 resume release). Before resumption, explicitly test accounting, payment failure/uncertain settlement, replay, delivery and refunds using an authorized independent real buyer—not a self-payment.
 
 If this release needs correction, deploy a forward fix retaining suspension. Do not blindly roll back to a pre-suspension deployment: it could reopen charging and restore the previous security exposure. Preserve unrelated feature work and never include local secrets in the release.

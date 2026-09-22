@@ -15,8 +15,8 @@ import {
   EntityResolutionService,
 } from "@/lib/services/entity-resolution";
 
-// Only legacy purchase/handoff assertions opt into active service explicitly.
-// Validation and free-download tests keep the actual suspended default.
+// Purchase/handoff assertions opt into active service explicitly.
+// Validation and free-download tests keep the suspended mock unless overridden.
 beforeEach(() => {
   availability.suspended = true;
 });
