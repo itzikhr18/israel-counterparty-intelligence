@@ -1,6 +1,6 @@
 # Israeli invoice report: bring your own trusted wallet
 
-**Paid services temporarily suspended. Do not sign or send payment.** Free previews remain available; wallet handoff and purchase steps below are unavailable reference material. Check [current service status](https://israel-counterparty-intelligence.vercel.app/health).
+**Mainnet paid services are live.** Wallet handoff and purchase steps below are available again for buyer-controlled wallets. Check [current service status](https://israel-counterparty-intelligence.vercel.app/health) before approving payment.
 
 For an accounts-payable automation that already has an x402-capable wallet and needs evidence about an Israeli supplier before paying an invoice.
 
