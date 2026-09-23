@@ -2,11 +2,11 @@
   "name": "Israel Business Intelligence MCP",
   "paid_service": {
     "status": "live",
-    "notice": "MAINNET LIVE — awaiting first EXTERNAL paid call. Paid Mainnet x402 reports are available; free previews remain available. No customer logos. Confirm /STATUS.md, /health, and /.well-known/x402 before paying.",
+    "notice": "MAINNET LIVE \u2014 awaiting first EXTERNAL paid call. Paid Mainnet x402 reports are available; free previews remain available. No customer logos. Confirm /STATUS.md, /health, and /.well-known/x402 before paying.",
     "status_url": "https://israel-counterparty-intelligence.vercel.app/STATUS.md",
     "health_url": "https://israel-counterparty-intelligence.vercel.app/health"
   },
-  "description": "Israeli supplier-invoice payment gate for AI agents: VAT arithmetic, allocation-number applicability, PAY/HOLD/BLOCK decisions, company verification, changes, and public-registry evidence.",
+  "description": "Israeli supplier-invoice payment gate for AI agents: VAT arithmetic, allocation-number applicability, PAY/HOLD/BLOCK decisions, company verification, changes, and public-registry evidence. Cheapest paid path: company-changes at $0.01 USDC on Base Mainnet.",
   "transport": "streamable-http",
   "production_url": "https://israel-counterparty-intelligence.vercel.app/mcp",
   "testnet_url": "https://israel-counterparty-intelligence.vercel.app/mcp/testnet",
@@ -121,6 +121,20 @@
     "agentic procurement guardrail",
     "verified payee firewall",
     "x402 pre-sign policy",
-    "agent wallet safety"
-  ]
+    "agent wallet safety",
+    "company-changes $0.01",
+    "x402 Base Mainnet",
+    "Israeli invoice PAY HOLD BLOCK"
+  ],
+  "cheapest_paid_path": {
+    "method": "POST",
+    "path": "/v1/company-changes/mainnet",
+    "url": "https://israel-counterparty-intelligence.vercel.app/v1/company-changes/mainnet",
+    "price_usdc": "0.01",
+    "network": "eip155:8453",
+    "asset": "USDC",
+    "facilitator": "Coinbase CDP",
+    "note": "Empty JSON body {} is canary-safe (defaults to public sample company). Returns HTTP 402 until paid. Do not operator-self-pay; awaiting first external paid call."
+  },
+  "mcp_url": "https://israel-counterparty-intelligence.vercel.app/mcp"
 }
