@@ -78,6 +78,8 @@ describe("service root", () => {
       "Stop a bad Israeli invoice before an agent pays it.",
     );
     expect(html).toContain('href="#invoice-preview"');
+    expect(html).toContain('href="/proof"');
+    expect(html).toContain("Settlement proof");
     expect(html).toContain('action="/invoice-preview"');
     expect(html).toContain('name="supplier_company_number"');
     expect(html).toContain('name="allocation_number"');
