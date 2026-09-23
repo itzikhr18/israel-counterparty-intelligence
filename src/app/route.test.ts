@@ -4,7 +4,7 @@ import { describe, expect, it } from "vitest";
 import { GET } from "@/app/route";
 
 describe("service root", () => {
-  it("preserves the machine-readable JSON response by default", async () => {
+  it("returns machine-readable JSON when application/json is preferred", async () => {
     const response = await GET(
       new NextRequest("https://service.example/", {
         headers: { accept: "application/json" },
@@ -26,7 +26,30 @@ describe("service root", () => {
           ],
         },
       },
+      discovery: {
+        well_known: {
+          x402: "/.well-known/x402",
+          agent_card: "/.well-known/agent-card.json",
+          mcp: "/.well-known/mcp.json",
+          llms: "/llms.txt",
+        },
+      },
     });
+  });
+
+  it("defaults to HTML for generic Accept so Bazaar/GoPlausible enrichment can read OG tags", async () => {
+    const response = await GET(
+      new NextRequest("https://service.example/", {
+        headers: { accept: "*/*" },
+      }),
+    );
+    const html = await response.text();
+
+    expect(response.headers.get("content-type")).toContain("text/html");
+    expect(html).toContain('property="og:title"');
+    expect(html).toContain('property="og:description"');
+    expect(html).toContain('href="/.well-known/agent-card.json"');
+    expect(html).toContain('href="/.well-known/x402"');
   });
 
   it("keeps free checks visible and restores browser purchase instructions when resumed", async () => {
@@ -41,6 +64,8 @@ describe("service root", () => {
     expect(response.headers.get("content-security-policy")).toContain(
       "default-src 'none'",
     );
+    expect(html).toContain('property="og:site_name"');
+    expect(html).toContain('name="twitter:card"');
     expect(html).toContain(
       "Stop a bad Israeli invoice before an agent pays it.",
     );

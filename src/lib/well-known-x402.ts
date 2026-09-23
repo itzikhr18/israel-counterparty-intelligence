@@ -122,6 +122,14 @@ export function wellKnownX402Manifest() {
       transport: "streamable-http",
       registry: "io.github.itzikhr18/israel-business-intelligence",
     },
+    agentDiscovery: {
+      agentCard: `${config.PUBLIC_BASE_URL}/.well-known/agent-card.json`,
+      agentManifest: `${config.PUBLIC_BASE_URL}/.well-known/agent.json`,
+      aiPlugin: `${config.PUBLIC_BASE_URL}/.well-known/ai-plugin.json`,
+      mcpManifest: `${config.PUBLIC_BASE_URL}/.well-known/mcp.json`,
+      llmsTxt: `${config.PUBLIC_BASE_URL}/llms.txt`,
+      goplausibleGuide: "https://facilitator.goplausible.xyz/guide/discovery",
+    },
     registry: {
       payaiResourceId: "6a91c9587356b8e8001ae3e5",
       payaiDiscovery: "https://facilitator.payai.network/discovery/resources",

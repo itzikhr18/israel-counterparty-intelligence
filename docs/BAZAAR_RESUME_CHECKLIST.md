@@ -46,3 +46,19 @@ Do **not** resume by toggling `X402_*` env alone. The containment release keeps 
 ## Out of scope for a CI-only fix
 
 Secrets, Vercel project settings, Coinbase CDP account linkage, and legal/commercial approval cannot be completed from the readiness workflow alone.
+
+## GoPlausible / Bazaar enrichment (post-listing branding)
+
+Listing still requires one successful CDP-facilitated settlement that echoes `extensions.bazaar`. Enrichment is separate and free: GoPlausible (and similar agent crawlers) read root HTML metadata plus well-known agent files from the **same origin** as the paid endpoints.
+
+Required probes (must be real JSON/text, never SPA `index.html`):
+
+- `GET /` with generic `Accept: */*` → `text/html` including `og:title` / `og:description`
+- `GET /.well-known/x402`
+- `GET /.well-known/agent-card.json`
+- `GET /.well-known/agent.json`
+- `GET /.well-known/ai-plugin.json`
+- `GET /.well-known/mcp.json`
+- `GET /llms.txt`
+
+Operator check: `npm run bazaar:check` (includes enrichment probes after the CDP validate loop).

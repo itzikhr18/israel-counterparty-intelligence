@@ -40,9 +40,9 @@ Free (no wallet): invoice structural preview, company identity preview, `preview
 ## Bazaar / discovery readiness
 
 - Coinbase Bazaar commercial-readiness resume was approved; paid charging is on.
-- Operator check (repo): `npm run bazaar:check` / `scripts/bazaar-readiness.mjs` against production.
-- Catalog activation still depends on conforming settlements through CDP — do **not** manufacture operator self-pay theater if the public claim is “first external paid call.”
-- Directory / indexer work (402 Index, etc.) is tracked separately; this STATUS page does not claim index badges.
+- HTTP + MCP `extensions.bazaar` declarations validate with CDP (`valid` + simulation `accepted`). Catalog `indexed/active` still waits for the first **external** Mainnet settlement that echoes the bazaar extension (do not operator-self-pay).
+- GoPlausible-style enrichment files are published on this origin (real JSON/text, not SPA HTML): `/.well-known/agent-card.json`, `/.well-known/agent.json`, `/.well-known/ai-plugin.json`, `/.well-known/mcp.json`, plus `/.well-known/x402` and `/llms.txt`. Generic `Accept` on `/` returns HTML with OpenGraph tags for crawler branding.
+- Operator check (repo): `npm run bazaar:check` / `scripts/bazaar-readiness.mjs` against production (includes enrichment probes).
 
 ## How a buyer makes the first $0.01 call
 

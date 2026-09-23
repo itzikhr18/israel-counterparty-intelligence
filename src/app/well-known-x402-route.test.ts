@@ -23,6 +23,11 @@ describe("x402 well-known discovery", () => {
       mcp: {
         registry: "io.github.itzikhr18/israel-business-intelligence",
       },
+      agentDiscovery: {
+        agentCard: expect.stringMatching(/\/\.well-known\/agent-card\.json$/),
+        mcpManifest: expect.stringMatching(/\/\.well-known\/mcp\.json$/),
+        llmsTxt: expect.stringMatching(/\/llms\.txt$/),
+      },
     });
 
     expect(manifest.endpoints).toEqual(
