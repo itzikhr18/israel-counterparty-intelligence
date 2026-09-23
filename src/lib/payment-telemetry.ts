@@ -25,6 +25,25 @@ function sameAddress(left: string, right: string): boolean {
   return left.toLowerCase() === right.toLowerCase();
 }
 
+/** Treat trailing-slash / case-host differences as the same paid resource. */
+function sameResource(left: string, right: string): boolean {
+  if (left === right) return true;
+  try {
+    const a = new URL(left);
+    const b = new URL(right);
+    const pathA = a.pathname.replace(/\/+$/, "") || "/";
+    const pathB = b.pathname.replace(/\/+$/, "") || "/";
+    return (
+      a.protocol === b.protocol &&
+      a.hostname.toLowerCase() === b.hostname.toLowerCase() &&
+      pathA === pathB
+    );
+  } catch {
+    return left.replace(/\/+$/, "") === right.replace(/\/+$/, "");
+  }
+}
+
+
 function cleanDiscoverySource(value?: string): string | null {
   if (!value) return null;
   const cleaned = value
@@ -58,7 +77,7 @@ export function createExternalPaidCallEvent(
   if (!sameAddress(input.asset, input.expectedAsset)) return null;
   if (input.amount !== input.expectedAmount) return null;
   if (!sameAddress(input.payTo, input.expectedPayTo)) return null;
-  if (input.resource !== input.expectedResource) return null;
+  if (!sameResource(input.resource, input.expectedResource)) return null;
   if (!input.payer || !EVM_ADDRESS.test(input.payer)) return null;
   if (!TRANSACTION_HASH.test(input.transaction)) return null;
   // Never count a payment from the receiving/operator wallet as "external".
