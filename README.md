@@ -27,7 +27,7 @@ The same verification engine is also exposed as a stateless Remote Streamable HT
 - `POST /mcp/pilot` - invitation-only partner evaluation with a time-limited bearer token.
 - Company and payment-risk previews, `preview_agent_payment_trust`, `describe_service`, and `get_schema` are free on both MCP endpoints.
 
-Cheapest path to External Paid Call #1: **company-changes at $0.01 USDC** (before verify $0.05 / invoice-gate $0.25). Unpaid POST → HTTP 402 → pay with a buyer-controlled x402 wallet. See [`public/STATUS.md`](./public/STATUS.md) for the exact curl and MCP tool `get_israeli_company_changes_paid`.
+Cheapest path to External Paid Call #1: **company-changes at $0.01 USDC** (omitted/`{}` body defaults `company_number` to public sample `514744887` for marketplace canaries) (before verify $0.05 / invoice-gate $0.25). Unpaid POST → HTTP 402 → pay with a buyer-controlled x402 wallet. See [`public/STATUS.md`](./public/STATUS.md) for the exact curl and MCP tool `get_israeli_company_changes_paid`.
 
 This repository is a deliberately small MVP for External Paid Call #1. It resolves an Israeli
 registered company, adds its public government-contract/support footprint, builds field-level

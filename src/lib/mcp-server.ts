@@ -446,6 +446,27 @@ function serviceDescription(
   return {
     name: MCP_SERVER_NAME,
     description: DESCRIPTION,
+    preferred_first_paid_path: {
+      why: "Cheapest path to External Paid Call #1",
+      rest: "POST /v1/company-changes/mainnet",
+      mcp_tool: PAID_COMPANY_CHANGES_TOOL,
+      price_usdc: "0.01",
+      sample_body: {
+        company_number: "514744887",
+        lookback_days: 366,
+        limit: 25,
+        language: "en",
+      },
+      note: "company_number defaults to the public sample when omitted, so marketplace canaries with an empty JSON body still return product after settlement.",
+    },
+    preferred_tools: {
+      first_paid: PAID_COMPANY_CHANGES_TOOL,
+      company_verify: PAID_VERIFY_TOOL,
+      invoice_gate: PAID_INVOICE_GATE_TOOL,
+      payment_risk: PAID_PAYMENT_RISK_TOOL,
+      free_preview: FREE_PREVIEW_TOOL,
+      legacy_aliases: ["verify_company", "preview_company"],
+    },
     does: "Gates Israeli invoices before payment and verifies Israeli companies with structured public-registry evidence.",
     does_not:
       "It does not provide Full Regulatory KYB, legal advice, sanctions/PEP/UBO certification, credit advice, or a guarantee that a counterparty is safe.",

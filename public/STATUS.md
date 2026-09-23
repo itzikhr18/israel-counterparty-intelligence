@@ -62,9 +62,16 @@ Cheapest honest path = **company-changes** at **$0.01 USDC**.
    - [x402 buyer quickstart](https://israel-counterparty-intelligence.vercel.app/x402-buyer-quickstart.md)
    - [Trusted / independent wallet guide](https://israel-counterparty-intelligence.vercel.app/trusted-wallet-guide.md)
    - Optional bridge package: `npx --yes https://israel-counterparty-intelligence.vercel.app/israel-company-verify-buyer-0.4.0.tgz`
-4. MCP equivalent: connect to `https://israel-counterparty-intelligence.vercel.app/mcp` and call `get_israeli_company_changes_paid` after a free preview if desired.
+4. MCP equivalent: connect to `https://israel-counterparty-intelligence.vercel.app/mcp` and call `get_israeli_company_changes_paid` (preferred first-paid MCP tool).
 
 A successful **external** settlement (non-operator wallet) is External Paid Call #1.
+
+## Marketplace canary readiness
+
+- Listed on PayAPI Market (form accepted; awaiting their wallet canary).
+- Challenge fields: HTTP **402**, Base Mainnet USDC, `extra.name` = `USD Coin`, `payTo` = operator receiving wallet.
+- `POST /v1/company-changes/mainnet` with `{}` or omitted `company_number` uses public sample **514744887** so a paid canary still returns product (not a validation 400).
+- Do **not** self-pay from the operator wallet; External Paid Call #1 must be an external payer.
 
 ## What we do **not** claim
 
