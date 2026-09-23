@@ -33,9 +33,25 @@ function cleanDiscoverySource(value?: string): string | null {
   return cleaned || null;
 }
 
+export type ExternalPaidCallEvent = {
+  event: "external_paid_call";
+  status: 200;
+  settlement_status: "success";
+  network: string;
+  asset: string;
+  payer: string;
+  amount: string;
+  amount_usdc: string;
+  pay_to: string;
+  tx_hash: string;
+  resource: string;
+  timestamp: string;
+  discovery_source: string | null;
+};
+
 export function createExternalPaidCallEvent(
   input: SettlementTelemetryInput,
-): Record<string, unknown> | null {
+): ExternalPaidCallEvent | null {
   if (!input.success) return null;
   if (input.network !== input.expectedNetwork) return null;
   if (!sameAddress(input.asset, input.expectedAsset)) return null;
@@ -109,19 +125,20 @@ function envConfiguredFirstPaidCall(): FirstExternalPaidCallRecord | null {
   if (!tx || !TRANSACTION_HASH.test(tx)) return null;
   return {
     tx_hash: tx,
-    resource: process.env.FIRST_EXTERNAL_PAID_CALL_RESOURCE?.trim() || "unknown",
+    resource:
+      process.env.FIRST_EXTERNAL_PAID_CALL_RESOURCE?.trim() || "unknown",
     route:
       process.env.FIRST_EXTERNAL_PAID_CALL_ROUTE?.trim() ||
       routeFromResource(
         process.env.FIRST_EXTERNAL_PAID_CALL_RESOURCE?.trim() || "",
       ) ||
       "unknown",
-    network: process.env.FIRST_EXTERNAL_PAID_CALL_NETWORK?.trim() || "eip155:8453",
-    amount_usdc: process.env.FIRST_EXTERNAL_PAID_CALL_AMOUNT_USDC?.trim() || "unknown",
+    network:
+      process.env.FIRST_EXTERNAL_PAID_CALL_NETWORK?.trim() || "eip155:8453",
+    amount_usdc:
+      process.env.FIRST_EXTERNAL_PAID_CALL_AMOUNT_USDC?.trim() || "unknown",
     payer: process.env.FIRST_EXTERNAL_PAID_CALL_PAYER?.trim() || "unknown",
-    timestamp:
-      process.env.FIRST_EXTERNAL_PAID_CALL_AT?.trim() ||
-      "unknown",
+    timestamp: process.env.FIRST_EXTERNAL_PAID_CALL_AT?.trim() || "unknown",
     source: "env",
     durable: true,
   };
@@ -172,22 +189,18 @@ async function notifyFirstPaidCallWebhook(
  * Persistence is best-effort (process memory + optional operator env); Vercel
  * has no durable store wired in this MVP.
  */
-export async function recordFirstExternalPaidCall(event: {
-  tx_hash: unknown;
-  resource: unknown;
-  network: unknown;
-  amount_usdc: unknown;
-  payer: unknown;
-  timestamp: unknown;
-}): Promise<FirstExternalPaidCallRecord | null> {
-  if (typeof event.tx_hash !== "string" || !TRANSACTION_HASH.test(event.tx_hash))
-    return null;
-  if (typeof event.resource !== "string" || !event.resource) return null;
-  if (typeof event.network !== "string" || !event.network) return null;
-  if (typeof event.amount_usdc !== "string" || !event.amount_usdc) return null;
-  if (typeof event.payer !== "string" || !EVM_ADDRESS.test(event.payer))
-    return null;
-  if (typeof event.timestamp !== "string" || !event.timestamp) return null;
+export async function recordFirstExternalPaidCall(
+  event: Pick<
+    ExternalPaidCallEvent,
+    "tx_hash" | "resource" | "network" | "amount_usdc" | "payer" | "timestamp"
+  >,
+): Promise<FirstExternalPaidCallRecord | null> {
+  if (!TRANSACTION_HASH.test(event.tx_hash)) return null;
+  if (!event.resource) return null;
+  if (!event.network) return null;
+  if (!event.amount_usdc) return null;
+  if (!EVM_ADDRESS.test(event.payer)) return null;
+  if (!event.timestamp) return null;
 
   // Env already records the durable milestone — still log loud observation.
   const existing = getFirstExternalPaidCall();
@@ -234,4 +247,3 @@ export async function recordFirstExternalPaidCall(event: {
   await notifyFirstPaidCallWebhook(record);
   return record;
 }
-

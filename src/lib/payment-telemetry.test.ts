@@ -68,7 +68,6 @@ describe("External Paid Call #1 telemetry", () => {
   );
 });
 
-
 describe("First external paid call celebration", () => {
   it("records the first external settlement loudly and exposes it via getter", async () => {
     const event = createExternalPaidCallEvent(settlement());
