@@ -177,13 +177,18 @@ function logMainnetSettlement(context: SettleResultContext): void {
   const route = paidRouteConfig[routeName];
   const environment = paymentEnvironments.mainnet;
   const resource = payloadResource ?? `${config.PUBLIC_BASE_URL}${route.path}`;
+  // Prefer facilitator settle.payer; fall back to EIP-3009 authorization.from
+  // (same as MCP). Missing payer previously dropped a real Mainnet settlement
+  // from first_external_paid_call recording without changing price/wallet.
+  const payer =
+    context.result.payer ?? lifecyclePayer(context.paymentPayload) ?? undefined;
   const event = createExternalPaidCallEvent({
     success: context.result.success,
     network: context.result.network,
     asset: context.requirements.asset,
     amount: context.result.amount ?? context.requirements.amount,
     payTo: context.requirements.payTo,
-    payer: context.result.payer,
+    payer,
     transaction: context.result.transaction,
     resource,
     expectedNetwork: environment.network,
@@ -210,7 +215,7 @@ function logMainnetSettlement(context: SettleResultContext): void {
         ? "settlement_success"
         : "settlement_failure",
       network: context.result.network,
-      payer: context.result.payer ?? null,
+      payer: payer ?? null,
       tx_hash: context.result.transaction,
       resource,
       endpoint: route.path,

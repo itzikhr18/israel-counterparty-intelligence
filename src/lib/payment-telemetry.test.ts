@@ -53,6 +53,21 @@ describe("External Paid Call #1 telemetry", () => {
     });
   });
 
+  it("accepts trailing-slash / host-case resource URL variants", () => {
+    expect(
+      createExternalPaidCallEvent(
+        settlement({
+          resource:
+            "https://ISRAEL-COUNTERPARTY-INTELLIGENCE.vercel.app/v1/company-changes/mainnet/",
+        }),
+      ),
+    ).toMatchObject({
+      event: "external_paid_call",
+      resource:
+        "https://ISRAEL-COUNTERPARTY-INTELLIGENCE.vercel.app/v1/company-changes/mainnet/",
+    });
+  });
+
   it.each([
     { network: "eip155:84532" },
     { asset: "0x036CbD53842c5426634e7929541eC2318f3dCF7e" },
