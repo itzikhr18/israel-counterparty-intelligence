@@ -138,7 +138,7 @@ export function renderLandingPage(options: LandingPageOptions): string {
       <span class="brand">Israel Business Intelligence MCP</span>
       <span class="status">${options.paidServiceNotice ? "Free previews available · Paid services paused" : "Mainnet live · first external paid call confirmed"}</span>
     </nav>
-    ${options.paidServiceNotice ? `<aside class="scope" role="status"><strong>Paid services temporarily suspended</strong><p>${escapeHtml(options.paidServiceNotice)}</p><p>Listed prices and integration examples are reference information, not an invitation to pay. <a href="/STATUS.md">Service status</a></p></aside>` : `<aside class="status-live" role="status"><strong>Honest status:</strong> Base Mainnet x402 is live (facilitator: Coinbase CDP). No customer logos and no inflated volume claims. First <em>external</em> paid call confirmed — <a href="/proof">/proof</a>. <a href="/STATUS.md">STATUS</a> · <a href="/health">/health</a> · cheapest inspect: company-changes <strong>$0.01</strong> USDC (returns HTTP 402 until paid).</aside>`}
+    ${options.paidServiceNotice ? `<aside class="scope" role="status"><strong>Paid services temporarily suspended</strong><p>${escapeHtml(options.paidServiceNotice)}</p><p>Listed prices and integration examples are reference information, not an invitation to pay. <a href="/STATUS.md">Service status</a></p></aside>` : `<aside class="status-live" role="status"><strong>Honest status:</strong> Base Mainnet x402 is live (facilitator: Coinbase CDP). No customer logos and no inflated volume claims. First <em>external</em> paid call confirmed — <a href="/proof">/proof</a>. Second settle still open ($0.05 verify canary). <a href="/buy">Pay in 60 seconds</a> · <a href="/STATUS.md">STATUS</a> · <a href="/health">/health</a> · cheapest inspect: company-changes <strong>$0.01</strong> USDC (returns HTTP 402 until paid).</aside>`}
 
     <header class="hero">
       <div class="eyebrow">Official-source Israeli business intelligence</div>
@@ -146,6 +146,7 @@ export function renderLandingPage(options: LandingPageOptions): string {
       <p class="lead">Check VAT arithmetic and allocation-number requirements, resolve the supplier, and return PAY, HOLD, or BLOCK. Structured evidence and deterministic decisions for AI agents.</p>
       <div class="actions">
         <a class="button primary" href="#invoice-preview">Check an invoice free</a>
+        <a class="button" href="/buy">Pay in 60 seconds</a>
         <a class="button" href="/proof">Settlement proof</a>
         <a class="button" href="/mcp.json">Inspect MCP metadata</a>
         <a class="button" href="/openapi.json">OpenAPI schema</a>
@@ -163,7 +164,7 @@ export function renderLandingPage(options: LandingPageOptions): string {
     <section id="first-paid-call" aria-labelledby="first-paid-call-title">
       <div class="eyebrow">Buyer conversion · External Paid Call #1</div>
       <h2 id="first-paid-call-title">First paid call in 60 seconds</h2>
-      <p class="section-copy">${PAID_SERVICE_SUSPENDED ? "Paid Mainnet routes are temporarily suspended. Use free previews only." : `Cheapest honest path: <strong>company-changes</strong> at <strong>${companyChangesPrice} USDC</strong> on Base Mainnet via Coinbase CDP. Empty JSON body <code>{}</code> is canary-safe (defaults to public sample company 514744887).`}</p>
+      <p class="section-copy">${PAID_SERVICE_SUSPENDED ? "Paid Mainnet routes are temporarily suspended. Use free previews only." : `Cheapest honest path: <strong>company-changes</strong> at <strong>${companyChangesPrice} USDC</strong> on Base Mainnet via Coinbase CDP (first external settle confirmed). Optional second canary: <strong>verify</strong> at <strong>${mcpPrice} USDC</strong> — <code>second_external_paid_call</code> is still null. Empty JSON body <code>{}</code> is canary-safe for company-changes (defaults to public sample 514744887). Short guide: <a href="/buy" style="color: var(--accent)">/buy</a>.`}</p>
       ${
         PAID_SERVICE_SUSPENDED
           ? ""
@@ -181,7 +182,8 @@ export function renderLandingPage(options: LandingPageOptions): string {
         <article class="card"><h3>Discovery</h3><p><a href="/.well-known/x402" style="color: var(--accent)">/.well-known/x402</a> · <a href="/mcp" style="color: var(--accent)">/mcp</a> · <a href="/agents.md" style="color: var(--accent)">/agents.md</a></p></article>
         <article class="card"><h3>MCP tool</h3><p><code>get_israeli_company_changes_paid</code> ($0.01)</p></article>
       </div>
-      <p class="section-copy" style="margin-top: 16px">2) Sign the returned x402 v2 terms with a <em>buyer-controlled</em> wallet (never the receiving wallet) and retry the identical POST. Guides: <a href="/agents.md" style="color: var(--accent)">agents.md</a> · <a href="/x402-buyer-quickstart.md" style="color: var(--accent)">buyer quickstart</a> · <a href="/STATUS.md" style="color: var(--accent)">STATUS</a>.</p>`
+      <p class="section-copy" style="margin-top: 16px">2) Sign the returned x402 v2 terms with a <em>buyer-controlled</em> wallet (never the receiving wallet) and retry the identical POST. Guides: <a href="/buy" style="color: var(--accent)">/buy</a> · <a href="/agents.md" style="color: var(--accent)">agents.md</a> · <a href="/x402-buyer-quickstart.md" style="color: var(--accent)">buyer quickstart</a> · <a href="/STATUS.md" style="color: var(--accent)">STATUS</a>.</p>
+      <p class="section-copy" style="margin-top: 12px">Optional second Mainnet canary (not yet settled publicly): <code>POST /v1/verify/mainnet</code> at <strong>${mcpPrice} USDC</strong>. Details on <a href="/buy" style="color: var(--accent)">/buy</a> and <a href="/proof" style="color: var(--accent)">/proof</a>.</p>`
       }
     </section>
 
@@ -325,7 +327,7 @@ export function renderLandingPage(options: LandingPageOptions): string {
 
     <footer>
       <span>${providerName}</span>
-      <span><a href="/?format=json">Machine-readable service manifest</a> · <a href="/proof">Settlement proof</a> · <a href="/health">Health</a> · <a href="/STATUS.md">Status</a> · <a href="/agents.md">Agents</a> · <a href="/README.md">Documentation</a></span>
+      <span><a href="/?format=json">Machine-readable service manifest</a> · <a href="/buy">Pay in 60 seconds</a> · <a href="/proof">Settlement proof</a> · <a href="/health">Health</a> · <a href="/STATUS.md">Status</a> · <a href="/agents.md">Agents</a> · <a href="/README.md">Documentation</a></span>
     </footer>
   </main>
 </body>

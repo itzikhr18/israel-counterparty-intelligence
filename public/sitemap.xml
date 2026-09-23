@@ -6,6 +6,16 @@
     <priority>1.0</priority>
   </url>
   <url>
+    <loc>https://israel-counterparty-intelligence.vercel.app/buy</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.95</priority>
+  </url>
+  <url>
+    <loc>https://israel-counterparty-intelligence.vercel.app/proof</loc>
+    <changefreq>daily</changefreq>
+    <priority>0.95</priority>
+  </url>
+  <url>
     <loc>https://israel-counterparty-intelligence.vercel.app/README.md</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>

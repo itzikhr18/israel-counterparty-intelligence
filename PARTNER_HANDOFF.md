@@ -21,34 +21,35 @@ This is the **single entry document** for a partner or helper. Start here, then 
 
 ## Live URLs
 
-| What | URL |
-| --- | --- |
-| Site | https://israel-counterparty-intelligence.vercel.app/ |
-| Health (JSON) | https://israel-counterparty-intelligence.vercel.app/health |
-| Settlement proof | https://israel-counterparty-intelligence.vercel.app/proof |
-| Public STATUS | https://israel-counterparty-intelligence.vercel.app/STATUS.md |
-| MCP | https://israel-counterparty-intelligence.vercel.app/mcp |
-| MCP metadata | https://israel-counterparty-intelligence.vercel.app/mcp.json |
-| x402 discovery | https://israel-counterparty-intelligence.vercel.app/.well-known/x402 |
-| Cheapest paid ($0.01) | `POST /v1/company-changes/mainnet` |
-| Second canary ($0.05) | `POST /v1/verify/mainnet` |
-| Buyer quickstart | https://israel-counterparty-intelligence.vercel.app/x402-buyer-quickstart.md |
+| What                  | URL                                                                          |
+| --------------------- | ---------------------------------------------------------------------------- |
+| Site                  | https://israel-counterparty-intelligence.vercel.app/                         |
+| Health (JSON)         | https://israel-counterparty-intelligence.vercel.app/health                   |
+| Settlement proof      | https://israel-counterparty-intelligence.vercel.app/proof                    |
+| Pay in 60 seconds     | https://israel-counterparty-intelligence.vercel.app/buy                      |
+| Public STATUS         | https://israel-counterparty-intelligence.vercel.app/STATUS.md                |
+| MCP                   | https://israel-counterparty-intelligence.vercel.app/mcp                      |
+| MCP metadata          | https://israel-counterparty-intelligence.vercel.app/mcp.json                 |
+| x402 discovery        | https://israel-counterparty-intelligence.vercel.app/.well-known/x402         |
+| Cheapest paid ($0.01) | `POST /v1/company-changes/mainnet`                                           |
+| Second canary ($0.05) | `POST /v1/verify/mainnet`                                                    |
+| Buyer quickstart      | https://israel-counterparty-intelligence.vercel.app/x402-buyer-quickstart.md |
 
 ---
 
 ## מצב עסקי עכשיו (2026-09-23)
 
-| Signal | Status |
-| --- | --- |
-| Mainnet charging | **ON** (Coinbase CDP facilitator) |
-| First external paid call | **DONE + durable** |
-| Amount / network | **0.01 USDC** on Base (`eip155:8453`) |
-| TX | `0x5b68756c1b1713e46c5d137c91c92df3d1e2e4e71e83c7025a8b833a077bbbbd` |
-| Proof page | Live at `/proof` (BaseScan links, external-payer framing) |
-| Second external paid call | **NOT YET** (`/health.payments.second_external_paid_call = null`) |
-| Optional second path | `POST /v1/verify/mainnet` → HTTP 402 for **0.05 USDC** |
-| Receiving wallet | `0xa0A3BB49eA4AC723Bcf4d2d1ecde2EE01BA03C82` |
-| Fake logos / inflated volume | **Never claimed** |
+| Signal                       | Status                                                               |
+| ---------------------------- | -------------------------------------------------------------------- |
+| Mainnet charging             | **ON** (Coinbase CDP facilitator)                                    |
+| First external paid call     | **DONE + durable**                                                   |
+| Amount / network             | **0.01 USDC** on Base (`eip155:8453`)                                |
+| TX                           | `0x5b68756c1b1713e46c5d137c91c92df3d1e2e4e71e83c7025a8b833a077bbbbd` |
+| Proof page                   | Live at `/proof` (BaseScan links, external-payer framing)            |
+| Second external paid call    | **NOT YET** (`/health.payments.second_external_paid_call = null`)    |
+| Optional second path         | `POST /v1/verify/mainnet` → HTTP 402 for **0.05 USDC**               |
+| Receiving wallet             | `0xa0A3BB49eA4AC723Bcf4d2d1ecde2EE01BA03C82`                         |
+| Fake logos / inflated volume | **Never claimed**                                                    |
 
 **Hard rule:** never pay from the receiving/operator wallet (“self-pay”). Only external payers count.
 
@@ -77,13 +78,13 @@ This is the **single entry document** for a partner or helper. Start here, then 
 
 ## Env var names (no secrets in this doc)
 
-| Name | Purpose |
-| --- | --- |
-| `FIRST_EXTERNAL_PAID_CALL_TX` (+ companions) | Durable first settle on `/health` |
-| `SECOND_EXTERNAL_PAID_CALL_TX` (+ companions) | Durable second settle on `/health` |
+| Name                                                  | Purpose                                              |
+| ----------------------------------------------------- | ---------------------------------------------------- |
+| `FIRST_EXTERNAL_PAID_CALL_TX` (+ companions)          | Durable first settle on `/health`                    |
+| `SECOND_EXTERNAL_PAID_CALL_TX` (+ companions)         | Durable second settle on `/health`                   |
 | `UPSTASH_REDIS_REST_URL` / `UPSTASH_REDIS_REST_TOKEN` | Optional auto-durable store (**not configured yet**) |
-| `FIRST_PAID_CALL_WEBHOOK_URL` / `NOTIFY_EMAIL` | Optional notify on first paid |
-| CDP / x402 facilitator + pay-to vars | Live charging (set in Vercel; do not paste here) |
+| `FIRST_PAID_CALL_WEBHOOK_URL` / `NOTIFY_EMAIL`        | Optional notify on first paid                        |
+| CDP / x402 facilitator + pay-to vars                  | Live charging (set in Vercel; do not paste here)     |
 
 ---
 

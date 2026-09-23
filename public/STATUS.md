@@ -97,5 +97,6 @@ Durability tiers: `FIRST_EXTERNAL_PAID_CALL_TX` env (always) → optional Upstas
 - Amount: **0.01 USDC** on Base Mainnet (`eip155:8453`)
 - TX: `0x5b68756c1b1713e46c5d137c91c92df3d1e2e4e71e83c7025a8b833a077bbbbd`
 - Public proof page: [/proof](https://israel-counterparty-intelligence.vercel.app/proof)
+- Buyer page (60s): [/buy](https://israel-counterparty-intelligence.vercel.app/buy)
 - Machine-readable: `/health` → `payments.first_external_paid_call`
 - Optional second canary: `POST /v1/verify/mainnet` at **0.05 USDC**
