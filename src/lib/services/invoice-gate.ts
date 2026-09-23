@@ -1,12 +1,14 @@
 import type { Evidence, ResolvedEntity } from "@/lib/domain";
 import type { InvoiceGateQuery } from "@/lib/invoice-gate-schema";
 import { assessPaymentRisk } from "@/lib/services/payment-risk";
+import {
+  allocationPolicyWithContext,
+  TAX_AUTHORITY_ALLOCATION_POLICY_URL,
+} from "@/lib/policies/israel-allocation-policy";
 
 export const INVOICE_GATE_VERSION = "1.1.0";
 export const TAX_AUTHORITY_VERIFIER_URL =
   "https://www.gov.il/en/service/verify-vendor-invoice-information";
-export const TAX_AUTHORITY_ALLOCATION_POLICY_URL =
-  "https://www.gov.il/he/service/request-assignment-number-for-tax-invoice";
 const MONEY_TOLERANCE = 0.02;
 
 type GateCheckStatus = "MATCH" | "MISMATCH" | "PASS" | "MISSING" | "SIGNAL";
@@ -24,75 +26,14 @@ function roundMoney(value: number): number {
   return Number(value.toFixed(2));
 }
 
-export function allocationPolicy(invoiceDate: string, amountBeforeVat: number) {
-  return allocationPolicyWithContext(invoiceDate, amountBeforeVat, {});
-}
-
-interface AllocationPolicyContext {
-  has_vat_component?: boolean;
-  buyer_is_authorized_dealer?: boolean;
-  buyer_requested_allocation_number?: boolean;
-}
-
-type AllocationApplicability = "REQUIRED" | "NOT_REQUIRED" | "UNKNOWN";
-
-function allocationPolicyWithContext(
-  invoiceDate: string,
-  amountBeforeVat: number,
-  context: AllocationPolicyContext,
-) {
-  const threshold =
-    invoiceDate >= "2026-06-01"
-      ? 5_000
-      : invoiceDate >= "2026-01-01"
-        ? 10_000
-        : 20_000;
-  const policyAsOf =
-    invoiceDate >= "2026-06-01"
-      ? "2026-06-01"
-      : invoiceDate >= "2026-01-01"
-        ? "2026-01-01"
-        : "2025-01-01";
-  const amountExceedsThreshold = amountBeforeVat > threshold;
-  const missingInputs: string[] = [];
-  if (amountExceedsThreshold && context.has_vat_component !== false) {
-    if (context.has_vat_component === undefined)
-      missingInputs.push("has_vat_component");
-    if (context.buyer_is_authorized_dealer === undefined)
-      missingInputs.push("buyer_is_authorized_dealer");
-    if (context.buyer_requested_allocation_number === undefined)
-      missingInputs.push("buyer_requested_allocation_number");
-  }
-  const allocationApplicability: AllocationApplicability =
-    !amountExceedsThreshold ||
-    context.has_vat_component === false ||
-    context.buyer_is_authorized_dealer === false ||
-    context.buyer_requested_allocation_number === false
-      ? "NOT_REQUIRED"
-      : missingInputs.length > 0
-        ? "UNKNOWN"
-        : "REQUIRED";
-  return {
-    allocation_threshold_ils: threshold,
-    threshold_comparison: "strictly_greater_than",
-    amount_exceeds_threshold: amountExceedsThreshold,
-    has_vat_component: context.has_vat_component ?? null,
-    buyer_is_authorized_dealer: context.buyer_is_authorized_dealer ?? null,
-    buyer_requested_allocation_number:
-      context.buyer_requested_allocation_number ?? null,
-    allocation_applicability: allocationApplicability,
-    allocation_required:
-      allocationApplicability === "REQUIRED"
-        ? true
-        : allocationApplicability === "NOT_REQUIRED"
-          ? false
-          : null,
-    missing_inputs: missingInputs,
-    policy_as_of: policyAsOf,
-    source_url: TAX_AUTHORITY_ALLOCATION_POLICY_URL,
-    note: "The amount before VAT must be strictly greater than the date-sensitive threshold. A mandatory allocation number also depends on a VAT component, an authorized-dealer buyer, and the buyer requesting the number. Tax rules can change; the authenticated Tax Authority service remains authoritative.",
-  };
-}
+export {
+  allocationPolicy,
+  allocationPolicyWithContext,
+  evaluateAllocationPolicy,
+  TAX_AUTHORITY_ALLOCATION_POLICY_URL,
+  POLICY_ID as ALLOCATION_POLICY_ID,
+  POLICY_VERSION as ALLOCATION_POLICY_VERSION,
+} from "@/lib/policies/israel-allocation-policy";
 
 function policyForQuery(query: InvoiceGateQuery) {
   return allocationPolicyWithContext(

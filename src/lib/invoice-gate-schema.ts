@@ -110,7 +110,7 @@ export const invoiceGateInputJsonSchema = {
     official_verification: {
       type: "object",
       description:
-        "Buyer-attested output from the authenticated Israel Tax Authority service; not independently authenticated by this API.",
+        "Buyer-attested output the buyer obtained from the Israel Tax Authority; this API does not call the Tax Authority and does not independently authenticate the result.",
       properties: {
         status: {
           type: "string",
@@ -193,6 +193,8 @@ export const invoiceGateOutputJsonSchema = {
 export const invoiceGateExample = {
   gate_version: "1.1.0",
   policy: {
+    policy_id: "israel-allocation-v2026.06",
+    policy_version: "2026.06",
     allocation_threshold_ils: 5000,
     threshold_comparison: "strictly_greater_than",
     amount_exceeds_threshold: true,
@@ -217,7 +219,7 @@ export const invoiceGateExample = {
     score: 35,
     reason_codes: ["OFFICIAL_ALLOCATION_VERIFICATION_REQUIRED"],
     explanation:
-      "Hold payment until the allocation number is confirmed through the authenticated Israel Tax Authority service.",
+      "Hold payment until the buyer confirms the allocation number through their own authorized Tax Authority access; this API does not authenticate Tax Authority results.",
   },
   checks: [],
   official_verification: {
