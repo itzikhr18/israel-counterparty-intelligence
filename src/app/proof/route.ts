@@ -4,7 +4,10 @@ import { join } from "node:path";
 export const dynamic = "force-static";
 
 export function GET() {
-  const html = readFileSync(join(process.cwd(), "public", "proof.html"), "utf8");
+  const html = readFileSync(
+    join(process.cwd(), "public", "proof.html"),
+    "utf8",
+  );
   return new Response(html, {
     headers: {
       "content-type": "text/html; charset=utf-8",
