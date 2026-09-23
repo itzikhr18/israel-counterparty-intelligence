@@ -2,7 +2,7 @@
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
   "name": "io.github.itzikhr18/israel-business-intelligence",
   "title": "Israel Business Intelligence MCP",
-  "description": "Israeli invoice PAY/HOLD/BLOCK gate and company intelligence over MCP + x402; cheapest paid path company-changes $0.01 USDC on Base Mainnet.",
+  "description": "Israeli invoice PAY/HOLD/BLOCK gate; cheapest paid path company-changes $0.01 USDC.",
   "version": "1.8.2",
   "websiteUrl": "https://israel-counterparty-intelligence.vercel.app/README.md",
   "repository": {
