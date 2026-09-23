@@ -1,17 +1,14 @@
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
 import { NextResponse } from "next/server";
 
-import { config } from "@/lib/config";
-import { renderProofPage } from "@/lib/proof-page";
-
 export async function GET() {
-  return new NextResponse(renderProofPage({ providerName: config.PROVIDER_NAME }), {
+  const html = readFileSync(join(process.cwd(), "public", "proof.html"), "utf8");
+  return new NextResponse(html, {
     headers: {
       "Content-Type": "text/html; charset=utf-8",
-      "Cache-Control": "no-store",
+      "Cache-Control": "public, max-age=60",
       "X-Content-Type-Options": "nosniff",
-      "Referrer-Policy": "strict-origin-when-cross-origin",
-      "Content-Security-Policy":
-        "default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline'; connect-src 'self'; img-src 'self'; base-uri 'none'; form-action 'self'; frame-ancestors 'none'",
     },
   });
 }
