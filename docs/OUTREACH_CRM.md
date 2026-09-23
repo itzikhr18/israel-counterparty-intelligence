@@ -1,4 +1,4 @@
-# Outreach CRM — ICI (as of 2026-09-23 ~15:20 IDT)
+# Outreach CRM\n\n**Reply kit:** [REPLY_TEMPLATES.md](./REPLY_TEMPLATES.md) · **Discovery:** [DISCOVERY_STATUS.md](./DISCOVERY_STATUS.md)\n\n**Now:** wait ≤48h on hot $0.05 wave; Agent402 seller-payability **blocked** (no separate buyer wallet). — ICI (as of 2026-09-23 ~15:20 IDT)
 
 **Owner inbox:** `itzikhr18@gmail.com`  
 **Goal now:** second external Mainnet settle at **$0.05** via `POST /v1/verify/mainnet` (or any honest external paid call on a second path).  
@@ -8,14 +8,14 @@ Status legend: `waiting` = no human product reply yet · `auto-ack` = ticket/bot
 
 ## Hot — waiting after $0.05 second-settle wave (sent ~15:17 IDT / 12:17 UTC)
 
-| Party           | Email                                       | Last touch | Status             | Waiting? | Next action                                                        | Notes                                                 |
-| --------------- | ------------------------------------------- | ---------- | ------------------ | -------- | ------------------------------------------------------------------ | ----------------------------------------------------- |
-| Mesh            | support@meshpayments.com                    | 2026-09-23 | waiting            | **YES**  | Wait ≤48h for human                                                | $0.05 second-settle ask + earlier design-partner note |
-| Dokka           | info@dokka.com                              | 2026-09-23 | waiting            | **YES**  | Wait ≤48h                                                          | $0.05 design-partner canary                           |
-| Cardcom         | support@secure.cardcom.co.il                | 2026-09-23 | auto-ack / waiting | **YES**  | Wait on ticket **639447**                                          | $0.01 ask then $0.05 follow-up                        |
-| Aerchain        | support@aerchain.io                         | 2026-09-23 | auto-ack           | **YES**  | Wait human on ticket **107580**                                    | Auto confirmation after $0.05 follow-up               |
-| Agent402        | mike@agent402.tools                         | 2026-09-23 | waiting            | **YES**  | Wait; optional seller-payability (~$0.10) only with spend approval | Multiple $0.01 bumps + $0.05 second-settle ask        |
-| EasyCount / HYP | contact.ez@hyp.co.il, contact@ezcount.co.il | 2026-09-23 | waiting            | YES      | Wait ≤48h                                                          | New design-partner ask + /proof /buy /partner         |
+| Party           | Email                                       | Last touch | Status             | Waiting? | Next action                                                                                   | Notes                                                 |
+| --------------- | ------------------------------------------- | ---------- | ------------------ | -------- | --------------------------------------------------------------------------------------------- | ----------------------------------------------------- |
+| Mesh            | support@meshpayments.com                    | 2026-09-23 | waiting            | **YES**  | Wait ≤48h for human                                                                           | $0.05 second-settle ask + earlier design-partner note |
+| Dokka           | info@dokka.com                              | 2026-09-23 | waiting            | **YES**  | Wait ≤48h                                                                                     | $0.05 design-partner canary                           |
+| Cardcom         | support@secure.cardcom.co.il                | 2026-09-23 | auto-ack / waiting | **YES**  | Wait on ticket **639447**                                                                     | $0.01 ask then $0.05 follow-up                        |
+| Aerchain        | support@aerchain.io                         | 2026-09-23 | auto-ack           | **YES**  | Wait human on ticket **107580**                                                               | Auto confirmation after $0.05 follow-up               |
+| Agent402        | mike@agent402.tools                         | 2026-09-23 | waiting            | **YES**  | Wait; seller-payability blocked — no buyer wallet; optional (~$0.10) only with spend approval | Multiple $0.01 bumps + $0.05 second-settle ask        |
+| EasyCount / HYP | contact.ez@hyp.co.il, contact@ezcount.co.il | 2026-09-23 | waiting            | YES      | Wait ≤48h                                                                                     | New design-partner ask + /proof /buy /partner         |
 
 ## Active threads (other)
 

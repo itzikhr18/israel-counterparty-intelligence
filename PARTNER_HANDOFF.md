@@ -118,4 +118,4 @@ npm test
 # production is Vercel project linked to this repo; push to main deploys
 ```
 
-This handoff pack is committed on `main` so GitHub is the backup of record.
+This handoff pack is committed on `main` so GitHub is the backup of record.\n\n**2026-09-23 evening:** Reply templates in `docs/REPLY_TEMPLATES.md`. Discovery snapshot in `docs/DISCOVERY_STATUS.md`. Agent402 ~$0.10 seller-payability blocked until an external buyer wallet exists (do not self-pay).\n
