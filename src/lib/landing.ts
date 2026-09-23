@@ -146,6 +146,7 @@ export function renderLandingPage(options: LandingPageOptions): string {
       <p class="lead">Check VAT arithmetic and allocation-number requirements, resolve the supplier, and return PAY, HOLD, or BLOCK. Structured evidence and deterministic decisions for AI agents.</p>
       <div class="actions">
         <a class="button primary" href="#invoice-preview">Check an invoice free</a>
+        <a class="button" href="/proof">Settlement proof</a>
         <a class="button" href="/mcp.json">Inspect MCP metadata</a>
         <a class="button" href="/openapi.json">OpenAPI schema</a>
       </div>
@@ -324,7 +325,7 @@ export function renderLandingPage(options: LandingPageOptions): string {
 
     <footer>
       <span>${providerName}</span>
-      <span><a href="/?format=json">Machine-readable service manifest</a> · <a href="/health">Health</a> · <a href="/STATUS.md">Status</a> · <a href="/agents.md">Agents</a> · <a href="/README.md">Documentation</a></span>
+      <span><a href="/?format=json">Machine-readable service manifest</a> · <a href="/proof">Settlement proof</a> · <a href="/health">Health</a> · <a href="/STATUS.md">Status</a> · <a href="/agents.md">Agents</a> · <a href="/README.md">Documentation</a></span>
     </footer>
   </main>
 </body>
