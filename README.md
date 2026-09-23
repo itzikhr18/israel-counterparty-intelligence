@@ -8,7 +8,6 @@ Public source: <https://github.com/itzikhr18/israel-counterparty-intelligence>
 
 For the current production posture, open leads, blockers, and next actions, see **[docs/PROJECT_STATUS.md](./docs/PROJECT_STATUS.md)**. Partner entry: [PARTNER_HANDOFF.md](./PARTNER_HANDOFF.md).
 
-
 **Bring your own trusted wallet:** the free invoice result can prepare a private, validated request
 for an existing x402 client, with a free supplier match and a 0.25 USDC proposed cap.
 No seller wallet package is required. Downloading is not payment approval; the buyer's wallet must

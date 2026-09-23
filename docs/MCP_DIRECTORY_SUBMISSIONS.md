@@ -88,9 +88,9 @@ Israel-specific counterparty intelligence over MCP + x402. Invoice PAY/HOLD/BLOC
 
 Update this table when done (date in Asia/Jerusalem):
 
-| Directory       | Submitted? | Listing URL | Notes |
-| --------------- | ---------- | ----------- | ----- |
-| mcpservers.org  |            |             | human form still open |
-| Smithery        |            |             | browser/OAuth |
-| Glama server    | n/a        |             | using connector path |
+| Directory       | Submitted?         | Listing URL                                                                      | Notes                                        |
+| --------------- | ------------------ | -------------------------------------------------------------------------------- | -------------------------------------------- |
+| mcpservers.org  |                    |                                                                                  | human form still open                        |
+| Smithery        |                    |                                                                                  | browser/OAuth                                |
+| Glama server    | n/a                |                                                                                  | using connector path                         |
 | Glama connector | **YES** 2026-09-23 | https://glama.ai/mcp/connectors/io.github.itzikhr18/israel-business-intelligence | Ownership verified; Frank pinged for refresh |

@@ -63,7 +63,6 @@ This is the **single entry document** for a partner or helper. Start here, then 
 
 0. **Glama connector ownership verified** (`io.github.itzikhr18/israel-business-intelligence`); claim at `/.well-known/glama.json`; Frank asked to refresh listing.
 
-
 1. Durable first external settle recorded on `/health` (env-backed).
 2. Top-tier `/proof` page (live status from `/health`, BaseScan TX/payer/receiver).
 3. Fixed dishonest public copy that still said “awaiting first paid” (STATUS, mcp.json, llms, landing, well-known).
@@ -127,4 +126,3 @@ npm test
 This handoff pack is committed on `main` so GitHub is the backup of record.
 
 **2026-09-23 evening:** See [docs/PROJECT_STATUS.md](./docs/PROJECT_STATUS.md) for the full ops snapshot (Glama claimed, CRM, blockers, next actions).
-
