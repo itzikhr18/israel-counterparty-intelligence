@@ -2,7 +2,7 @@
 
 > Israeli invoice payment gates, company changes, verification, and vendor payment-risk intelligence with public-registry evidence. This service does not call the Tax Authority; buyer-authorized TA access is required for official allocation verification.
 
-- Status: MAINNET LIVE — AWAITING FIRST EXTERNAL PAID CALL; PAID x402 ENDPOINTS AVAILABLE; FREE PREVIEWS AVAILABLE; NO CUSTOMER LOGOS
+- Status: MAINNET LIVE — first external paid call confirmed; PAID x402 ENDPOINTS AVAILABLE; FREE PREVIEWS AVAILABLE; NO CUSTOMER LOGOS
 - Unpaid paid-route POSTs return HTTP 402 with PAYMENT-REQUIRED. Confirm /health and /.well-known/x402 before paying.
 - Current availability: https://israel-counterparty-intelligence.vercel.app/health
 - Public status: https://israel-counterparty-intelligence.vercel.app/STATUS.md

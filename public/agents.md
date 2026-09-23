@@ -3,7 +3,7 @@
 Short, copy-pasteable guide for AI agents and marketplace canaries.
 
 **Live:** https://israel-counterparty-intelligence.vercel.app  
-**Status:** MAINNET LIVE — awaiting first _external_ paid call (do not pay from the receiving wallet).
+**Status:** MAINNET LIVE — first external paid call confirmed (do not pay from the receiving wallet). Proof: /proof.
 
 ## Discover
 
@@ -68,5 +68,5 @@ Free (no wallet): invoice preview, company preview, `preview_agent_payment_trust
 ## Honesty boundaries
 
 - No Tax Authority calls; buyer-attested TA results are never presented as independently authenticated.
-- No fake customer logos / paid volume until External Paid Call #1 settles from an external wallet.
+- No fake customer logos. First external paid call is confirmed (see /proof); do not invent extra volume.
 - Confirm `/health` → `paid_service_suspended: false` and unpaid paid-routes return **402** (not 503) before paying.

@@ -70,7 +70,7 @@ legal ownership of the recipient wallet. The manifest specification is published
 `/agent-payee-manifest-v0.1.md` and its JSON Schema at
 `/.well-known/agent-payee-schema.json`.
 
-Production status: **MAINNET LIVE - AWAITING FIRST EXTERNAL PAID CALL**. Public buyer-facing summary: [`public/STATUS.md`](./public/STATUS.md) (served at `/STATUS.md`). No internal Mainnet
+Production status: **MAINNET LIVE - first external paid call confirmed**. Public buyer-facing summary: [`public/STATUS.md`](./public/STATUS.md) (served at `/STATUS.md`). No internal Mainnet
 payment is required for launch. The first genuine external Base Mainnet USDC payment is also the
 first production end-to-end settlement and External Paid Call #1.
 

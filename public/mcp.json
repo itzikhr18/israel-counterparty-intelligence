@@ -2,9 +2,10 @@
   "name": "Israel Business Intelligence MCP",
   "paid_service": {
     "status": "live",
-    "notice": "MAINNET LIVE \u2014 awaiting first EXTERNAL paid call. Paid Mainnet x402 reports are available; free previews remain available. No customer logos. Confirm /STATUS.md, /health, and /.well-known/x402 before paying.",
+    "notice": "MAINNET LIVE \u2014 first external paid call confirmed on Base (0.01 USDC). Proof: /proof. Confirm /STATUS.md, /health, and /.well-known/x402 before paying. No customer logos.",
     "status_url": "https://israel-counterparty-intelligence.vercel.app/STATUS.md",
-    "health_url": "https://israel-counterparty-intelligence.vercel.app/health"
+    "health_url": "https://israel-counterparty-intelligence.vercel.app/health",
+    "proof_url": "https://israel-counterparty-intelligence.vercel.app/proof"
   },
   "description": "Israeli supplier-invoice payment gate for AI agents: VAT arithmetic, allocation-number applicability, PAY/HOLD/BLOCK decisions, company verification, changes, and public-registry evidence. Cheapest paid path: company-changes at $0.01 USDC on Base Mainnet.",
   "transport": "streamable-http",
@@ -134,7 +135,7 @@
     "network": "eip155:8453",
     "asset": "USDC",
     "facilitator": "Coinbase CDP",
-    "note": "Empty JSON body {} is canary-safe (defaults to public sample company). Returns HTTP 402 until paid. Do not operator-self-pay; awaiting first external paid call."
+    "note": "Empty JSON body {} is canary-safe (defaults to public sample company). Returns HTTP 402 until paid. First external paid call is confirmed; do not operator-self-pay from the receiving wallet."
   },
   "mcp_url": "https://israel-counterparty-intelligence.vercel.app/mcp"
 }

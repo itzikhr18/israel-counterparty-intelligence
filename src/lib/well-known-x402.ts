@@ -89,7 +89,7 @@ export function wellKnownX402Manifest() {
     status: PAID_SERVICE_SUSPENDED
       ? "PAID SERVICES SUSPENDED - FREE PREVIEWS AVAILABLE"
       : config.X402_MAINNET_ENABLED
-        ? "MAINNET LIVE - AWAITING FIRST EXTERNAL PAID CALL"
+        ? "MAINNET LIVE - first external paid call confirmed"
         : "MAINNET DISABLED",
     description:
       "Pre-payment intelligence for Israeli supplier invoices: allocation-number applicability, PAY/HOLD/BLOCK decisions, company verification, company changes, and vendor-risk checks with field-level public-registry evidence. Missing buyer context fails safely. This service does not call the Tax Authority; buyer-authorized TA access is required for official allocation verification; buyer-attested results are not independently authenticated.",

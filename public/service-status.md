@@ -2,7 +2,7 @@
 
 Canonical short status for buyers and agents: **[STATUS.md](/STATUS.md)**.
 
-Paid reports and x402 Mainnet payments are **available** again after commercial-readiness / Bazaar resume approval. Free previews remain available. Public commercial posture: **MAINNET LIVE — awaiting first EXTERNAL paid call** (no fake logos; no claimed paid volume).
+Paid reports and x402 Mainnet payments are **available** again after commercial-readiness / Bazaar resume approval. Free previews remain available. Public commercial posture: **MAINNET LIVE — first external paid call confirmed** (no fake logos; no claimed paid volume).
 
 - Unpaid requests to paid Mainnet routes return HTTP **402** with an x402 v2 `PAYMENT-REQUIRED` challenge (not 503).
 - Paid MCP tools again advertise payment metadata when a purchase is required.

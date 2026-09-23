@@ -2,13 +2,13 @@
 
 **Updated:** 23 September 2026 (Asia/Jerusalem)  
 **Live site:** https://israel-counterparty-intelligence.vercel.app  
-**Rule:** No fake customer logos. No claimed paid volume until External Paid Call #1 settles.
+**Rule:** No fake customer logos. No inflated paid volume. First external paid call is confirmed — see /proof.
 
 ## Current posture
 
 | Signal                 | Value                                                                |
 | ---------------------- | -------------------------------------------------------------------- |
-| Commercial status      | **MAINNET LIVE — awaiting first EXTERNAL paid call**                 |
+| Commercial status      | **MAINNET LIVE — first external paid call confirmed**                |
 | Paid service suspended | `false` (confirm live `/health`)                                     |
 | Facilitator            | Authenticated Coinbase CDP (`api.cdp.coinbase.com/platform/v2/x402`) |
 | Network                | Base Mainnet `eip155:8453`                                           |
@@ -67,7 +67,7 @@ Cheapest honest path = **company-changes** at **$0.01 USDC** on Base Mainnet (Co
    - Optional bridge: `npx --yes https://israel-counterparty-intelligence.vercel.app/israel-company-verify-buyer-0.4.0.tgz`
 4. MCP equivalent: connect to `https://israel-counterparty-intelligence.vercel.app/mcp` → `describe_service` → call `get_israeli_company_changes_paid`.
 
-A successful **external** settlement (non-operator / non-receiving wallet) is External Paid Call #1.
+External Paid Call #1 is **confirmed** (non-operator / non-receiving wallet). See [/proof](/proof).
 
 ### Durable recording (operator)
 
@@ -84,10 +84,18 @@ Durability tiers: `FIRST_EXTERNAL_PAID_CALL_TX` env (always) → optional Upstas
 - Listed on PayAPI Market (form accepted; awaiting their wallet canary).
 - Challenge fields: HTTP **402**, Base Mainnet USDC, `extra.name` = `USD Coin`, `payTo` = operator receiving wallet.
 - `POST /v1/company-changes/mainnet` with `{}` or omitted `company_number` uses public sample **514744887** so a paid canary still returns product (not a validation 400).
-- Do **not** self-pay from the operator wallet; External Paid Call #1 must be an external payer.
+- Do **not** self-pay from the operator wallet; External Paid Call #1 already came from an external payer.
 
 ## What we do **not** claim
 
 - Customer logos, case studies, or ARR/MRR traction.
 - Independent Israel Tax Authority authentication of buyer-supplied allocation results.
 - Bank-account ownership, sanctions/PEP/UBO, credit scoring, or legal advice.
+
+## First external paid call (confirmed)
+
+- Amount: **0.01 USDC** on Base Mainnet (`eip155:8453`)
+- TX: `0x5b68756c1b1713e46c5d137c91c92df3d1e2e4e71e83c7025a8b833a077bbbbd`
+- Public proof page: [/proof](https://israel-counterparty-intelligence.vercel.app/proof)
+- Machine-readable: `/health` → `payments.first_external_paid_call`
+- Optional second canary: `POST /v1/verify/mainnet` at **0.05 USDC**

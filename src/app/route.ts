@@ -15,7 +15,7 @@ export function serviceManifest() {
     version: API_VERSION,
     status: PAID_SERVICE_SUSPENDED
       ? "PAID SERVICES SUSPENDED - FREE PREVIEWS AVAILABLE"
-      : "MAINNET LIVE - AWAITING FIRST EXTERNAL PAID CALL",
+      : "MAINNET LIVE - first external paid call confirmed",
     paid_service: {
       suspended: PAID_SERVICE_SUSPENDED,
       notice: PAID_SERVICE_SUSPENDED ? PAID_SERVICE_NOTICE : undefined,
