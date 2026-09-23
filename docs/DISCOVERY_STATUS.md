@@ -4,12 +4,12 @@ Canonical ops snapshot: [PROJECT_STATUS.md](./PROJECT_STATUS.md)
 
 ## Live surfaces (verified)
 
-| Path | Status |
-| ---- | ------ |
-| `/` `/buy` `/proof` `/partner` `/health` | 200 |
-| `/mcp` `/mcp.json` `/.well-known/x402` | 200 |
-| `/.well-known/glama.json` | 200 (Glama claim token) |
-| `/STATUS.md` `/llms.txt` `/agents.md` | 200 |
+| Path                                     | Status                  |
+| ---------------------------------------- | ----------------------- |
+| `/` `/buy` `/proof` `/partner` `/health` | 200                     |
+| `/mcp` `/mcp.json` `/.well-known/x402`   | 200                     |
+| `/.well-known/glama.json`                | 200 (Glama claim token) |
+| `/STATUS.md` `/llms.txt` `/agents.md`    | 200                     |
 
 `/health`: `first_external_paid_call` durable; `second_external_paid_call` **null**.
 
@@ -21,15 +21,15 @@ Canonical ops snapshot: [PROJECT_STATUS.md](./PROJECT_STATUS.md)
 
 ## Directories
 
-| Surface | Status | Next |
-| ------- | ------ | ---- |
-| Glama connector | **Ownership verified** (2026-09-23) | Wait Frank refresh; listing https://glama.ai/mcp/connectors/io.github.itzikhr18/israel-business-intelligence |
-| Agent Tools | Re-crawled; $0.01 + MCP OK | No paid trial; cool |
-| Agent402 | Indexed (9 tools) | Paid canary **closed** (router policy) |
-| MCP.Directory | Submitted earlier | Wait approval email |
-| Smithery / mcpservers.org / 402.ad | Not finished | Needs human browser / captcha |
-| Agent402 seller-payability | **Blocked** | Needs ~$0.10 from non-receiving buyer wallet |
-| Upstash auto-durability | **Blocked** | Needs Redis REST credentials from owner |
+| Surface                            | Status                              | Next                                                                                                         |
+| ---------------------------------- | ----------------------------------- | ------------------------------------------------------------------------------------------------------------ |
+| Glama connector                    | **Ownership verified** (2026-09-23) | Wait Frank refresh; listing https://glama.ai/mcp/connectors/io.github.itzikhr18/israel-business-intelligence |
+| Agent Tools                        | Re-crawled; $0.01 + MCP OK          | No paid trial; cool                                                                                          |
+| Agent402                           | Indexed (9 tools)                   | Paid canary **closed** (router policy)                                                                       |
+| MCP.Directory                      | Submitted earlier                   | Wait approval email                                                                                          |
+| Smithery / mcpservers.org / 402.ad | Not finished                        | Needs human browser / captcha                                                                                |
+| Agent402 seller-payability         | **Blocked**                         | Needs ~$0.10 from non-receiving buyer wallet                                                                 |
+| Upstash auto-durability            | **Blocked**                         | Needs Redis REST credentials from owner                                                                      |
 
 ## Explicitly not done (by policy)
 
