@@ -43,7 +43,6 @@ function sameResource(left: string, right: string): boolean {
   }
 }
 
-
 function cleanDiscoverySource(value?: string): string | null {
   if (!value) return null;
   const cleaned = value

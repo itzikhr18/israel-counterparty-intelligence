@@ -180,7 +180,8 @@ function logMainnetSettlement(context: SettleResultContext): void {
   // Prefer facilitator settle.payer; fall back to EIP-3009 authorization.from
   // (same as MCP). Missing payer previously dropped a real Mainnet settlement
   // from first_external_paid_call recording without changing price/wallet.
-  const payer = context.result.payer ?? lifecyclePayer(context.paymentPayload) ?? undefined;
+  const payer =
+    context.result.payer ?? lifecyclePayer(context.paymentPayload) ?? undefined;
   const event = createExternalPaidCallEvent({
     success: context.result.success,
     network: context.result.network,
