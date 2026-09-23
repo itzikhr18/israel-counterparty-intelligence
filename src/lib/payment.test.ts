@@ -72,6 +72,7 @@ describe("dual-network x402 configuration", () => {
     };
     expect(bazaar.info.input.method).toBe("POST");
     expect(JSON.stringify(challenge.extensions)).not.toContain('"format"');
+    expect(JSON.stringify(challenge.extensions)).not.toContain('"$schema"');
   });
 
   it("creates a discoverable 0.10 USDC payment-risk challenge", () => {
@@ -125,13 +126,16 @@ describe("dual-network x402 configuration", () => {
   });
 
   it("gives non-x402-aware buyers a machine-readable path past the 402", () => {
-    const body = buildPaymentRequiredBody(
-      buildPaymentRequired("verify-mainnet"),
-    );
+    const challenge = buildPaymentRequired("verify-mainnet");
+    const body = buildPaymentRequiredBody(challenge);
 
     expect(body).toMatchObject({
       error: "Payment required",
       x402_version: 2,
+      x402Version: 2,
+      accepts: challenge.accepts,
+      resource: challenge.resource,
+      extensions: challenge.extensions,
       payment: {
         scheme: "exact",
         network: "eip155:8453",
@@ -144,6 +148,34 @@ describe("dual-network x402 configuration", () => {
         ),
       },
     });
+    expect(body.extensions?.bazaar).toBeTruthy();
+  });
+
+  it("includes extensions.bazaar in the company-changes Mainnet 402 JSON body", () => {
+    const challenge = buildPaymentRequired("company-changes-mainnet");
+    const body = buildPaymentRequiredBody(challenge);
+
+    expect(body).toMatchObject({
+      error: "Payment required",
+      x402Version: 2,
+      x402_version: 2,
+      accepts: [
+        {
+          scheme: "exact",
+          network: "eip155:8453",
+          amount: "10000",
+        },
+      ],
+      payment: {
+        amount: "10000",
+        asset_decimals: 6,
+      },
+    });
+    expect(body.resource?.url).toMatch(/\/v1\/company-changes\/mainnet$/);
+    expect(body.extensions?.bazaar).toBeTruthy();
+    expect(JSON.stringify(body.extensions)).toContain("lookback_days");
+    expect(body.extensions).toEqual(challenge.extensions);
+    expect(body.accepts).toEqual(challenge.accepts);
   });
 
   it("keeps every paid-route resource.description within the CDP 500-character limit", () => {

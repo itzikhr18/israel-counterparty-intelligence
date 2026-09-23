@@ -41,6 +41,7 @@ Free (no wallet): invoice structural preview, company identity preview, `preview
 
 - Coinbase Bazaar commercial-readiness resume was approved; paid charging is on.
 - HTTP + MCP `extensions.bazaar` declarations validate with CDP (`valid` + simulation `accepted`). Catalog `indexed/active` still waits for the first **external** Mainnet settlement that echoes the bazaar extension (do not operator-self-pay).
+- גוף JSON של HTTP 402 כולל כעת את אתגר ה-PaymentRequired המלא (כולל `extensions.bazaar`), לא רק רמז קונה קצר — אותו אובייקט כמו ב-header.
 - GoPlausible-style enrichment files are published on this origin (real JSON/text, not SPA HTML): `/.well-known/agent-card.json`, `/.well-known/agent.json`, `/.well-known/ai-plugin.json`, `/.well-known/mcp.json`, plus `/.well-known/x402` and `/llms.txt`. Generic `Accept` on `/` returns HTML with OpenGraph tags for crawler branding.
 - Operator check (repo): `npm run bazaar:check` / `scripts/bazaar-readiness.mjs` against production (includes enrichment probes).
 

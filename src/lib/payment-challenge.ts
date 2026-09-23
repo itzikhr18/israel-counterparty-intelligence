@@ -127,69 +127,73 @@ export function buildPaymentRequired(
     maxTimeoutSeconds: 300,
     extra: option.price.extra,
   };
-  const extensions = declareDiscoveryExtension({
-    bodyType: "json",
-    input:
-      routeName === "invoice-gate-mainnet"
-        ? {
-            supplier_company_number: "514744887",
-            invoice_number: "INV-2026-001",
-            invoice_date: "2026-09-04",
-            amount_before_vat: 6000,
-            vat_amount: 1080,
-            total_amount: 7080,
-            currency: "ILS",
-            buyer_is_authorized_dealer: true,
-            buyer_requested_allocation_number: true,
-            allocation_number: "123456789",
-            language: "en",
-          }
-        : routeName === "payment-risk-mainnet"
+  // Strip nested JSON Schema `$schema` / `format` keys from bazaar payloads
+  // (including wrapper schema injected by declareDiscoveryExtension).
+  const extensions = x402DiscoverySchema(
+    declareDiscoveryExtension({
+      bodyType: "json",
+      input:
+        routeName === "invoice-gate-mainnet"
           ? {
-              company_number: "514744887",
-              invoice_company_number: "514744887",
-              invoice_company_name: "מנדיי. קום בעמ",
+              supplier_company_number: "514744887",
+              invoice_number: "INV-2026-001",
+              invoice_date: "2026-09-04",
+              amount_before_vat: 6000,
+              vat_amount: 1080,
+              total_amount: 7080,
+              currency: "ILS",
+              buyer_is_authorized_dealer: true,
+              buyer_requested_allocation_number: true,
+              allocation_number: "123456789",
               language: "en",
             }
-          : routeName === "company-changes-mainnet"
+          : routeName === "payment-risk-mainnet"
             ? {
                 company_number: "514744887",
-                lookback_days: 366,
-                limit: 25,
+                invoice_company_number: "514744887",
+                invoice_company_name: "מנדיי. קום בעמ",
                 language: "en",
-              }
-            : { company_number: "514744887", language: "en" },
-    inputSchema:
-      routeName === "invoice-gate-mainnet"
-        ? x402DiscoverySchema(invoiceGateInputJsonSchema)
-        : routeName === "payment-risk-mainnet"
-          ? x402DiscoverySchema(paymentRiskInputJsonSchema)
-          : routeName === "company-changes-mainnet"
-            ? x402DiscoverySchema(companyChangesInputJsonSchema)
-            : x402DiscoverySchema(verifyInputJsonSchema),
-    output:
-      routeName === "verify" || routeName === "verify-mainnet"
-        ? {
-            example: paymentOutputExample("verify"),
-            schema: x402DiscoverySchema(verifyOutputJsonSchema),
-          }
-        : routeName === "payment-risk-mainnet"
-          ? {
-              example: paymentRiskExample,
-              schema: x402DiscoverySchema(paymentRiskOutputJsonSchema),
-            }
-          : routeName === "invoice-gate-mainnet"
-            ? {
-                example: invoiceGateExample,
-                schema: x402DiscoverySchema(invoiceGateOutputJsonSchema),
               }
             : routeName === "company-changes-mainnet"
               ? {
-                  example: companyChangesExample,
-                  schema: x402DiscoverySchema(companyChangesOutputJsonSchema),
+                  company_number: "514744887",
+                  lookback_days: 366,
+                  limit: 25,
+                  language: "en",
                 }
-              : { example: paymentOutputExample(routeName) },
-  });
+              : { company_number: "514744887", language: "en" },
+      inputSchema:
+        routeName === "invoice-gate-mainnet"
+          ? x402DiscoverySchema(invoiceGateInputJsonSchema)
+          : routeName === "payment-risk-mainnet"
+            ? x402DiscoverySchema(paymentRiskInputJsonSchema)
+            : routeName === "company-changes-mainnet"
+              ? x402DiscoverySchema(companyChangesInputJsonSchema)
+              : x402DiscoverySchema(verifyInputJsonSchema),
+      output:
+        routeName === "verify" || routeName === "verify-mainnet"
+          ? {
+              example: paymentOutputExample("verify"),
+              schema: x402DiscoverySchema(verifyOutputJsonSchema),
+            }
+          : routeName === "payment-risk-mainnet"
+            ? {
+                example: paymentRiskExample,
+                schema: x402DiscoverySchema(paymentRiskOutputJsonSchema),
+              }
+            : routeName === "invoice-gate-mainnet"
+              ? {
+                  example: invoiceGateExample,
+                  schema: x402DiscoverySchema(invoiceGateOutputJsonSchema),
+                }
+              : routeName === "company-changes-mainnet"
+                ? {
+                    example: companyChangesExample,
+                    schema: x402DiscoverySchema(companyChangesOutputJsonSchema),
+                  }
+                : { example: paymentOutputExample(routeName) },
+    }),
+  );
   const bazaar = extensions.bazaar as {
     info: { input: { method?: string } };
   };
@@ -216,8 +220,12 @@ export function buildPaymentRequiredBody(paymentRequired: PaymentRequired) {
   const buyerQuickstart = `${config.PUBLIC_BASE_URL}/x402-buyer-quickstart.md`;
   const buyerBridge = `${config.PUBLIC_BASE_URL}/israel-company-verify-buyer-0.4.0.tgz`;
 
+  // Mirror the same PaymentRequired object encoded in PAYMENT-REQUIRED so
+  // body-only clients / indexers can settle while echoing extensions.bazaar.
+  // Slim buyer hints stay additive for non-x402-aware clients.
   return {
-    error: "Payment required",
+    ...paymentRequired,
+    error: paymentRequired.error ?? "Payment required",
     x402_version: paymentRequired.x402Version,
     payment: requirement
       ? {
