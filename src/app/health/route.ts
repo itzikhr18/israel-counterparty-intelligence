@@ -28,6 +28,20 @@ export async function GET() {
             ? undefined
             : "In-process observation only; set FIRST_EXTERNAL_PAID_CALL_TX (or UPSTASH_REDIS_REST_*) for durable display across cold starts. Never self-pay from the receiving wallet."
           : "No external Mainnet settlement observed yet. Do not self-pay from the operator/receiving wallet.",
+        optional_second_paid_call: {
+          status: "available" as const,
+          amount_usdc: "0.05",
+          network: paymentEnvironments.mainnet.network,
+          path: "/v1/verify/mainnet",
+          resource_url:
+            "https://israel-counterparty-intelligence.vercel.app/v1/verify/mainnet",
+          method: "POST",
+          atomic_amount: "50000",
+          note: "Optional second Mainnet canary for PayAPI / repeat-settle demos alongside the $0.01 company-changes path.",
+        },
+        second_external_paid_call: null,
+        second_external_paid_call_note:
+          "No second external Mainnet settlement recorded yet. Settle POST /v1/verify/mainnet ($0.05) to demonstrate a non-one-shot payment path.",
       },
     },
     { headers: { "cache-control": "no-store" } },
