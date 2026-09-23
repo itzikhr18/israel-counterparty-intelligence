@@ -7,7 +7,9 @@ export function x402DiscoverySchema<T>(schema: T): T {
 
   return Object.fromEntries(
     Object.entries(schema).flatMap(([key, value]) =>
-      key === "format" ? [] : [[key, x402DiscoverySchema(value)]],
+      key === "format" || key === "$schema"
+        ? []
+        : [[key, x402DiscoverySchema(value)]],
     ),
   ) as T;
 }
