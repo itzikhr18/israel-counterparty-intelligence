@@ -1,11 +1,22 @@
 import { z } from "zod";
 
+/** Public sample used by bazaar/PayAPI canaries when body omits company_number. */
+export const SAMPLE_COMPANY_NUMBER = "514744887";
+
 export const companyChangesQuerySchema = z.object({
-  company_number: z
-    .string()
-    .trim()
-    .regex(/^\d{9}$/, "company_number must contain exactly 9 digits")
-    .describe("Exact nine-digit Israeli company registration number."),
+  company_number: z.preprocess(
+    (value) =>
+      value === undefined || value === null || value === ""
+        ? SAMPLE_COMPANY_NUMBER
+        : value,
+    z
+      .string()
+      .trim()
+      .regex(/^\d{9}$/, "company_number must contain exactly 9 digits")
+      .describe(
+        "Exact nine-digit Israeli company registration number. Defaults to the public sample 514744887 when omitted (marketplace canary / empty paid body).",
+      ),
+  ),
   lookback_days: z
     .number()
     .int()
