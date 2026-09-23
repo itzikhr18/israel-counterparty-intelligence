@@ -353,3 +353,7 @@ Change the offer or stop.
 - [Implementation analysis in Hebrew](docs/ANALYSIS_HE.md)
 - [Current blockers](docs/BLOCKERS.md)
 - [Paid settlement test](docs/PAID_SETTLEMENT_TEST.md)
+
+## Partner handoff
+
+Start at [`PARTNER_HANDOFF.md`](./PARTNER_HANDOFF.md) (status, system map, outreach CRM).
