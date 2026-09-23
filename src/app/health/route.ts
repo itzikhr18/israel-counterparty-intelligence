@@ -2,14 +2,14 @@ import { NextResponse } from "next/server";
 
 import { API_VERSION } from "@/lib/domain";
 import { paymentEnvironments } from "@/lib/config";
-import { getFirstExternalPaidCall } from "@/lib/payment-telemetry";
+import { getFirstExternalPaidCallDurable } from "@/lib/payment-telemetry";
 import {
   PAID_SERVICE_NOTICE,
   PAID_SERVICE_SUSPENDED,
 } from "@/lib/service-availability";
 
 export async function GET() {
-  const firstExternalPaidCall = getFirstExternalPaidCall();
+  const firstExternalPaidCall = await getFirstExternalPaidCallDurable();
   return NextResponse.json(
     {
       status: "ok",
@@ -26,8 +26,8 @@ export async function GET() {
         first_external_paid_call_note: firstExternalPaidCall
           ? firstExternalPaidCall.durable
             ? undefined
-            : "In-process observation only; set FIRST_EXTERNAL_PAID_CALL_TX for durable display across cold starts."
-          : "No external Mainnet settlement observed yet. Do not self-pay from the operator wallet.",
+            : "In-process observation only; set FIRST_EXTERNAL_PAID_CALL_TX (or UPSTASH_REDIS_REST_*) for durable display across cold starts. Never self-pay from the receiving wallet."
+          : "No external Mainnet settlement observed yet. Do not self-pay from the operator/receiving wallet.",
       },
     },
     { headers: { "cache-control": "no-store" } },

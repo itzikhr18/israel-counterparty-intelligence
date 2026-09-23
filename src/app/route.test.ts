@@ -32,6 +32,14 @@ describe("service root", () => {
           agent_card: "/.well-known/agent-card.json",
           mcp: "/.well-known/mcp.json",
           llms: "/llms.txt",
+          agents: "/agents.md",
+          status: "/STATUS.md",
+        },
+        preferred_first_paid_path: {
+          rest: "POST /v1/company-changes/mainnet",
+          mcp_tool: "get_israeli_company_changes_paid",
+          price_usdc: "0.01",
+          agents_guide: "/agents.md",
         },
       },
     });
@@ -92,6 +100,12 @@ describe("service root", () => {
     expect(html).toContain("/v1/invoice-gate/preview");
     expect(html).toContain("/v1/payment-risk/mainnet");
     expect(html).toContain("/v1/company-changes/mainnet");
+    expect(html).toContain("First paid call in 60 seconds");
+    expect(html).toContain('id="first-paid-call"');
+    expect(html).toContain("/agents.md");
+    expect(html).toContain("--data '{}'");
+    expect(html).toContain("0xa0A3BB49eA4AC723Bcf4d2d1ecde2EE01BA03C82");
+    expect(html).toContain("Coinbase CDP");
     expect(response.headers.get("content-security-policy")).toContain(
       "form-action 'self'",
     );
