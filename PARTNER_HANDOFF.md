@@ -7,6 +7,7 @@
 
 This is the **single entry document** for a partner or helper. Start here, then open:
 
+- **Public one-pager (no chat needed):** https://israel-counterparty-intelligence.vercel.app/partner
 - [docs/OUTREACH_CRM.md](./docs/OUTREACH_CRM.md) — who we emailed, who we wait on
 - [docs/SYSTEM_MAP.md](./docs/SYSTEM_MAP.md) — routes, payments, deploy
 - Public status: https://israel-counterparty-intelligence.vercel.app/STATUS.md
@@ -27,6 +28,7 @@ This is the **single entry document** for a partner or helper. Start here, then 
 | Health (JSON)         | https://israel-counterparty-intelligence.vercel.app/health                   |
 | Settlement proof      | https://israel-counterparty-intelligence.vercel.app/proof                    |
 | Pay in 60 seconds     | https://israel-counterparty-intelligence.vercel.app/buy                      |
+| Partner one-pager     | https://israel-counterparty-intelligence.vercel.app/partner                  |
 | Public STATUS         | https://israel-counterparty-intelligence.vercel.app/STATUS.md                |
 | MCP                   | https://israel-counterparty-intelligence.vercel.app/mcp                      |
 | MCP metadata          | https://israel-counterparty-intelligence.vercel.app/mcp.json                 |
@@ -98,7 +100,7 @@ This is the **single entry document** for a partner or helper. Start here, then 
 
 ## How a partner can help in 48 hours
 
-1. Open `/proof` + `/health` and confirm first TX on BaseScan.
+1. Open `/partner` (public one-pager), then `/proof` + `/health`, and confirm first TX on BaseScan.
 2. Read [docs/OUTREACH_CRM.md](./docs/OUTREACH_CRM.md) — answer any human reply fast; do **not** spam PayAPI/GoPlausible today.
 3. If you have a Base USDC wallet that is **not** the receiving wallet: pay once `POST /v1/verify/mainnet` at $0.05, then set `SECOND_EXTERNAL_PAID_CALL_TX`.
 4. Optional: create free Upstash Redis and add the two REST env vars on Vercel.

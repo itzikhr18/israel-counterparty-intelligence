@@ -1,0 +1,454 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Partner one-pager — Israel Counterparty Intelligence</title>
+    <meta
+      name="description"
+      content="Public partner brief for Israel Counterparty Intelligence: product, live status, on-chain proof, how to buy, and what is still open."
+    />
+    <link rel="icon" href="/icon.svg" type="image/svg+xml" />
+    <link
+      rel="canonical"
+      href="https://israel-counterparty-intelligence.vercel.app/partner"
+    />
+    <style>
+      :root {
+        --bg: #fafafa;
+        --surface: #ffffff;
+        --ink: #0a0a0a;
+        --muted: #525252;
+        --line: #e5e5e5;
+        --live: #166534;
+        --live-bg: #dcfce7;
+        --pending: #92400e;
+        --pending-bg: #fef3c7;
+        --code-bg: #f5f5f5;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        min-height: 100vh;
+        background: var(--bg);
+        color: var(--ink);
+        font:
+          15px/1.55 -apple-system,
+          BlinkMacSystemFont,
+          "Segoe UI",
+          system-ui,
+          sans-serif;
+        -webkit-font-smoothing: antialiased;
+      }
+      main {
+        max-width: 40rem;
+        margin: 0 auto;
+        padding: 4.5rem 1.5rem 5rem;
+      }
+      .eyebrow {
+        margin: 0 0 0.75rem;
+        font-size: 0.75rem;
+        font-weight: 600;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--muted);
+      }
+      h1 {
+        margin: 0 0 0.35rem;
+        font-size: clamp(1.5rem, 3vw, 1.85rem);
+        font-weight: 650;
+        letter-spacing: -0.025em;
+        line-height: 1.2;
+      }
+      .he {
+        margin: 0 0 0.85rem;
+        color: var(--muted);
+        font-size: 0.92rem;
+        direction: rtl;
+      }
+      h2 {
+        margin: 0 0 0.65rem;
+        font-size: 1.05rem;
+        font-weight: 650;
+        letter-spacing: -0.015em;
+      }
+      .lede {
+        margin: 0 0 2rem;
+        color: var(--muted);
+        font-size: 0.98rem;
+        max-width: 36rem;
+      }
+      .card {
+        background: var(--surface);
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        padding: 1.35rem 1.4rem;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+        margin-bottom: 1rem;
+      }
+      .row {
+        display: grid;
+        grid-template-columns: 8.5rem 1fr;
+        gap: 0.65rem 1rem;
+        padding: 0.7rem 0;
+        border-top: 1px solid var(--line);
+        align-items: start;
+      }
+      .row:first-child {
+        border-top: 0;
+        padding-top: 0;
+      }
+      .row:last-child {
+        padding-bottom: 0;
+      }
+      .label {
+        color: var(--muted);
+        font-size: 0.82rem;
+        font-weight: 500;
+        padding-top: 0.12rem;
+      }
+      .value {
+        font-size: 0.95rem;
+        word-break: break-word;
+      }
+      .mono {
+        font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+        font-size: 0.82rem;
+        line-height: 1.45;
+      }
+      a {
+        color: var(--ink);
+        text-underline-offset: 3px;
+      }
+      a:hover {
+        opacity: 0.72;
+      }
+      .badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        padding: 0.2rem 0.55rem;
+        border-radius: 999px;
+        font-size: 0.78rem;
+        font-weight: 650;
+        letter-spacing: 0.01em;
+      }
+      .badge::before {
+        content: "";
+        width: 0.45rem;
+        height: 0.45rem;
+        border-radius: 50%;
+        background: currentColor;
+      }
+      .badge.live {
+        color: var(--live);
+        background: var(--live-bg);
+      }
+      .badge.pending {
+        color: var(--pending);
+        background: var(--pending-bg);
+      }
+      .badge.checking {
+        color: var(--muted);
+        background: #f5f5f5;
+      }
+      .links {
+        margin: 0;
+        padding: 0;
+        list-style: none;
+      }
+      .links li {
+        padding: 0.55rem 0;
+        border-top: 1px solid var(--line);
+        font-size: 0.92rem;
+      }
+      .links li:first-child {
+        border-top: 0;
+        padding-top: 0;
+      }
+      .links li:last-child {
+        padding-bottom: 0;
+      }
+      .links span {
+        display: block;
+        color: var(--muted);
+        font-size: 0.8rem;
+        margin-top: 0.15rem;
+      }
+      .open-list {
+        margin: 0;
+        padding: 0;
+        list-style: none;
+      }
+      .open-list li {
+        padding: 0.7rem 0;
+        border-top: 1px solid var(--line);
+        font-size: 0.92rem;
+      }
+      .open-list li:first-child {
+        border-top: 0;
+        padding-top: 0;
+      }
+      .open-list li:last-child {
+        padding-bottom: 0;
+      }
+      .open-list strong {
+        display: block;
+        margin-bottom: 0.15rem;
+      }
+      .open-list p {
+        margin: 0;
+        color: var(--muted);
+        font-size: 0.88rem;
+      }
+      .note {
+        margin: 1.35rem 0 0;
+        color: var(--muted);
+        font-size: 0.86rem;
+      }
+      footer {
+        margin-top: 2rem;
+        color: var(--muted);
+        font-size: 0.8rem;
+      }
+      footer a {
+        color: var(--muted);
+      }
+      @media (max-width: 560px) {
+        .row {
+          grid-template-columns: 1fr;
+          gap: 0.25rem;
+        }
+        main {
+          padding-top: 3rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <p class="eyebrow">Partner brief · public one-pager</p>
+      <h1>Israel Counterparty Intelligence</h1>
+      <p class="he">מודיעין צד־נגדי ישראלי · APIs בתשלום x402 על Base</p>
+      <p class="lede">
+        Short public brief for partners: what it is, live status, on-chain
+        proof, how a buyer pays in ~60 seconds, and what is still open. No chat
+        history required. No operator self-pay.
+      </p>
+
+      <section class="card" aria-labelledby="what-title">
+        <h2 id="what-title">What it is</h2>
+        <ul class="links">
+          <li>
+            Pre-payment intelligence for Israeli supplier invoices and company
+            identity.
+            <span
+              >PAY / HOLD / BLOCK with Companies Registry evidence — not Tax
+              Authority login.</span
+            >
+          </li>
+          <li>
+            Paid agent APIs over <strong>x402</strong> on
+            <strong>Base Mainnet</strong> (USDC via Coinbase CDP).
+            <span
+              >No subscription. No API key. Agent/CLI settle, not card
+              checkout.</span
+            >
+          </li>
+          <li>
+            Surfaces: REST (<span class="mono">/v1/*</span>), MCP (<span
+              class="mono"
+              >/mcp</span
+            >), discovery (<span class="mono">/.well-known/x402</span>).
+          </li>
+        </ul>
+      </section>
+
+      <section class="card" aria-label="Live status">
+        <h2>Live status</h2>
+        <div class="row">
+          <div class="label">First settle</div>
+          <div class="value">
+            <span id="first-status" class="badge checking">Checking…</span>
+            <span class="mono" style="display: block; margin-top: 0.35rem"
+              >$0.01 · POST /v1/company-changes/mainnet ·
+              <a href="/proof">/proof</a> ·
+              <a
+                href="https://basescan.org/tx/0x5b68756c1b1713e46c5d137c91c92df3d1e2e4e71e83c7025a8b833a077bbbbd"
+                rel="noopener noreferrer"
+                target="_blank"
+                >BaseScan TX</a
+              ></span
+            >
+          </div>
+        </div>
+        <div class="row">
+          <div class="label">Second settle</div>
+          <div class="value">
+            <span id="second-status" class="badge checking">Checking…</span>
+            <span class="mono" style="display: block; margin-top: 0.35rem"
+              >$0.05 · POST /v1/verify/mainnet · still open</span
+            >
+          </div>
+        </div>
+        <div class="row">
+          <div class="label">Network</div>
+          <div class="value">
+            Base Mainnet <span class="mono">(eip155:8453)</span> · Coinbase CDP
+          </div>
+        </div>
+        <div class="row">
+          <div class="label">Receiver</div>
+          <div class="value mono">
+            <a
+              href="https://basescan.org/address/0xa0A3BB49eA4AC723Bcf4d2d1ecde2EE01BA03C82"
+              rel="noopener noreferrer"
+              target="_blank"
+              >0xa0A3BB49eA4AC723Bcf4d2d1ecde2EE01BA03C82</a
+            >
+          </div>
+        </div>
+        <div class="row">
+          <div class="label">Honesty</div>
+          <div class="value">
+            External payer only. Never pay from the receiving wallet. No fake
+            logos or inflated volume.
+          </div>
+        </div>
+      </section>
+
+      <section class="card" aria-labelledby="buy-title">
+        <h2 id="buy-title">How a buyer pays in 60 seconds</h2>
+        <ul class="links">
+          <li>
+            Open <a href="/buy">/buy</a> — inspect HTTP 402, then settle with a
+            buyer-controlled x402 wallet.
+            <span
+              >Cheapest proven path: $0.01 company-changes. Optional second
+              canary: $0.05 verify.</span
+            >
+          </li>
+          <li>
+            Confirm machine status on <a href="/health">/health</a> and the
+            first TX on <a href="/proof">/proof</a>.
+          </li>
+        </ul>
+      </section>
+
+      <section class="card" aria-labelledby="urls-title">
+        <h2 id="urls-title">Key URLs</h2>
+        <ul class="links">
+          <li>
+            <a href="/">/</a>
+            <span>Product landing</span>
+          </li>
+          <li>
+            <a href="/buy">/buy</a>
+            <span>Pay in 60 seconds</span>
+          </li>
+          <li>
+            <a href="/proof">/proof</a>
+            <span>First external settle + BaseScan</span>
+          </li>
+          <li>
+            <a href="/health">/health</a>
+            <span>Machine-readable payment status</span>
+          </li>
+          <li>
+            <a href="/mcp.json">/mcp.json</a>
+            <span>MCP metadata · connect /mcp</span>
+          </li>
+          <li>
+            <a
+              href="https://github.com/itzikhr18/israel-counterparty-intelligence"
+              rel="noopener noreferrer"
+              target="_blank"
+              >GitHub</a
+            >
+            <span>itzikhr18/israel-counterparty-intelligence</span>
+          </li>
+        </ul>
+      </section>
+
+      <section class="card" aria-labelledby="open-title">
+        <h2 id="open-title">What's open</h2>
+        <ul class="open-list">
+          <li>
+            <strong>Second $0.05 settle</strong>
+            <p>
+              <span class="mono">second_external_paid_call</span> is still
+              <strong>null</strong>. Optional path:
+              <span class="mono">POST /v1/verify/mainnet</span>. Persist with
+              <span class="mono">SECOND_EXTERNAL_PAID_CALL_TX</span> after an
+              external settle.
+            </p>
+          </li>
+          <li>
+            <strong>Inbound replies</strong>
+            <p>
+              Waiting on human replies from outreach — answer fast when they
+              arrive; do not invent CRM outcomes here.
+            </p>
+          </li>
+          <li>
+            <strong>Upstash durable lock</strong>
+            <p>
+              Optional Redis REST vars are
+              <strong>pending credentials</strong> — without them, next settles
+              need env paste or process memory until configured.
+            </p>
+          </li>
+        </ul>
+      </section>
+
+      <p class="note">
+        This page is a public partner one-pager. Live badges refresh from
+        <a href="/health">/health</a>. Deeper handoff (repo):
+        <span class="mono">PARTNER_HANDOFF.md</span>.
+      </p>
+
+      <footer>
+        <a href="https://israel-counterparty-intelligence.vercel.app/"
+          >israel-counterparty-intelligence.vercel.app</a
+        >
+        · <a href="/">Home</a> · <a href="/buy">Buy</a> ·
+        <a href="/proof">Proof</a>
+      </footer>
+    </main>
+    <script>
+      (function () {
+        var firstEl = document.getElementById("first-status");
+        var secondEl = document.getElementById("second-status");
+        function setBadge(el, live, liveText, pendingText) {
+          el.className = "badge " + (live ? "live" : "pending");
+          el.textContent = live ? liveText : pendingText;
+        }
+        fetch("/health", { cache: "no-store" })
+          .then(function (r) {
+            return r.json();
+          })
+          .then(function (d) {
+            var payments = (d && d.payments) || {};
+            setBadge(
+              firstEl,
+              !!payments.first_external_paid_call,
+              "Confirmed",
+              "Pending",
+            );
+            setBadge(
+              secondEl,
+              !!payments.second_external_paid_call,
+              "Recorded",
+              "Open · not yet settled",
+            );
+          })
+          .catch(function () {
+            setBadge(firstEl, true, "Confirmed", "Pending");
+            setBadge(secondEl, false, "Recorded", "Open · not yet settled");
+          });
+      })();
+    </script>
+  </body>
+</html>

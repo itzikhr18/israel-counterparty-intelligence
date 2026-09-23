@@ -327,7 +327,7 @@ export function renderLandingPage(options: LandingPageOptions): string {
 
     <footer>
       <span>${providerName}</span>
-      <span><a href="/?format=json">Machine-readable service manifest</a> · <a href="/buy">Pay in 60 seconds</a> · <a href="/proof">Settlement proof</a> · <a href="/health">Health</a> · <a href="/STATUS.md">Status</a> · <a href="/agents.md">Agents</a> · <a href="/README.md">Documentation</a></span>
+      <span><a href="/?format=json">Machine-readable service manifest</a> · <a href="/buy">Pay in 60 seconds</a> · <a href="/proof">Settlement proof</a> · <a href="/partner">Partner</a> · <a href="/health">Health</a> · <a href="/STATUS.md">Status</a> · <a href="/agents.md">Agents</a> · <a href="/README.md">Documentation</a></span>
     </footer>
   </main>
 </body>
