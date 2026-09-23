@@ -100,17 +100,37 @@ export function serviceManifest() {
       agent_tools: "israel-counterparty-intelligence-vercel-app-sub393",
       x402scan: "e9b83616-3c3e-483a-81a2-a93c2b85dd7e",
       index_402: "fa0902ac-90a7-431a-8979-97da22a12911",
+      well_known: {
+        x402: "/.well-known/x402",
+        agent_card: "/.well-known/agent-card.json",
+        agent: "/.well-known/agent.json",
+        ai_plugin: "/.well-known/ai-plugin.json",
+        mcp: "/.well-known/mcp.json",
+        llms: "/llms.txt",
+      },
     },
     disclaimer: "Not legal, credit, sanctions, or investment advice.",
   };
 }
 
 function wantsHtml(request?: NextRequest): boolean {
+  // Programmatic GET() (no Request) stays JSON for tests/manifest callers.
   if (!request) return false;
   const format = request.nextUrl.searchParams.get("format");
   if (format === "json") return false;
   if (format === "html") return true;
-  return request.headers.get("accept")?.includes("text/html") ?? false;
+
+  const accept = request.headers.get("accept")?.toLowerCase() ?? "";
+  // GoPlausible / Bazaar enrichment crawlers often fetch "/" with */* or no Accept.
+  // Prefer HTML so og:/icon metadata and agent discovery links are visible; JSON
+  // remains available when the client explicitly prefers application/json.
+  if (!accept || accept === "*/*") return true;
+  const htmlIndex = accept.indexOf("text/html");
+  const jsonIndex = accept.indexOf("application/json");
+  if (htmlIndex === -1 && jsonIndex === -1) return true;
+  if (htmlIndex === -1) return false;
+  if (jsonIndex === -1) return true;
+  return htmlIndex <= jsonIndex;
 }
 
 export async function GET(request?: NextRequest) {

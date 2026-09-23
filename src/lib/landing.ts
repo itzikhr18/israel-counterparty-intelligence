@@ -53,7 +53,23 @@ export function renderLandingPage(options: LandingPageOptions): string {
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="Check an Israeli supplier invoice before payment. VAT arithmetic, allocation-number applicability, company-registry evidence, and a PAY, HOLD, or BLOCK decision for AI agents.">
   <meta name="keywords" content="verify Israeli tax invoice before payment, Israel Invoices allocation number, Israeli supplier payment gate, accounts payable AI agent, Israel company registry, Israeli VAT invoice">
+  <meta name="theme-color" content="#61e6ad">
   <link rel="canonical" href="https://israel-counterparty-intelligence.vercel.app/">
+  <link rel="icon" href="/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="/icon.svg">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="${providerName}">
+  <meta property="og:title" content="Israeli Invoice Payment Gate for AI Agents · ${providerName}">
+  <meta property="og:description" content="Pre-payment intelligence for Israeli supplier invoices: allocation-number applicability, PAY/HOLD/BLOCK decisions, company verification, and vendor-risk checks with public-registry evidence.">
+  <meta property="og:url" content="https://israel-counterparty-intelligence.vercel.app/">
+  <meta property="og:image" content="https://israel-counterparty-intelligence.vercel.app/icon.svg">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Israeli Invoice Payment Gate for AI Agents · ${providerName}">
+  <meta name="twitter:description" content="Pre-payment intelligence for Israeli supplier invoices with public-registry evidence. x402 on Base.">
+  <link rel="alternate" type="application/json" href="/.well-known/x402" title="x402 discovery">
+  <link rel="alternate" type="application/json" href="/.well-known/agent-card.json" title="A2A agent card">
+  <link rel="alternate" type="application/json" href="/.well-known/mcp.json" title="MCP manifest">
+  <link rel="alternate" type="text/plain" href="/llms.txt" title="llms.txt">
   <title>Israeli Invoice Payment Gate for AI Agents · ${providerName}</title>
   <style>
     :root { color-scheme: dark; --bg: #07110f; --panel: #0d1c18; --line: #24433a; --text: #effbf6; --muted: #a9c3b8; --accent: #61e6ad; --accent-dark: #082119; }

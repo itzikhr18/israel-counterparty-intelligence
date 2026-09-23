@@ -6,6 +6,63 @@ const endpoints = [
   "/v1/payment-risk/mainnet",
 ].map((path) => `https://israel-counterparty-intelligence.vercel.app${path}`);
 
+const ORIGIN = "https://israel-counterparty-intelligence.vercel.app";
+const enrichmentPaths = [
+  "/.well-known/x402",
+  "/.well-known/agent-card.json",
+  "/.well-known/agent.json",
+  "/.well-known/ai-plugin.json",
+  "/.well-known/mcp.json",
+  "/llms.txt",
+];
+
+async function probeEnrichment() {
+  const root = await fetch(ORIGIN + "/", {
+    headers: { accept: "*/*" },
+    redirect: "manual",
+  });
+  const rootType = root.headers.get("content-type") ?? "";
+  const rootBody = await root.text();
+  const rootIsHtml =
+    root.status === 200 &&
+    rootType.includes("text/html") &&
+    rootBody.includes("og:title") &&
+    !rootBody.trimStart().startsWith("{");
+
+  const files = [];
+  for (const path of enrichmentPaths) {
+    const response = await fetch(ORIGIN + path, { redirect: "manual" });
+    const contentType = response.headers.get("content-type") ?? "";
+    const body = await response.text();
+    const looksHtml =
+      contentType.includes("text/html") ||
+      body.trimStart().toLowerCase().startsWith("<!doctype") ||
+      body.trimStart().toLowerCase().startsWith("<html");
+    let jsonOk = null;
+    if (path.endsWith(".json") || path.endsWith("/x402")) {
+      try {
+        JSON.parse(body);
+        jsonOk = true;
+      } catch {
+        jsonOk = false;
+      }
+    }
+    files.push({
+      path,
+      status: response.status,
+      contentType,
+      looksHtml,
+      jsonOk,
+      ok:
+        response.status === 200 &&
+        !looksHtml &&
+        (jsonOk === null || jsonOk === true),
+    });
+  }
+
+  return { rootIsHtml, rootStatus: root.status, rootType, files };
+}
+
 async function validateEndpoint(url) {
   const response = await fetch(bazaarMcp, {
     method: "POST",
@@ -156,6 +213,31 @@ if (process.env.GITHUB_STEP_SUMMARY) {
     process.env.GITHUB_STEP_SUMMARY,
     `## Coinbase Bazaar readiness\n\n| Endpoint | Valid | Accepted | Indexed | Active | Live status | Live error |\n|---|---:|---:|---:|---:|---:|---|\n${rows}\n${diagnosis}\n### Failed required preflight\n\n${preflightNotes || "_none_"}\n`,
   );
+}
+
+const enrichment = await probeEnrichment();
+console.log(
+  JSON.stringify(
+    {
+      enrichment: {
+        rootIsHtml: enrichment.rootIsHtml,
+        rootStatus: enrichment.rootStatus,
+        rootType: enrichment.rootType,
+        files: enrichment.files,
+      },
+    },
+    null,
+    2,
+  ),
+);
+
+const enrichmentFailed =
+  !enrichment.rootIsHtml || enrichment.files.some((f) => !f.ok);
+if (enrichmentFailed) {
+  console.error(
+    "Discovery enrichment gap: root must be HTML with og:title for generic Accept, and GoPlausible well-known agent files must return JSON/text (not SPA HTML).",
+  );
+  process.exitCode = 1;
 }
 
 if (summary.some((item) => !item.valid || !item.accepted)) {
