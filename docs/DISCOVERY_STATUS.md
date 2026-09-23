@@ -31,3 +31,7 @@
 
 - No further cold email to Mesh / Dokka / Cardcom / Aerchain / Mike / PayAPI / GoPlausible today
 - No self-pay from receiving wallet
+
+## Copy honesty (2026-09-23 evening)
+
+Aligned remaining `awaiting first external paid call` strings in `glama.json` + submission docs with live `/proof`, `/mcp.json`, and `/STATUS.md`.

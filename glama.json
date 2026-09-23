@@ -2,7 +2,7 @@
   "$schema": "https://glama.ai/mcp/schemas/server.json",
   "maintainers": ["itzikhr18"],
   "name": "israel-business-intelligence",
-  "description": "Israeli invoice payment gate and company intelligence over MCP + x402: free previews plus pay-per-call PAY/HOLD/BLOCK, verification, company changes, and vendor-risk on Base Mainnet USDC. No API key. Honest status: Mainnet live, awaiting first external paid call. Cheapest paid path: company-changes $0.01 USDC on Base Mainnet.",
+  "description": "Israeli invoice payment gate and company intelligence over MCP + x402: free previews plus pay-per-call PAY/HOLD/BLOCK, verification, company changes, and vendor-risk on Base Mainnet USDC. No API key. Honest status: Mainnet live; first external paid call confirmed (/proof). Cheapest paid path: company-changes $0.01 USDC on Base Mainnet.",
   "type": "mcp_server",
   "status": "active",
   "keywords": [

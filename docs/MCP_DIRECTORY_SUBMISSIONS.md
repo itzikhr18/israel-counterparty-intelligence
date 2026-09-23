@@ -8,7 +8,7 @@
 
 Automation cannot finish these listings without human captcha / OAuth. Drafts below are ready to paste. Prefer **Free** plans; do not buy Premium unless you choose to.
 
-Honest claim to use everywhere: **Mainnet live · awaiting first external paid call · no customer logos.**
+Honest claim to use everywhere: **Mainnet live · first external paid call confirmed · no customer logos.**
 
 ---
 
@@ -19,7 +19,7 @@ Honest claim to use everywhere: **Mainnet live · awaiting first external paid c
    - **Server Name:** `Israel Business Intelligence MCP`
    - **Category:** `Finance` (fallback: `Other`)
    - **Short Description:**  
-     `Israeli invoice payment gate for AI agents: VAT + allocation-number checks, PAY/HOLD/BLOCK, company verification/changes, and vendor-risk with public-registry evidence. Free previews; paid tools via x402 USDC on Base Mainnet. No API key. Mainnet live — awaiting first external paid call.`
+     `Israeli invoice payment gate for AI agents: VAT + allocation-number checks, PAY/HOLD/BLOCK, company verification/changes, and vendor-risk with public-registry evidence. Free previews; paid tools via x402 USDC on Base Mainnet. No API key. Mainnet live — first external paid call confirmed (see /proof).`
    - **Repository, Website or Documentation:** `https://github.com/itzikhr18/israel-counterparty-intelligence`  
      (also acceptable: `https://israel-counterparty-intelligence.vercel.app/mcp.json`)
    - **Official MCP Registry Name (optional):** `io.github.itzikhr18/israel-business-intelligence`
@@ -32,7 +32,7 @@ Honest claim to use everywhere: **Mainnet live · awaiting first external paid c
 **Paste-ready short description (≤500 chars):**
 
 ```
-Israeli invoice payment gate for AI agents. Checks VAT arithmetic and allocation-number applicability, resolves the supplier against public company-registry evidence, and returns PAY, HOLD, or BLOCK. Also company verification, company changes ($0.01), and vendor payment-risk. Free previews + x402 USDC on Base Mainnet. No API key. Status: Mainnet live, awaiting first external paid call.
+Israeli invoice payment gate for AI agents. Checks VAT arithmetic and allocation-number applicability, resolves the supplier against public company-registry evidence, and returns PAY, HOLD, or BLOCK. Also company verification, company changes ($0.01), and vendor payment-risk. Free previews + x402 USDC on Base Mainnet. No API key. Status: Mainnet live, first external paid call confirmed (see /proof).
 ```
 
 ---
@@ -57,7 +57,7 @@ npx --yes @smithery/cli mcp publish \
 6. Suggested display blurb (if asked):
 
 ```
-Israel-specific counterparty intelligence over MCP + x402. Invoice PAY/HOLD/BLOCK gate, $0.01 company-changes, verification, vendor-risk. Free previews. Base Mainnet USDC. Awaiting first external paid call.
+Israel-specific counterparty intelligence over MCP + x402. Invoice PAY/HOLD/BLOCK gate, $0.01 company-changes, verification, vendor-risk. Free previews. Base Mainnet USDC. First external paid call confirmed (see /proof).
 ```
 
 ---

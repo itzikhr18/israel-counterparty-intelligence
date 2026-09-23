@@ -4,7 +4,7 @@
 
 **Audience:** Product / partnerships at Israeli AP, procurement, or ERP-adjacent platforms (e.g. DOKKA, Procee, Priority integrators).  
 **From:** Itzik Harush · itzikhr18@gmail.com · https://israel-counterparty-intelligence.vercel.app  
-**Commercial status (honest):** Base Mainnet live via x402. **Awaiting first external paid call.** No customer logos. No claimed paid volume.
+**Commercial status (honest):** Base Mainnet live via x402. **First external paid call confirmed** (see /proof). No customer logos. No claimed paid volume.
 
 ---
 
