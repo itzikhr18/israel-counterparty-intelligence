@@ -27,6 +27,8 @@ The same verification engine is also exposed as a stateless Remote Streamable HT
 - `POST /mcp/pilot` - invitation-only partner evaluation with a time-limited bearer token.
 - Company and payment-risk previews, `preview_agent_payment_trust`, `describe_service`, and `get_schema` are free on both MCP endpoints.
 
+Cheapest path to External Paid Call #1: **company-changes at $0.01 USDC** (before verify $0.05 / invoice-gate $0.25). Unpaid POST → HTTP 402 → pay with a buyer-controlled x402 wallet. See [`public/STATUS.md`](./public/STATUS.md) for the exact curl and MCP tool `get_israeli_company_changes_paid`.
+
 This repository is a deliberately small MVP for External Paid Call #1. It resolves an Israeli
 registered company, adds its public government-contract/support footprint, builds field-level
 evidence, and returns a transparent heuristic risk signal. It is not a legal, credit, sanctions,
@@ -49,7 +51,7 @@ or investment service.
 - x402 v2 fixed-price protection and Bazaar metadata when `X402_ENABLED=true`.
 - Remote Streamable HTTP MCP with paid `verify_company` plus free `preview_company`, `preview_agent_payment_trust`, `describe_service`, and `get_schema`.
 
-Allocation applicability uses a strictly-greater-than amount threshold and also depends on a VAT component, an authorized-dealer buyer, and a buyer request; missing buyer context fails safely to `HOLD`. Official Tax Authority allocation verification requires an authorized dealer/representative connection. Buyer-supplied verification results are labeled `BUYER_ATTESTED` and are not independently authenticated. Not included: dashboards, accounts, subscriptions, PDF reports, broad scraping, bank-account
+Allocation applicability uses a strictly-greater-than amount threshold and also depends on a VAT component, an authorized-dealer buyer, and a buyer request; missing buyer context fails safely to `HOLD`. This service does not call or independently authenticate the Tax Authority; official allocation verification requires the buyer's own authorized dealer/representative connection. Buyer-supplied verification results are labeled `BUYER_ATTESTED` and are not independently authenticated. Not included: dashboards, accounts, subscriptions, PDF reports, broad scraping, bank-account
 ownership verification, document forensics, UBO/PEP/sanctions certification, adverse-media
 screening, creditworthiness, TASE enrichment, or a custom ML model.
 

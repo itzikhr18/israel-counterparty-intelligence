@@ -25,7 +25,10 @@ import {
   buildPaymentRequiredBody,
 } from "@/lib/payment-challenge";
 import { paymentOptionFor, priceToAtomicUsdc } from "@/lib/payment-config";
-import { createExternalPaidCallEvent } from "@/lib/payment-telemetry";
+import {
+  createExternalPaidCallEvent,
+  recordFirstExternalPaidCall,
+} from "@/lib/payment-telemetry";
 import {
   PAID_SERVICE_SUSPENDED,
   paidServiceUnavailableResponse,
@@ -212,7 +215,10 @@ function logMainnetSettlement(context: SettleResultContext): void {
       endpoint: route.path,
     }),
   );
-  if (event) console.info(JSON.stringify(event));
+  if (event) {
+    console.info(JSON.stringify(event));
+    void recordFirstExternalPaidCall(event);
+  }
 }
 
 function getServer(

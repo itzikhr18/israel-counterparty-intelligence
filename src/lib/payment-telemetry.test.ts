@@ -3,6 +3,8 @@ import { describe, expect, it } from "vitest";
 import {
   createExternalPaidCallEvent,
   type SettlementTelemetryInput,
+  getFirstExternalPaidCall,
+  recordFirstExternalPaidCall,
 } from "@/lib/payment-telemetry";
 
 const externalPayer = "0x1111111111111111111111111111111111111111";
@@ -64,4 +66,25 @@ describe("External Paid Call #1 telemetry", () => {
       expect(createExternalPaidCallEvent(settlement(overrides))).toBeNull();
     },
   );
+});
+
+
+describe("First external paid call celebration", () => {
+  it("records the first external settlement loudly and exposes it via getter", async () => {
+    const event = createExternalPaidCallEvent(settlement());
+    expect(event).not.toBeNull();
+    const record = await recordFirstExternalPaidCall(event!);
+    expect(record).toMatchObject({
+      tx_hash: event!.tx_hash,
+      durable: false,
+      source: "process_memory",
+    });
+    expect(getFirstExternalPaidCall()?.tx_hash).toBe(event!.tx_hash);
+    // Second call should not overwrite
+    const again = await recordFirstExternalPaidCall({
+      ...event!,
+      tx_hash: `0x${"c".repeat(64)}`,
+    });
+    expect(again?.tx_hash).toBe(event!.tx_hash);
+  });
 });

@@ -15,7 +15,7 @@
   "payment_asset": "USDC",
   "icon_url": "https://israel-counterparty-intelligence.vercel.app/icon.svg",
   "agent_skill": "https://israel-counterparty-intelligence.vercel.app/SKILL.md",
-  "instructions": "Paid Mainnet reports are available via x402. Use preview_israeli_invoice_payment_gate_free or preview_israeli_company_free for limited free checks first. Unpaid paid-tool calls receive a payment challenge. Official Tax Authority verification requires buyer authorization.",
+  "instructions": "Paid Mainnet reports are available via x402. Use preview_israeli_invoice_payment_gate_free or preview_israeli_company_free for limited free checks first. Unpaid paid-tool calls receive a payment challenge. This service does not call the Tax Authority; buyer-authorized TA access is required for official allocation verification.",
   "buyer_bridge": "https://israel-counterparty-intelligence.vercel.app/israel-company-verify-buyer-0.4.0.tgz",
   "buyer_bridge_github": "https://github.com/itzikhr18/israel-company-verify-buyer",
   "source_repository": "https://github.com/itzikhr18/israel-counterparty-intelligence",

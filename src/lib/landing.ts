@@ -276,7 +276,7 @@ export function renderLandingPage(options: LandingPageOptions): string {
 
     <section class="scope" aria-labelledby="scope">
       <h2 id="scope">Evidence scope</h2>
-      Public Israeli company-registry evidence and buyer-provided transaction context only. Direct Tax Authority verification requires authorized access; buyer-supplied results are clearly labeled and never presented as independently authenticated. The service does not verify bank-account ownership and is not legal, tax, accounting, credit, or compliance advice.
+      Public Israeli company-registry evidence and buyer-provided transaction context only. This service does not call the Tax Authority; direct verification requires the buyer's own authorized access; buyer-supplied results are clearly labeled and never presented as independently authenticated. The service does not verify bank-account ownership and is not legal, tax, accounting, credit, or compliance advice.
     </section>
 
     <footer>

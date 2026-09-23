@@ -92,7 +92,7 @@ export function wellKnownX402Manifest() {
         ? "MAINNET LIVE - AWAITING FIRST EXTERNAL PAID CALL"
         : "MAINNET DISABLED",
     description:
-      "Pre-payment intelligence for Israeli supplier invoices: allocation-number applicability, PAY/HOLD/BLOCK decisions, company verification, company changes, and vendor-risk checks with field-level public-registry evidence. Missing buyer context fails safely. Official Tax Authority verification requires buyer authorization; buyer-attested results are not independently authenticated.",
+      "Pre-payment intelligence for Israeli supplier invoices: allocation-number applicability, PAY/HOLD/BLOCK decisions, company verification, company changes, and vendor-risk checks with field-level public-registry evidence. Missing buyer context fails safely. This service does not call the Tax Authority; buyer-authorized TA access is required for official allocation verification; buyer-attested results are not independently authenticated.",
     category: "business-intelligence",
     tags: [
       "israel",

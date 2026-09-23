@@ -46,7 +46,10 @@ import {
   paymentRiskQuerySchema,
   type PaymentRiskQuery,
 } from "@/lib/payment-risk-schema";
-import { createExternalPaidCallEvent } from "@/lib/payment-telemetry";
+import {
+  createExternalPaidCallEvent,
+  recordFirstExternalPaidCall,
+} from "@/lib/payment-telemetry";
 import {
   invoiceGateExample,
   invoiceGateInputJsonSchema,
@@ -101,7 +104,7 @@ function serverInstructions(accessMode: "paid" | "pilot"): string {
     return "Use verify_company for invitation-only partner verification. Payment is waived only when this authenticated pilot endpoint is used. Use get_sample_verification_report to inspect the response shape without a live lookup.";
   }
   if (PAID_SERVICE_SUSPENDED) return PAID_SERVICE_NOTICE;
-  return `For an Israeli tax invoice, start with ${FREE_INVOICE_GATE_PREVIEW_TOOL}, then use ${PAID_INVOICE_GATE_TOOL} for the PAY, HOLD, or BLOCK gate. Official Tax Authority verification requires buyer authorization and buyer-attested results are never presented as independently authenticated. For company intelligence, start with ${FREE_PREVIEW_TOOL}, then use ${PAID_VERIFY_TOOL}; company changes cost $0.01 USDC, full verification $0.05, vendor payment risk through ${PAID_PAYMENT_RISK_TOOL} costs $0.10, and the invoice gate $0.25 on Base Mainnet. Before signing an x402 payment, use ${AGENT_PAYMENT_TRUST_TOOL}. Buyer bridge: ${X402_BUYER_BRIDGE_URL}`;
+  return `For an Israeli tax invoice, start with ${FREE_INVOICE_GATE_PREVIEW_TOOL}, then use ${PAID_INVOICE_GATE_TOOL} for the PAY, HOLD, or BLOCK gate. This service does not call the Tax Authority; buyer-authorized TA access is required for official allocation verification and buyer-attested results are never presented as independently authenticated. For company intelligence, start with ${FREE_PREVIEW_TOOL}, then use ${PAID_VERIFY_TOOL}; recommended first paid inspect is company-changes at $0.01 USDC (cheapest path to External Paid Call #1), then full verification $0.05, vendor payment risk through ${PAID_PAYMENT_RISK_TOOL} costs $0.10, and the invoice gate $0.25 on Base Mainnet. Before signing an x402 payment, use ${AGENT_PAYMENT_TRUST_TOOL}. Buyer bridge: ${X402_BUYER_BRIDGE_URL}`;
 }
 
 const previewCandidateSchema = z.object({
@@ -853,6 +856,7 @@ function settlementTelemetry(
     transport: "mcp",
     tool,
   });
+  void recordFirstExternalPaidCall(external);
 }
 
 export async function createIsraelMcpServer(
@@ -1761,7 +1765,7 @@ export async function createIsraelMcpServer(
     PAID_INVOICE_GATE_TOOL,
     {
       title: "Authorize an Israeli invoice payment - paid",
-      description: `PRE-PAYMENT GATE for an Israeli tax invoice and accounts-payable agent. Checks VAT and total arithmetic; date, amount, VAT component, authorized-dealer buyer and buyer-request conditions for an Israel Invoices allocation number; supplier public-registry identity; and vendor-risk signals. Returns PAY, HOLD, or BLOCK with deterministic reason codes and fails safely when buyer context is missing. Costs ${mcpInvoiceGatePrice(environmentName)} USDC on ${environmentName === "mainnet" ? "Base Mainnet" : "Base Sepolia"}. Official Tax Authority verification requires buyer authorization; buyer-attested results are labeled and not independently authenticated. Use ${FREE_INVOICE_GATE_PREVIEW_TOOL} first.`,
+      description: `PRE-PAYMENT GATE for an Israeli tax invoice and accounts-payable agent. Checks VAT and total arithmetic; date, amount, VAT component, authorized-dealer buyer and buyer-request conditions for an Israel Invoices allocation number; supplier public-registry identity; and vendor-risk signals. Returns PAY, HOLD, or BLOCK with deterministic reason codes and fails safely when buyer context is missing. Costs ${mcpInvoiceGatePrice(environmentName)} USDC on ${environmentName === "mainnet" ? "Base Mainnet" : "Base Sepolia"}. This service does not call the Tax Authority; buyer-authorized TA access is required for official allocation verification; buyer-attested results are labeled and not independently authenticated. Use ${FREE_INVOICE_GATE_PREVIEW_TOOL} first.`,
       inputSchema: invoiceGateQuerySchema,
       annotations: {
         readOnlyHint: true,
