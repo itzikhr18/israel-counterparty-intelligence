@@ -1,6 +1,6 @@
 # STATUS — Israel Counterparty Intelligence
 
-**Updated:** 23 September 2026 (Asia/Jerusalem)  
+**Updated:** 23 September 2026 ~21:10 (Asia/Jerusalem)  
 **Live site:** https://israel-counterparty-intelligence.vercel.app  
 **Rule:** No fake customer logos. No inflated paid volume. First external paid call is confirmed — see /proof.
 
@@ -102,3 +102,9 @@ Durability tiers: `FIRST_EXTERNAL_PAID_CALL_TX` env (always) → optional Upstas
 - Partner one-pager: [/partner](https://israel-counterparty-intelligence.vercel.app/partner)
 - Machine-readable: `/health` → `payments.first_external_paid_call`
 - Optional second canary: `POST /v1/verify/mainnet` at **0.05 USDC**
+
+## Discovery note (2026-09-23 evening)
+
+- Glama connector **ownership verified**: https://glama.ai/mcp/connectors/io.github.itzikhr18/israel-business-intelligence
+- Claim file: `/.well-known/glama.json`
+- Full ops / next-actions for contributors: see repo `docs/PROJECT_STATUS.md`

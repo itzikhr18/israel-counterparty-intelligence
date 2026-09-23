@@ -62,27 +62,13 @@ Israel-specific counterparty intelligence over MCP + x402. Invoice PAY/HOLD/BLOC
 
 ---
 
-## 3) Glama (GitHub login — human)
+## 3) Glama — **DONE (ownership verified 2026-09-23)**
 
-FAQ: https://glama.ai/mcp/faq · claim via root `glama.json` (added in this PR).
-
-### A) Open-source server indexing
-
-1. Open Glama MCP servers → **Add MCP Server**.
-2. GitHub repository URL: `https://github.com/itzikhr18/israel-counterparty-intelligence`
-3. Display name: `Israel Business Intelligence MCP`
-4. Short description: same paste-ready text as mcpservers.org.
-5. After index, **Claim ownership** (repo is under `itzikhr18`; `glama.json` lists `itzikhr18` as maintainer).
-
-### B) Remote connector (recommended for hosted endpoint)
-
-1. Add MCP Server → **Connector**.
-2. Name: `Israel Business Intelligence MCP`
-3. Server URL: `https://israel-counterparty-intelligence.vercel.app/mcp`
-4. Transport: streamable-http / HTTPS
-5. Optional private test credentials: leave empty (no API key; use free tools for smoke).
-
-Note: Glama historically prefers stdio for some hosted runners; the **Connector** path is the correct fit for this remote x402 service.
+- Listing: https://glama.ai/mcp/connectors/io.github.itzikhr18/israel-business-intelligence
+- Claim file (keep published): `public/.well-known/glama.json`
+- Root maintainer metadata: repo `glama.json` (`maintainers: ["itzikhr18"]`)
+- Frank (`frank@glama.ai`) notified after claim — waiting for listing refresh of payments-live / $0.01 path
+- FAQ (if claim ever drops): https://glama.ai/mcp/faq — Claim with GitHub or republish `/.well-known/glama.json`
 
 ---
 
@@ -104,7 +90,7 @@ Update this table when done (date in Asia/Jerusalem):
 
 | Directory       | Submitted? | Listing URL | Notes |
 | --------------- | ---------- | ----------- | ----- |
-| mcpservers.org  |            |             |       |
-| Smithery        |            |             |       |
-| Glama server    |            |             |       |
-| Glama connector |            |             |       |
+| mcpservers.org  |            |             | human form still open |
+| Smithery        |            |             | browser/OAuth |
+| Glama server    | n/a        |             | using connector path |
+| Glama connector | **YES** 2026-09-23 | https://glama.ai/mcp/connectors/io.github.itzikhr18/israel-business-intelligence | Ownership verified; Frank pinged for refresh |

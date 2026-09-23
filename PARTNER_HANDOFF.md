@@ -1,11 +1,13 @@
 # Partner Handoff — Israel Counterparty Intelligence (ICI)
 
-**Updated:** 2026-09-23 (Asia/Jerusalem)  
+**Updated:** 2026-09-23 ~21:10 (Asia/Jerusalem)  
 **Owner:** Itzik Harush (`itzikhr18@gmail.com`)  
 **Repo:** https://github.com/itzikhr18/israel-counterparty-intelligence  
 **Live:** https://israel-counterparty-intelligence.vercel.app/
 
 This is the **single entry document** for a partner or helper. Start here, then open:
+
+- **[docs/PROJECT_STATUS.md](./docs/PROJECT_STATUS.md) — canonical “where we are / what next”**
 
 - **Public one-pager (no chat needed):** https://israel-counterparty-intelligence.vercel.app/partner
 - [docs/OUTREACH_CRM.md](./docs/OUTREACH_CRM.md) — who we emailed, who we wait on
@@ -59,6 +61,9 @@ This is the **single entry document** for a partner or helper. Start here, then 
 
 ## What we shipped recently (same day)
 
+0. **Glama connector ownership verified** (`io.github.itzikhr18/israel-business-intelligence`); claim at `/.well-known/glama.json`; Frank asked to refresh listing.
+
+
 1. Durable first external settle recorded on `/health` (env-backed).
 2. Top-tier `/proof` page (live status from `/health`, BaseScan TX/payer/receiver).
 3. Fixed dishonest public copy that still said “awaiting first paid” (STATUS, mcp.json, llms, landing, well-known).
@@ -92,9 +97,10 @@ This is the **single entry document** for a partner or helper. Start here, then 
 
 ## Blockers
 
-1. **Second external settle** still missing (waiting on design-partner canaries).
+1. **Second external settle** still missing (waiting on design-partner canaries / Grow conversation).
 2. **Upstash** not connected → next settles need env paste or process memory until configured.
 3. Gmail often wraps URLs — partners must copy **bare hostnames**.
+4. **Agent402 seller-payability** blocked without a funded buyer wallet ≠ receiving wallet.
 
 ---
 
@@ -118,4 +124,7 @@ npm test
 # production is Vercel project linked to this repo; push to main deploys
 ```
 
-This handoff pack is committed on `main` so GitHub is the backup of record.\n\n**2026-09-23 evening:** Reply templates in `docs/REPLY_TEMPLATES.md`. Discovery snapshot in `docs/DISCOVERY_STATUS.md`. Agent402 ~$0.10 seller-payability blocked until an external buyer wallet exists (do not self-pay).\n
+This handoff pack is committed on `main` so GitHub is the backup of record.
+
+**2026-09-23 evening:** See [docs/PROJECT_STATUS.md](./docs/PROJECT_STATUS.md) for the full ops snapshot (Glama claimed, CRM, blockers, next actions).
+

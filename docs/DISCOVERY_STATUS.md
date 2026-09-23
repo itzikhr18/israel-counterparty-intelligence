@@ -1,37 +1,42 @@
-# Discovery status — 2026-09-23 (no cold email / no self-pay)
+# Discovery status — 2026-09-23 evening (Asia/Jerusalem)
 
-## Live surfaces (verified HTTP 200)
+Canonical ops snapshot: [PROJECT_STATUS.md](./PROJECT_STATUS.md)
 
-| Path                                                    | Status                      |
-| ------------------------------------------------------- | --------------------------- |
-| `/` `/buy` `/proof` `/partner` `/health`                | 200                         |
-| `/mcp.json` `/.well-known/mcp.json` `/.well-known/x402` | 200                         |
-| `/server.json` (MCP registry card)                      | **200** (shipped `abedf53`) |
-| `/STATUS.md` `/llms.txt` `/agents.md`                   | 200                         |
+## Live surfaces (verified)
+
+| Path | Status |
+| ---- | ------ |
+| `/` `/buy` `/proof` `/partner` `/health` | 200 |
+| `/mcp` `/mcp.json` `/.well-known/x402` | 200 |
+| `/.well-known/glama.json` | 200 (Glama claim token) |
+| `/STATUS.md` `/llms.txt` `/agents.md` | 200 |
 
 `/health`: `first_external_paid_call` durable; `second_external_paid_call` **null**.
 
 ## Official MCP Registry
 
 - Name: `io.github.itzikhr18/israel-business-intelligence`
-- **Latest on registry: 1.8.2** (already active) — no republish required this pass.
-- Note: `mcp-publisher validate` rejects descriptions **>100 chars**; keep `server.json` description ≤100 if republishing.
+- Latest published: **1.8.2** (active)
+- Note: keep `server.json` description ≤100 chars if republishing (`mcp-publisher validate`)
 
 ## Directories
 
-| Surface                            | Status                           | Blocker / next                                                     |
-| ---------------------------------- | -------------------------------- | ------------------------------------------------------------------ |
-| MCP.Directory                      | Submitted earlier today (review) | Wait approval email to itzikhr18@gmail.com                         |
-| Glama connector                    | Already indexed                  | Optional GitHub-login claim/refresh (needs browser login)          |
-| Smithery / mcpservers.org / 402.ad | Not completed this pass          | Needs browser + logged-in session / captcha                        |
-| Agent402 seller-payability         | **Blocked**                      | Needs ~$0.10 from a **non-receiving** buyer wallet (user has none) |
-| Upstash auto-durability            | **Blocked**                      | Needs user Redis REST credentials                                  |
+| Surface | Status | Next |
+| ------- | ------ | ---- |
+| Glama connector | **Ownership verified** (2026-09-23) | Wait Frank refresh; listing https://glama.ai/mcp/connectors/io.github.itzikhr18/israel-business-intelligence |
+| Agent Tools | Re-crawled; $0.01 + MCP OK | No paid trial; cool |
+| Agent402 | Indexed (9 tools) | Paid canary **closed** (router policy) |
+| MCP.Directory | Submitted earlier | Wait approval email |
+| Smithery / mcpservers.org / 402.ad | Not finished | Needs human browser / captcha |
+| Agent402 seller-payability | **Blocked** | Needs ~$0.10 from non-receiving buyer wallet |
+| Upstash auto-durability | **Blocked** | Needs Redis REST credentials from owner |
 
 ## Explicitly not done (by policy)
 
-- No further cold email to Mesh / Dokka / Cardcom / Aerchain / Mike / PayAPI / GoPlausible today
+- No further cold email to Mesh / Dokka / Cardcom / Aerchain / Mike / PayAPI / GoPlausible while cooling
 - No self-pay from receiving wallet
+- No Google-wrapped links in outbound mail (bare hostnames only)
 
-## Copy honesty (2026-09-23 evening)
+## Copy honesty
 
-Aligned remaining `awaiting first external paid call` strings in `glama.json` + submission docs with live `/proof`, `/mcp.json`, and `/STATUS.md`.
+Removed leftover “awaiting first external paid call” strings from `glama.json` + submission docs. Live `/mcp.json` already said first paid confirmed.
