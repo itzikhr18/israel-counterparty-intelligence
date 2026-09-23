@@ -219,6 +219,8 @@ export function buildPaymentRequiredBody(paymentRequired: PaymentRequired) {
   const requirement = paymentRequired.accepts[0];
   const buyerQuickstart = `${config.PUBLIC_BASE_URL}/x402-buyer-quickstart.md`;
   const buyerBridge = `${config.PUBLIC_BASE_URL}/israel-company-verify-buyer-0.4.0.tgz`;
+  const resourceUrl = paymentRequired.resource?.url ?? "";
+  const isCompanyChanges = resourceUrl.includes("/company-changes/");
 
   // Mirror the same PaymentRequired object encoded in PAYMENT-REQUIRED so
   // body-only clients / indexers can settle while echoing extensions.bazaar.
@@ -241,6 +243,21 @@ export function buildPaymentRequiredBody(paymentRequired: PaymentRequired) {
       action: "Sign the PAYMENT-REQUIRED terms and retry the identical request",
       buyer_quickstart: buyerQuickstart,
       buyer_bridge: buyerBridge,
+      agents_guide: `${config.PUBLIC_BASE_URL}/agents.md`,
     },
+    ...(isCompanyChanges
+      ? {
+          canary: {
+            preferred_first_paid_path: true,
+            empty_json_body_ok: true,
+            default_company_number: "514744887",
+            amount_atomic: requirement?.amount ?? "10000",
+            amount_usdc: "0.01",
+            network: "eip155:8453",
+            asset_name: "USD Coin",
+            note: "POST with {} (or omitted company_number) uses the public sample and returns product after settlement.",
+          },
+        }
+      : {}),
   };
 }

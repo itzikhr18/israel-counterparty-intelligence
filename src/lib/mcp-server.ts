@@ -451,13 +451,18 @@ function serviceDescription(
       rest: "POST /v1/company-changes/mainnet",
       mcp_tool: PAID_COMPANY_CHANGES_TOOL,
       price_usdc: "0.01",
+      network: "eip155:8453",
+      facilitator: "coinbase-cdp",
+      empty_json_body_ok: true,
       sample_body: {
         company_number: "514744887",
         lookback_days: 366,
         limit: 25,
         language: "en",
       },
-      note: "company_number defaults to the public sample when omitted, so marketplace canaries with an empty JSON body still return product after settlement.",
+      canary_body: {},
+      agents_guide: `${config.PUBLIC_BASE_URL}/agents.md`,
+      note: "company_number defaults to the public sample when omitted, so marketplace canaries with an empty JSON body still return product after settlement. Never pay from the receiving/operator wallet.",
     },
     preferred_tools: {
       first_paid: PAID_COMPANY_CHANGES_TOOL,
@@ -867,6 +872,7 @@ function settlementTelemetry(
     internalPayers: [
       config.INTERNAL_TEST_PAYER,
       config.MAINNET_INTERNAL_TEST_PAYER,
+      environment.payTo, // receiving/operator wallet is never "external"
     ],
   });
   if (!external) return;

@@ -3,6 +3,7 @@
   "description": "Pre-payment intelligence for Israeli supplier invoices: allocation-number applicability, PAY/HOLD/BLOCK decisions, company verification, company changes, and vendor-risk checks with field-level public-registry evidence. Missing buyer context fails safely. This service does not call the Tax Authority; buyer-authorized TA access is required for official allocation verification.",
   "url": "https://israel-counterparty-intelligence.vercel.app/",
   "documentation": "https://israel-counterparty-intelligence.vercel.app/llms.txt",
+  "agents": "https://israel-counterparty-intelligence.vercel.app/agents.md",
   "openapi": "https://israel-counterparty-intelligence.vercel.app/openapi.json",
   "mcp": "https://israel-counterparty-intelligence.vercel.app/mcp",
   "status": "https://israel-counterparty-intelligence.vercel.app/STATUS.md",
@@ -19,6 +20,11 @@
   "preferred_first_paid_path": {
     "rest": "POST /v1/company-changes/mainnet",
     "mcp_tool": "get_israeli_company_changes_paid",
-    "price_usdc": "0.01"
+    "price_usdc": "0.01",
+    "network": "eip155:8453",
+    "facilitator": "coinbase-cdp",
+    "empty_json_body_ok": true,
+    "sample_body": {},
+    "agents_guide": "https://israel-counterparty-intelligence.vercel.app/agents.md"
   }
 }

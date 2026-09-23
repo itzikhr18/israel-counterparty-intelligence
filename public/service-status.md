@@ -10,7 +10,7 @@ Paid reports and x402 Mainnet payments are **available** again after commercial-
 - Facilitator: authenticated Coinbase CDP on Base Mainnet (`eip155:8453`).
 - Security hardenings from the 7 September 2026 containment release remain in place (bounded JSON, public-manifest SSRF controls, facilitator settlement checks, rate-limit identity hardening). See `docs/SECURITY_CONTAINMENT_2026-09-07.md`.
 - Published prices and buyer examples describe live purchasable routes. Confirm live status before paying.
-- Cheapest paid inspect path: company-changes at **$0.01** USDC — see [STATUS.md](/STATUS.md) for the exact curl.
+- Cheapest paid inspect path: company-changes at **$0.01** USDC — see [STATUS.md](/STATUS.md) and [agents.md](/agents.md) for the exact curl (`{}` body ok). Receiving-wallet self-pay is never counted as External Paid #1.
 
 ## 402 Index / discovery notes (23 Sep 2026 IDT)
 

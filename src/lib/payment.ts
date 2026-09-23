@@ -194,6 +194,7 @@ function logMainnetSettlement(context: SettleResultContext): void {
     internalPayers: [
       config.INTERNAL_TEST_PAYER,
       config.MAINNET_INTERNAL_TEST_PAYER,
+      environment.payTo, // receiving/operator wallet is never "external"
     ],
     discoverySource: discoverySource(context),
   });

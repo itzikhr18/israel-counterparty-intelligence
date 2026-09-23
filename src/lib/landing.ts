@@ -70,6 +70,8 @@ export function renderLandingPage(options: LandingPageOptions): string {
   <link rel="alternate" type="application/json" href="/.well-known/agent-card.json" title="A2A agent card">
   <link rel="alternate" type="application/json" href="/.well-known/mcp.json" title="MCP manifest">
   <link rel="alternate" type="text/plain" href="/llms.txt" title="llms.txt">
+  <link rel="alternate" type="text/markdown" href="/agents.md" title="agents.md">
+  <link rel="alternate" type="text/markdown" href="/STATUS.md" title="STATUS">
   <title>Israeli Invoice Payment Gate for AI Agents · ${providerName}</title>
   <style>
     :root { color-scheme: dark; --bg: #07110f; --panel: #0d1c18; --line: #24433a; --text: #effbf6; --muted: #a9c3b8; --accent: #61e6ad; --accent-dark: #082119; }
@@ -155,6 +157,31 @@ export function renderLandingPage(options: LandingPageOptions): string {
     <section aria-labelledby="why-number-one">
       <h2 id="why-number-one">One Israel-specific toolchain, from identity to payment</h2>
       <p class="section-copy">${PAID_SERVICE_SUSPENDED ? "Start with a free invoice or registry preview. Full reports are currently suspended; listed prices are reference information only." : `Start with a free invoice or registry preview. Run the full invoice payment gate for ${invoiceGatePrice} USDC, recent company changes for ${companyChangesPrice}, full verification for ${mcpPrice}, or vendor-risk triage for ${paymentRiskPrice}. No subscription and no API key.`}</p>
+    </section>
+
+    <section id="first-paid-call" aria-labelledby="first-paid-call-title">
+      <div class="eyebrow">Buyer conversion · External Paid Call #1</div>
+      <h2 id="first-paid-call-title">First paid call in 60 seconds</h2>
+      <p class="section-copy">${PAID_SERVICE_SUSPENDED ? "Paid Mainnet routes are temporarily suspended. Use free previews only." : `Cheapest honest path: <strong>company-changes</strong> at <strong>${companyChangesPrice} USDC</strong> on Base Mainnet via Coinbase CDP. Empty JSON body <code>{}</code> is canary-safe (defaults to public sample company 514744887).`}</p>
+      ${
+        PAID_SERVICE_SUSPENDED
+          ? ""
+          : `<div class="code-card" style="margin-top: 18px">
+        <div class="code-title">1) Inspect the $0.01 challenge (expect HTTP 402 — do not pay yet)</div>
+        <pre tabindex="0"><code>curl -i https://israel-counterparty-intelligence.vercel.app/v1/company-changes/mainnet \
+  -H 'content-type: application/json' \
+  --data '{}'</code></pre>
+      </div>
+      <div class="grid" style="margin-top: 16px">
+        <article class="card"><h3>Network</h3><p>Base Mainnet <code>eip155:8453</code></p></article>
+        <article class="card"><h3>Asset</h3><p>USDC <code>0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913</code></p></article>
+        <article class="card"><h3>Pay to</h3><p>Receiving wallet <code>0xa0A3BB49eA4AC723Bcf4d2d1ecde2EE01BA03C82</code></p></article>
+        <article class="card"><h3>Facilitator</h3><p>Coinbase CDP (authenticated)</p></article>
+        <article class="card"><h3>Discovery</h3><p><a href="/.well-known/x402" style="color: var(--accent)">/.well-known/x402</a> · <a href="/mcp" style="color: var(--accent)">/mcp</a> · <a href="/agents.md" style="color: var(--accent)">/agents.md</a></p></article>
+        <article class="card"><h3>MCP tool</h3><p><code>get_israeli_company_changes_paid</code> ($0.01)</p></article>
+      </div>
+      <p class="section-copy" style="margin-top: 16px">2) Sign the returned x402 v2 terms with a <em>buyer-controlled</em> wallet (never the receiving wallet) and retry the identical POST. Guides: <a href="/agents.md" style="color: var(--accent)">agents.md</a> · <a href="/x402-buyer-quickstart.md" style="color: var(--accent)">buyer quickstart</a> · <a href="/STATUS.md" style="color: var(--accent)">STATUS</a>.</p>`
+      }
     </section>
 
     <section id="invoice-preview" aria-labelledby="invoice-preview-title">
@@ -283,10 +310,10 @@ export function renderLandingPage(options: LandingPageOptions): string {
   --data '{"company_number":"514744887","invoice_company_number":"514744887","invoice_company_name":"מנדיי. קום בעמ"}'</code></pre>
       </div>
       <div class="code-card" style="margin-top: 16px">
-        <div class="code-title">${PAID_SERVICE_SUSPENDED ? "Company-change reports return 503 (suspended)" : `Inspect the $${companyChangesPrice} recent company-changes challenge`}</div>
+        <div class="code-title">${PAID_SERVICE_SUSPENDED ? "Company-change reports return 503 (suspended)" : `Preferred first paid path — $${companyChangesPrice} company-changes ({} body ok)`}</div>
         <pre tabindex="0"><code>curl -i https://israel-counterparty-intelligence.vercel.app/v1/company-changes/mainnet \
   -H 'content-type: application/json' \
-  --data '{"company_number":"514744887","lookback_days":366,"limit":25}'</code></pre>
+  --data '{}'</code></pre>
       </div>
     </section>
 
@@ -297,7 +324,7 @@ export function renderLandingPage(options: LandingPageOptions): string {
 
     <footer>
       <span>${providerName}</span>
-      <span><a href="/?format=json">Machine-readable service manifest</a> · <a href="/health">Health</a> · <a href="/STATUS.md">Status</a> · <a href="/README.md">Documentation</a></span>
+      <span><a href="/?format=json">Machine-readable service manifest</a> · <a href="/health">Health</a> · <a href="/STATUS.md">Status</a> · <a href="/agents.md">Agents</a> · <a href="/README.md">Documentation</a></span>
     </footer>
   </main>
 </body>

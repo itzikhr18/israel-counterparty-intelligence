@@ -22,6 +22,7 @@ Machine-readable checks:
 - x402 discovery: [/.well-known/x402](https://israel-counterparty-intelligence.vercel.app/.well-known/x402)
 - MCP metadata: [/mcp.json](https://israel-counterparty-intelligence.vercel.app/mcp.json)
 - Agent-oriented summary: [/llms.txt](https://israel-counterparty-intelligence.vercel.app/llms.txt)
+- Agent playbook (discover → pay → call): [/agents.md](https://israel-counterparty-intelligence.vercel.app/agents.md)
 - Longer ops note: [/service-status.md](https://israel-counterparty-intelligence.vercel.app/service-status.md)
 
 Unpaid POSTs to paid Mainnet routes must return **HTTP 402** with `PAYMENT-REQUIRED` (not 503).
@@ -45,27 +46,38 @@ Free (no wallet): invoice structural preview, company identity preview, `preview
 - GoPlausible-style enrichment files are published on this origin (real JSON/text, not SPA HTML): `/.well-known/agent-card.json`, `/.well-known/agent.json`, `/.well-known/ai-plugin.json`, `/.well-known/mcp.json`, plus `/.well-known/x402` and `/llms.txt`. Generic `Accept` on `/` returns HTML with OpenGraph tags for crawler branding.
 - Operator check (repo): `npm run bazaar:check` / `scripts/bazaar-readiness.mjs` against production (includes enrichment probes).
 
-## How a buyer makes the first $0.01 call
+## First paid call in 60 seconds ($0.01)
 
-Cheapest honest path = **company-changes** at **$0.01 USDC**.
+Cheapest honest path = **company-changes** at **$0.01 USDC** on Base Mainnet (Coinbase CDP).
 
 1. Confirm health is green and `paid_service_suspended` is false:
    ```bash
    curl -s https://israel-counterparty-intelligence.vercel.app/health
    ```
-2. Inspect the payment challenge **without paying** (expect HTTP 402):
+2. Inspect the payment challenge **without paying** (expect HTTP 402). Empty `{}` is canary-safe:
    ```bash
    curl -i https://israel-counterparty-intelligence.vercel.app/v1/company-changes/mainnet \
      -H 'content-type: application/json' \
-     --data '{"company_number":"514744887","lookback_days":30,"limit":5,"language":"en"}'
+     --data '{}'
    ```
-3. Pay only with a **buyer-controlled** x402-capable wallet that enforces the returned terms. Guides:
+3. Pay only with a **buyer-controlled** x402-capable wallet that enforces the returned terms (never the receiving wallet `0xa0A3BB49eA4AC723Bcf4d2d1ecde2EE01BA03C82`). Guides:
+   - [agents.md](https://israel-counterparty-intelligence.vercel.app/agents.md) (copy-paste agent playbook)
    - [x402 buyer quickstart](https://israel-counterparty-intelligence.vercel.app/x402-buyer-quickstart.md)
    - [Trusted / independent wallet guide](https://israel-counterparty-intelligence.vercel.app/trusted-wallet-guide.md)
-   - Optional bridge package: `npx --yes https://israel-counterparty-intelligence.vercel.app/israel-company-verify-buyer-0.4.0.tgz`
-4. MCP equivalent: connect to `https://israel-counterparty-intelligence.vercel.app/mcp` and call `get_israeli_company_changes_paid` (preferred first-paid MCP tool).
+   - Optional bridge: `npx --yes https://israel-counterparty-intelligence.vercel.app/israel-company-verify-buyer-0.4.0.tgz`
+4. MCP equivalent: connect to `https://israel-counterparty-intelligence.vercel.app/mcp` → `describe_service` → call `get_israeli_company_changes_paid`.
 
-A successful **external** settlement (non-operator wallet) is External Paid Call #1.
+A successful **external** settlement (non-operator / non-receiving wallet) is External Paid Call #1.
+
+### Durable recording (operator)
+
+On first external Mainnet success the runtime:
+
+1. Sets `/health.payments.first_external_paid_call` (process memory immediately; Upstash if configured).
+2. Emits a structured `STATUS_HOOK` log (`event=first_external_paid_call`, includes `operator_env`).
+3. POSTs `FIRST_PAID_CALL_WEBHOOK_URL` once (payload includes optional `NOTIFY_EMAIL`).
+
+Durability tiers: `FIRST_EXTERNAL_PAID_CALL_TX` env (always) → optional Upstash Redis REST (`UPSTASH_REDIS_REST_URL` + `UPSTASH_REDIS_REST_TOKEN`) → process memory (lost on cold start). Payments from the receiving wallet are never counted as external.
 
 ## Marketplace canary readiness
 

@@ -176,6 +176,16 @@ describe("dual-network x402 configuration", () => {
     expect(JSON.stringify(body.extensions)).toContain("lookback_days");
     expect(body.extensions).toEqual(challenge.extensions);
     expect(body.accepts).toEqual(challenge.accepts);
+    expect(body.canary).toMatchObject({
+      preferred_first_paid_path: true,
+      empty_json_body_ok: true,
+      default_company_number: "514744887",
+      amount_usdc: "0.01",
+      amount_atomic: "10000",
+    });
+    expect(body.next_action).toMatchObject({
+      agents_guide: expect.stringMatching(/\/agents\.md$/),
+    });
   });
 
   it("keeps every paid-route resource.description within the CDP 500-character limit", () => {

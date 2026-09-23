@@ -6,6 +6,8 @@
 - Unpaid paid-route POSTs return HTTP 402 with PAYMENT-REQUIRED. Confirm /health and /.well-known/x402 before paying.
 - Current availability: https://israel-counterparty-intelligence.vercel.app/health
 - Public status: https://israel-counterparty-intelligence.vercel.app/STATUS.md
+- Agent playbook: https://israel-counterparty-intelligence.vercel.app/agents.md
+- Preferred first paid path: POST /v1/company-changes/mainnet for $0.01 USDC on Base Mainnet (empty JSON body {} is canary-safe; defaults company_number to 514744887). MCP tool get_israeli_company_changes_paid. Facilitator: Coinbase CDP. Receiving wallet: 0xa0A3BB49eA4AC723Bcf4d2d1ecde2EE01BA03C82. Never self-pay from the receiving wallet.
 
 - Production endpoint: https://israel-counterparty-intelligence.vercel.app/v1/verify/mainnet
 - Method: POST
