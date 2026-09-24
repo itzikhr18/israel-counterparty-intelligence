@@ -1,6 +1,6 @@
 # Project status — Israel Counterparty Intelligence (ICI)
 
-**Updated:** 2026-09-23 ~21:50 Asia/Jerusalem  
+**Updated:** 2026-09-24 ~14:30 Asia/Jerusalem  
 **Audience:** any engineer, partner, or agent picking up this repo  
 **Owner:** Itzik Harush (`itzikhr18@gmail.com`) · GitHub `itzikhr18`
 
@@ -42,6 +42,7 @@ Start-here docs in-repo:
 3. [docs/DISCOVERY_STATUS.md](./DISCOVERY_STATUS.md) — directories / discovery
 4. [docs/REPLY_TEMPLATES.md](./REPLY_TEMPLATES.md) — reply kit
 5. [docs/SYSTEM_MAP.md](./SYSTEM_MAP.md) — routes / deploy
+6. [docs/ICP_RESEARCH.md](./ICP_RESEARCH.md) — who would actually pay, and why the x402 rail filters them out
 
 ---
 
@@ -82,16 +83,16 @@ Unpaid POSTs must return **HTTP 402** with a real x402 challenge (not 503).
 
 ## 5. Discovery / listings (2026-09-23 evening)
 
-| Surface                                                  | Status                        | Notes                                                                                                                             |
-| -------------------------------------------------------- | ----------------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
-| Official MCP Registry                                    | Live **1.8.2**                | `io.github.itzikhr18/israel-business-intelligence`                                                                                |
-| Glama connector                                          | **Ownership verified**        | Claimed via GitHub + `/.well-known/glama.json`; Frank notified for refresh                                                        |
-| Agent Tools                                              | Re-crawl verified $0.01 + MCP | Discovery copy inconsistency fixed; no paid trial expected                                                                        |
-| Agent402 (Mike)                                          | Indexed (9 tools)             | Will **not** fund paid trial until `payTo` has seller settlement history from their router — treat paid-canary asks as **closed** |
-| PayAPI / GoPlausible / Mesh / Dokka / Cardcom / Aerchain | Cooling / waiting             | No same-day spam; use reply templates if they answer                                                                              |
-| Grow (Yaki)                                              | **Human thread open**         | They don’t acquire FX; conversation is integration/agents, not merchant acquiring — waiting on schedule                           |
-| Upstash Redis                                            | **Blocked**                   | Needs user REST URL + token for auto-durable next settles                                                                         |
-| Agent402 seller-payability (~$0.10)                      | **Blocked**                   | Needs funded **buyer** wallet ≠ receiving wallet                                                                                  |
+| Surface                                                  | Status                        | Notes                                                                                                                                                                                  |
+| -------------------------------------------------------- | ----------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Official MCP Registry                                    | Live **1.8.2**                | `io.github.itzikhr18/israel-business-intelligence`                                                                                                                                     |
+| Glama connector                                          | **Ownership verified**        | Claimed via GitHub + `/.well-known/glama.json`; Frank notified for refresh                                                                                                             |
+| Agent Tools                                              | Re-crawl verified $0.01 + MCP | Discovery copy inconsistency fixed; no paid trial expected                                                                                                                             |
+| Agent402 (Mike)                                          | Indexed (9 tools)             | Will **not** fund paid trial until `payTo` has seller settlement history from their router — treat paid-canary asks as **closed**                                                      |
+| PayAPI / GoPlausible / Mesh / Dokka / Cardcom / Aerchain | Cooling / waiting             | No same-day spam; use reply templates if they answer                                                                                                                                   |
+| Grow (Yaki)                                              | **Call proposed: Sun 27.09**  | Yaki (sales) asked for a convenient time on Sunday 24.09 13:37 IDT; we owe a reply. Grow is receiving-side acquiring, not a product partner — see [ICP_RESEARCH.md](./ICP_RESEARCH.md) |
+| Upstash Redis                                            | **Blocked**                   | Needs user REST URL + token for auto-durable next settles                                                                                                                              |
+| Agent402 seller-payability (~$0.10)                      | **Blocked**                   | Needs funded **buyer** wallet ≠ receiving wallet                                                                                                                                       |
 
 Glama claim file (keep published): `public/.well-known/glama.json` →  
 https://israel-counterparty-intelligence.vercel.app/.well-known/glama.json
@@ -103,7 +104,7 @@ https://israel-counterparty-intelligence.vercel.app/.well-known/glama.json
 ### P0 — business-moving
 
 1. **Land second external Mainnet settle** ($0.05 verify path preferred) from a non-receiving wallet; lock on `/health`.
-2. **Advance Grow/Yaki** when they propose a call time (integration / agents angle only).
+2. **Reply to Grow/Yaki with a Sunday 27.09 time** (Chol HaMoed Sukkot: propose a morning slot + alternative). Goal of the call: learn + referral, not a deal — prep in [ICP_RESEARCH.md](./ICP_RESEARCH.md) §5.
 3. **Answer human replies within hours** using [REPLY_TEMPLATES.md](./REPLY_TEMPLATES.md); do not re-cold Mesh/Dokka/Cardcom/Aerchain/PayAPI/GoPlausible while cooling.
 
 ### P1 — durability / discovery
@@ -134,14 +135,15 @@ curl -s https://israel-counterparty-intelligence.vercel.app/.well-known/glama.js
 
 ## 8. Change log (ops, not product)
 
-| When (IDT)         | Change                                                                                                                                                 |
-| ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| 2026-09-23 night   | CI unblocked: 6 Markdown docs re-formatted with Prettier (`format:check` was the only failing step)                                                    |
-| 2026-09-23 night   | First-settle timestamp verified on-chain (`2026-09-23T09:57:29Z`); env `FIRST_EXTERNAL_PAID_CALL_AT` still holds the wrong `2026-09-21` value — see §3 |
-| 2026-09-23 night   | Root cause of Google-wrapped links found: the Gmail connector rewrites URLs on compose — see §6 “do not”                                               |
-| 2026-09-23 evening | Glama connector **ownership verified**; claim JSON published; Frank emailed for listing refresh                                                        |
-| 2026-09-23 evening | Removed leftover “awaiting first paid” copy from discovery surfaces (`glama.json` + submission docs)                                                   |
-| 2026-09-23         | First external 0.01 USDC settle durable on `/health` via env; `/proof` + `/buy` live                                                                   |
-| 2026-09-23         | Outreach wave + proof emails; cooling on several directories; Grow human thread open                                                                   |
+| When (IDT)         | Change                                                                                                                                                                                                                          |
+| ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 2026-09-24 midday  | Grow/Yaki proposed a Sunday 27.09 call; ICP research written (`docs/ICP_RESEARCH.md`): paying segments need API key + ₪/$ billing, not USDC; owner has no external wallet, so the second settle cannot be manufactured honestly |
+| 2026-09-23 night   | CI unblocked: 6 Markdown docs re-formatted with Prettier (`format:check` was the only failing step)                                                                                                                             |
+| 2026-09-23 night   | First-settle timestamp verified on-chain (`2026-09-23T09:57:29Z`); env `FIRST_EXTERNAL_PAID_CALL_AT` still holds the wrong `2026-09-21` value — see §3                                                                          |
+| 2026-09-23 night   | Root cause of Google-wrapped links found: the Gmail connector rewrites URLs on compose — see §6 “do not”                                                                                                                        |
+| 2026-09-23 evening | Glama connector **ownership verified**; claim JSON published; Frank emailed for listing refresh                                                                                                                                 |
+| 2026-09-23 evening | Removed leftover “awaiting first paid” copy from discovery surfaces (`glama.json` + submission docs)                                                                                                                            |
+| 2026-09-23         | First external 0.01 USDC settle durable on `/health` via env; `/proof` + `/buy` live                                                                                                                                            |
+| 2026-09-23         | Outreach wave + proof emails; cooling on several directories; Grow human thread open                                                                                                                                            |
 
 When you change production posture, **update this file the same day** and bump the timestamp at the top.

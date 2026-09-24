@@ -1,6 +1,6 @@
 # Outreach CRM
 
-**Updated:** 2026-09-23 ~21:50 Asia/Jerusalem  
+**Updated:** 2026-09-24 ~14:30 Asia/Jerusalem  
 **Owner inbox:** `itzikhr18@gmail.com`  
 **Canonical status:** [PROJECT_STATUS.md](./PROJECT_STATUS.md) · **Reply kit:** [REPLY_TEMPLATES.md](./REPLY_TEMPLATES.md)
 
@@ -11,10 +11,10 @@ Status legend: `waiting` · `auto-ack` · `human` · `cooling` · `closed` · `b
 
 ## Hot / human
 
-| Party         | Email                               | Last touch | Status    | Next action                 | Notes                                                      |
-| ------------- | ----------------------------------- | ---------- | --------- | --------------------------- | ---------------------------------------------------------- |
-| Grow / Yaki   | support@grow.business               | 2026-09-23 | **human** | Wait for proposed call time | Not FX acquiring; talk = agents / AP integration           |
-| Glama / Frank | frank@glama.ai (+ support@glama.ai) | 2026-09-23 | **human** | Wait listing refresh        | Connector ownership verified; asked refresh for $0.01 path |
+| Party         | Email                               | Last touch | Status    | Next action                                                             | Notes                                                                                                                                                                                 |
+| ------------- | ----------------------------------- | ---------- | --------- | ----------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Grow / Yaki   | support@grow.business               | 2026-09-24 | **human** | **Reply with a Sunday 27.09 time** (Chol HaMoed; propose morning + alt) | Yaki (sales dept) proposed Sunday; not FX acquiring; Grow = receiving side, possible ₪ acquiring vendor for us later, not a product partner. See [ICP_RESEARCH.md](./ICP_RESEARCH.md) |
+| Glama / Frank | frank@glama.ai (+ support@glama.ai) | 2026-09-23 | **human** | Wait listing refresh                                                    | Connector ownership verified; asked refresh for $0.01 path                                                                                                                            |
 
 ## Cooling / waiting (no same-day ping)
 
