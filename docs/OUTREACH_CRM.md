@@ -1,20 +1,30 @@
 # Outreach CRM
 
-**Updated:** 2026-09-23 ~21:50 Asia/Jerusalem  
+**Updated:** 2026-09-24 ~15:15 Asia/Jerusalem  
 **Owner inbox:** `itzikhr18@gmail.com`  
 **Canonical status:** [PROJECT_STATUS.md](./PROJECT_STATUS.md) · **Reply kit:** [REPLY_TEMPLATES.md](./REPLY_TEMPLATES.md)
 
-**Goal now:** second external Mainnet settle (**$0.05** via `POST /v1/verify/mainnet`) + advance the Grow/Yaki human thread.  
+**Goal now:** (1) Grow/Yaki call on Sunday 27.09 (learn + referral), (2) Israeli OEM channel: send the three Gmail drafts to Morning / iCount / Sumit from the **web UI** after pasting the partner link, (3) packaging: pilot token or API key + monthly plan so a partner can say yes without USDC. The second external settle is now a **passive** metric (owner has no external wallet; do not chase).  
 **Do not spam today:** PayAPI, GoPlausible, Mesh, Dokka, Cardcom, Aerchain, Agent402 paid-canary asks.
 
 Status legend: `waiting` · `auto-ack` · `human` · `cooling` · `closed` · `blocked`
 
 ## Hot / human
 
-| Party         | Email                               | Last touch | Status    | Next action                 | Notes                                                      |
-| ------------- | ----------------------------------- | ---------- | --------- | --------------------------- | ---------------------------------------------------------- |
-| Grow / Yaki   | support@grow.business               | 2026-09-23 | **human** | Wait for proposed call time | Not FX acquiring; talk = agents / AP integration           |
-| Glama / Frank | frank@glama.ai (+ support@glama.ai) | 2026-09-23 | **human** | Wait listing refresh        | Connector ownership verified; asked refresh for $0.01 path |
+| Party         | Email                               | Last touch | Status    | Next action                                                                                                                          | Notes                                                                                                                                                                                                                                 |
+| ------------- | ----------------------------------- | ---------- | --------- | ------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Grow / Yaki   | support@grow.business               | 2026-09-24 | **human** | Wait for Yaki to confirm 10:30 or 12:00 on Sun 27.09 (Chol HaMoed). Calendar hold + call prep already in the owner's Google Calendar | Reply sent 24.09 14:54 IDT proposing both slots, phone or video. Yaki = sales dept. Grow is receiving-side acquiring, not a product partner; possible ₪ payment-link vendor for us later. See [ICP_RESEARCH.md](./ICP_RESEARCH.md) §5 |
+| Glama / Frank | frank@glama.ai (+ support@glama.ai) | 2026-09-23 | **human** | Wait listing refresh                                                                                                                 | Connector ownership verified; asked refresh for $0.01 path                                                                                                                                                                            |
+
+## Drafted, not yet sent (owner action: open draft in Gmail web UI, replace `[קישור לדף השותפים]` with `https://israel-counterparty-intelligence.vercel.app/partner`, send)
+
+| Party   | Email                 | Drafted    | Status    | Ask                                                            |
+| ------- | --------------------- | ---------- | --------- | -------------------------------------------------------------- |
+| Morning | support@morning.co.il | 2026-09-24 | **draft** | 20-min product/partnerships call + free pilot token, no crypto |
+| iCount  | support@icount.co.il  | 2026-09-24 | **draft** | Same                                                           |
+| SUMIT   | support@sumit.co.il   | 2026-09-24 | **draft** | Same                                                           |
+
+These are support inboxes (no partnerships address is published); each draft asks to be forwarded. Drafts contain **no URL on purpose**: the Claude Gmail connector wraps even a bare hostname (verified again 2026-09-24 on a throwaway draft, deleted).
 
 ## Cooling / waiting (no same-day ping)
 
@@ -47,4 +57,5 @@ Status legend: `waiting` · `auto-ack` · `human` · `cooling` · `closed` · `b
 4. Second canary copy-paste:
    - `POST https://israel-counterparty-intelligence.vercel.app/v1/verify/mainnet`
    - body `{}` → HTTP 402 → **0.05 USDC** on Base.
-5. After any material reply or settle, update **this file** and [PROJECT_STATUS.md](./PROJECT_STATUS.md) the same day.
+5. Pilot access for a design partner already exists in code: `POST /v1/pilot/verify` and `/mcp/pilot` with a bearer token whose SHA-256 sits in Vercel env `PILOT_TOKEN_SHA256` (plus `PILOT_PARTNER_ID`, `PILOT_EXPIRES_AT`, `PILOT_VERIFICATION_LIMIT`). Code default expiry is 2026-09-14, so **set a fresh expiry in Vercel before promising a pilot**. Covers company verification only; invoice gate stays on the paid path.
+6. After any material reply or settle, update **this file** and [PROJECT_STATUS.md](./PROJECT_STATUS.md) the same day.
