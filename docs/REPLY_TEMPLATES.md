@@ -147,3 +147,28 @@ MCP: אותו header על /mcp/pilot.
 תנאי הפיילוט בעמוד אחד (מה נשמר, גבולות, סיום): israel-counterparty-intelligence.vercel.app/pilot-terms.md
 גבולות: ראיות מרשם החברות בלבד, לא אימות מול רשות המסים, לא בעלות על חשבון בנק. אשמח ל־20 דקות עם המפתח/ת שלכם.
 ```
+
+---
+
+## 8) After the Grow call (HE): thank-you, demo, one ask
+
+Send the same day, from the Gmail **web UI** (it carries links). Pick one of the two middle blocks; delete the other. Fill the braces. No prices, no volumes, no "verified with the Tax Authority".
+
+```
+היי יקי, תודה על הזמן היום.
+
+לסיכום במשפט: בודקים ספק ישראלי מול רשם החברות לפני שמשלמים לו חשבונית, ומחזירים לשלם / לעכב / לחסום עם נימוקים. גם תוכנה או סוכן AI יכולים להפעיל את זה לבד.
+לראות בעצמך, בלי להקליד: https://israel-counterparty-intelligence.vercel.app/invoice-check/he (שני כפתורי דוגמה בתחתית הדף).
+
+{אם עלה כיוון פנימי ב־Grow:}
+אשמח שתחבר אותי ל{שם / תפקיד} שאחראי על {שותפויות / אינטגרציות / תשלומים לספקים}. ההצעה: פיילוט חינם 60 יום עם מפתח API, בלי קריפטו ובלי התחייבות. דף שותפים בעברית: https://israel-counterparty-intelligence.vercel.app/partner/he
+
+{אם לא רלוונטי ל־Grow:}
+הבנתי שזה לא בליבת Grow, ותודה על הכנות. אם עולה לך גורם אחד בשוק שבודק ספקים לפני תשלום (הנהלת חשבונות, פינטק, מערכת ניהול ספקים או תשלומים), הכרות במייל אחד תעזור לי מאוד.
+
+{אם דיברנו על גבייה בשקלים:}
+ולשאלה שלי על קישור תשלום או חיוב חודשי ב־Grow ללקוחות ישראלים: אם יש למי לפנות, אשמח לשם.
+
+תודה,
+יצחק
+```
