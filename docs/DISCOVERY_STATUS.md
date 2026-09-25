@@ -1,4 +1,4 @@
-# Discovery status — 2026-09-23 evening (Asia/Jerusalem)
+# Discovery status — 2026-09-25 early morning (Asia/Jerusalem)
 
 Canonical ops snapshot: [PROJECT_STATUS.md](./PROJECT_STATUS.md)
 
@@ -21,15 +21,16 @@ Canonical ops snapshot: [PROJECT_STATUS.md](./PROJECT_STATUS.md)
 
 ## Directories
 
-| Surface                            | Status                              | Next                                                                                                         |
-| ---------------------------------- | ----------------------------------- | ------------------------------------------------------------------------------------------------------------ |
-| Glama connector                    | **Ownership verified** (2026-09-23) | Wait Frank refresh; listing https://glama.ai/mcp/connectors/io.github.itzikhr18/israel-business-intelligence |
-| Agent Tools                        | Re-crawled; $0.01 + MCP OK          | No paid trial; cool                                                                                          |
-| Agent402                           | Indexed (9 tools)                   | Paid canary **closed** (router policy)                                                                       |
-| MCP.Directory                      | Submitted earlier                   | Wait approval email                                                                                          |
-| Smithery / mcpservers.org / 402.ad | Not finished                        | Needs human browser / captcha                                                                                |
-| Agent402 seller-payability         | **Blocked**                         | Needs ~$0.10 from non-receiving buyer wallet                                                                 |
-| Upstash auto-durability            | **Blocked**                         | Needs Redis REST credentials from owner                                                                      |
+| Surface                    | Status                              | Next                                                                                                                                                                                                                                              |
+| -------------------------- | ----------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Glama connector            | **Ownership verified** (2026-09-23) | Wait Frank refresh; listing https://glama.ai/mcp/connectors/io.github.itzikhr18/israel-business-intelligence                                                                                                                                      |
+| Agent Tools                | Re-crawled; $0.01 + MCP OK          | No paid trial; cool                                                                                                                                                                                                                               |
+| Agent402                   | Indexed (9 tools)                   | Paid canary **closed** (router policy)                                                                                                                                                                                                            |
+| MCP.Directory              | Submitted earlier                   | Wait approval email                                                                                                                                                                                                                               |
+| mcpservers.org             | **Approved, live** (2026-09-25)     | Listing https://mcpservers.org/servers/itzikhr18/israel-counterparty-intelligence; badge in README; paid sponsorship offer not taken; older duplicate entry (`…-vercel-app-readme-md`) has stale copy, removal/merge request drafted, owner sends |
+| Smithery / 402.ad          | Not finished                        | Needs human browser / captcha                                                                                                                                                                                                                     |
+| Agent402 seller-payability | **Blocked**                         | Needs ~$0.10 from non-receiving buyer wallet                                                                                                                                                                                                      |
+| Upstash auto-durability    | **Blocked**                         | Needs Redis REST credentials from owner                                                                                                                                                                                                           |
 
 ## Explicitly not done (by policy)
 

@@ -4,6 +4,8 @@ One agent-native gate to check an Israeli supplier invoice before payment, with 
 
 Public source: <https://github.com/itzikhr18/israel-counterparty-intelligence>
 
+[![Listed on mcpservers.org](https://mcpservers.org/badge.svg)](https://mcpservers.org/servers/itzikhr18/israel-counterparty-intelligence)
+
 ## Project status (read this first)
 
 For the current production posture, open leads, blockers, and next actions, see **[docs/PROJECT_STATUS.md](./docs/PROJECT_STATUS.md)**. Partner entry: [PARTNER_HANDOFF.md](./PARTNER_HANDOFF.md).
