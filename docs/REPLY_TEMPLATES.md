@@ -124,6 +124,7 @@ REST (send the key as "Authorization: Bearer {RAW_KEY}"):
 • POST https://israel-counterparty-intelligence.vercel.app/v1/pilot/verify         → company verification with registry evidence
 • POST https://israel-counterparty-intelligence.vercel.app/v1/pilot/payment-risk   → PROCEED / REVIEW / BLOCK vendor triage
 • POST https://israel-counterparty-intelligence.vercel.app/v1/pilot/company-changes → recent registry changes
+Integration guide for your engineer (curl, Node, Python, how to wire PAY/HOLD/BLOCK): https://israel-counterparty-intelligence.vercel.app/partner-integration.md
 Request/response schemas: https://israel-counterparty-intelligence.vercel.app/openapi.json (operations under /v1/pilot/*)
 
 MCP (Claude, Cursor, any Streamable HTTP client): POST https://israel-counterparty-intelligence.vercel.app/mcp/pilot with the same Authorization header. tools/list shows the four tools.
