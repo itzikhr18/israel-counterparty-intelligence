@@ -181,7 +181,13 @@ try {
       }),
     }),
   );
-  for (const path of ["/v1/pilot/verify", "/mcp/pilot"]) {
+  for (const path of [
+    "/v1/pilot/verify",
+    "/v1/pilot/invoice-gate",
+    "/v1/pilot/payment-risk",
+    "/v1/pilot/company-changes",
+    "/mcp/pilot",
+  ]) {
     const pilot = await request(path, {
       method: "POST",
       headers: { "content-type": "application/json" },

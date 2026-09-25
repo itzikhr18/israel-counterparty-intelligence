@@ -242,18 +242,24 @@ tests. It does not alter the production service or represent public-registry evi
 
 ## Partner pilot
 
-The partner pilot is isolated from both paid routes. A valid bearer token can call the same
-verification engine through `/mcp/pilot` or `/v1/pilot/verify` while payment is waived. The current
-offer is limited to 100 successful verifications and a fixed expiration date. Each successful call
-emits a `pilot_verification` event with a partner identifier and no raw token or raw IP address.
+Partners that cannot pay in USDC get the whole product through an invitation-only bearer key,
+with payment waived and usage metered per partner for a monthly invoice in ₪ or $:
 
-The in-process counter is a safety cap, not a globally durable billing ledger. The authoritative
-pilot total is the centralized count of successful `pilot_verification` events. If the product
-moves beyond a small evaluation, replace this mechanism with an atomic shared usage store before
-selling metered plans.
+| Product                           | REST (`POST`)               | MCP tool on `/mcp/pilot`                               |
+| --------------------------------- | --------------------------- | ------------------------------------------------------ |
+| Invoice gate (PAY / HOLD / BLOCK) | `/v1/pilot/invoice-gate`    | `authorize_israeli_invoice_payment_paid`               |
+| Company verification              | `/v1/pilot/verify`          | `verify_israeli_company_paid` (alias `verify_company`) |
+| Vendor payment risk               | `/v1/pilot/payment-risk`    | `assess_israeli_vendor_payment_risk_paid`              |
+| Company changes                   | `/v1/pilot/company-changes` | `get_israeli_company_changes_paid`                     |
 
-Keep the raw bearer token outside the repository and configure only its SHA-256 digest. See
-[the pilot runbook](docs/PILOT.md) for activation, monitoring, and shutdown steps.
+Contracts match the paid Mainnet routes; pilot responses add a `pilot` block and `x-pilot-*`
+headers. Keys live in the `PILOT_KEYS` environment variable as a JSON array, one entry per partner
+with its own SHA-256 digest, expiry, and call allowance; the raw key never enters the repository.
+Each successful call emits a `pilot_call` event with the partner identifier and tool and no raw
+token or raw IP address. The in-process counter is a safety cap, not a globally durable billing
+ledger: the authoritative total is the centralized count of successful `pilot_call` events, so
+connect a log drain before the first billable month. See [the pilot runbook](docs/PILOT.md) for
+key issuance, activation, verification, metering, and revocation.
 
 ## Smoke tests
 

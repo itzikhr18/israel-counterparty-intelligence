@@ -19,6 +19,7 @@ A **Verified Payee / invoice payment gate** for Israeli suppliers:
 1. Free structural preview (VAT math + allocation applicability using buyer-attested conditions).
 2. Paid gate returns **`PAY` / `HOLD` / `BLOCK`** with reason codes and public **Companies Registry** evidence.
 3. Adjacent tools: company verification (**$0.05**), company changes (**$0.01**), vendor payment-risk (**$0.10**), invoice gate (**$0.25**) — Base Mainnet USDC, x402 v2, MCP + REST, **no API key**.
+4. **Partner access without crypto:** a bearer API key on `/v1/pilot/*` and `/mcp/pilot` gives your platform the same four tools with payment waived and usage metered per partner, invoiced monthly in ₪ or $. No wallet, no USDC, same request/response contracts. Runbook: [PILOT.md](./PILOT.md).
 
 **Not claimed:** independent Tax Authority authentication of buyer-supplied allocation results; bank-account ownership; sanctions/PEP/UBO; credit scoring; legal advice.
 
@@ -36,7 +37,7 @@ We are a **pre-payment intelligence sidecar**, not a replacement AP suite.
 
 | Package            | Indicative price                | Includes (negotiable)                                                                                                                                            |
 | ------------------ | ------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Design partner** | Soft / credits                  | Sandbox + Mainnet MCP endpoint, joint success criteria, no exclusivity                                                                                           |
+| **Design partner** | Soft / credits                  | API key (no crypto) for all four tools on `/v1/pilot/*` + `/mcp/pilot`, metered usage, joint success criteria, no exclusivity                                    |
 | **Platform / OEM** | **$1,500–$4,000 / month**       | Embed `authorize_israeli_invoice_payment_paid` (and optional verify/changes/risk), policy knobs, audit-oriented response shape, named slack/email, roadmap input |
 | **Usage**          | Pass-through or prepaid credits | Keep agent x402 spot pricing public; OEM can resell under your SKU                                                                                               |
 
@@ -45,7 +46,7 @@ Prices are **proposals for conversation**, not a published rate card and not a c
 ### Integration sketch (one afternoon)
 
 - MCP: `https://israel-counterparty-intelligence.vercel.app/mcp`
-- REST: `POST /v1/invoice-gate/mainnet` (and free `/v1/invoice-gate/preview`)
+- REST: `POST /v1/invoice-gate/mainnet` (and free `/v1/invoice-gate/preview`); with a partner key: `POST /v1/pilot/invoice-gate`
 - Metadata: `/mcp.json`, `/.well-known/x402`, `/STATUS.md`
 - Buyer wallet / agent: your runtime signs x402 terms, or we prepare private request JSON after free supplier match (`/trusted-wallet-guide.md`)
 

@@ -103,6 +103,45 @@ function paidPost(
   };
 }
 
+function pilotPost(
+  summary: string,
+  description: string,
+  inputSchema: Record<string, unknown> = requestSchema,
+  outputSchema: Record<string, unknown> = {
+    type: "object",
+    required: ["request_id", "evidence", "checked_at"],
+  },
+) {
+  return {
+    summary,
+    description: `${description} Invitation-only partner pilot: authenticate with a bearer key issued by the operator. Payment is waived; each successful call counts against the partner's allowance and is metered for month-end invoicing.`,
+    operationId: `pilot_${summary.toLocaleLowerCase("en").replace(/[^a-z0-9]+/g, "_")}`,
+    security: [{ pilotBearer: [] }],
+    requestBody: {
+      required: true,
+      content: { "application/json": { schema: inputSchema } },
+    },
+    responses: {
+      "200": {
+        description: "Evidence-backed result with a `pilot` metadata block",
+        headers: {
+          "x-pilot-partner": { schema: { type: "string" } },
+          "x-pilot-expires-at": { schema: { type: "string" } },
+          "x-pilot-call-limit": { schema: { type: "string" } },
+        },
+        content: { "application/json": { schema: outputSchema } },
+      },
+      "400": { description: "Invalid input" },
+      "401": { description: "Missing or invalid pilot bearer key" },
+      "409": { description: "Ambiguous entity resolution" },
+      "410": { description: "Pilot access period has ended" },
+      "422": { description: "No reliable entity resolution" },
+      "429": { description: "Rate limited or pilot allowance reached" },
+      "502": { description: "Critical public source unavailable" },
+    },
+  };
+}
+
 export const openApiDocument = {
   openapi: "3.1.0",
   info: {
@@ -112,6 +151,16 @@ export const openApiDocument = {
       "Agent-native Israeli invoice payment gate, supplier-registry intelligence, and x402 pre-sign payment firewall. Allocation applicability uses date, amount, VAT component, and buyer-attested conditions; missing context fails safely. Output is not official Tax Authority authentication, legal, credit, or payment advice.",
   },
   servers: [{ url: config.PUBLIC_BASE_URL }],
+  components: {
+    securitySchemes: {
+      pilotBearer: {
+        type: "http",
+        scheme: "bearer",
+        description:
+          "Invitation-only partner pilot key. Payment is waived on /v1/pilot/* routes; successful calls are metered per partner. Request a key from the operator.",
+      },
+    },
+  },
   tags: [
     {
       name: "counterparty",
@@ -225,6 +274,48 @@ export const openApiDocument = {
           "Get recent Israeli company changes",
           paidRouteConfig["company-changes-mainnet"].description,
           paidRouteConfig["company-changes-mainnet"].price,
+          companyChangesInputJsonSchema,
+          companyChangesOutputJsonSchema,
+        ),
+      },
+    },
+    "/v1/pilot/verify": {
+      post: {
+        tags: ["counterparty"],
+        ...pilotPost(
+          "Verify an Israeli company",
+          paidRouteConfig["verify-mainnet"].description,
+        ),
+      },
+    },
+    "/v1/pilot/invoice-gate": {
+      post: {
+        tags: ["agent-payments"],
+        ...pilotPost(
+          "Authorize an Israeli invoice payment",
+          paidRouteConfig["invoice-gate-mainnet"].description,
+          invoiceGateInputJsonSchema,
+          invoiceGateOutputJsonSchema,
+        ),
+      },
+    },
+    "/v1/pilot/payment-risk": {
+      post: {
+        tags: ["counterparty"],
+        ...pilotPost(
+          "Assess Israeli vendor payment risk",
+          paidRouteConfig["payment-risk-mainnet"].description,
+          paymentRiskInputJsonSchema,
+          paymentRiskOutputJsonSchema,
+        ),
+      },
+    },
+    "/v1/pilot/company-changes": {
+      post: {
+        tags: ["counterparty"],
+        ...pilotPost(
+          "Get recent Israeli company changes",
+          paidRouteConfig["company-changes-mainnet"].description,
           companyChangesInputJsonSchema,
           companyChangesOutputJsonSchema,
         ),

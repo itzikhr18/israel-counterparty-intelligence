@@ -129,7 +129,7 @@ export function logMcpRequest(
   }
   if (method === "tools/call" && toolName && VERIFY_TOOLS.has(toolName)) {
     event = context
-      ? "mcp_pilot_verify"
+      ? "mcp_pilot_call"
       : payment
         ? "mcp_payment_attempt"
         : "mcp_verify_unpaid";

@@ -2,10 +2,13 @@ import { WebStandardStreamableHTTPServerTransport } from "@modelcontextprotocol/
 import { type NextRequest, NextResponse } from "next/server";
 
 import type { PaymentEnvironmentName } from "@/lib/config";
-import { config } from "@/lib/config";
 import { createIsraelMcpServer } from "@/lib/mcp-server";
 import { logMcpRequest, logMcpResponse } from "@/lib/mcp-telemetry";
-import { authorizePilotRequest, pilotResponseHeaders } from "@/lib/pilot";
+import {
+  authorizePilotRequest,
+  type PilotPartner,
+  pilotResponseHeaders,
+} from "@/lib/pilot";
 import { ApiError } from "@/lib/domain";
 import { readBoundedJson, MCP_JSON_BODY_BYTES } from "@/lib/http/body";
 import { rateLimitClientKey } from "@/lib/http/client-key";
@@ -42,17 +45,24 @@ export function createMcpRoute(
   options: { accessMode?: "paid" | "pilot" } = {},
 ) {
   const accessMode = options.accessMode ?? "paid";
-  const responseHeaders = accessMode === "pilot" ? pilotResponseHeaders() : {};
 
   async function handle(request: NextRequest): Promise<Response> {
+    let pilotPartner: PilotPartner | undefined;
+    let responseHeaders: Record<string, string> = {};
     if (accessMode === "pilot") {
-      const unauthorized = authorizePilotRequest(request);
-      if (unauthorized) return withHeaders(unauthorized, responseHeaders);
+      const authorization = authorizePilotRequest(request);
+      if (!authorization.ok) return withHeaders(authorization.response);
+      pilotPartner = authorization.partner;
+      responseHeaders = pilotResponseHeaders(pilotPartner);
     }
 
     let parsedBody: unknown;
     if (request.method === "POST") {
-      const rate = checkRateLimit(rateLimitClientKey(request));
+      const rate = checkRateLimit(
+        pilotPartner
+          ? `pilot:${pilotPartner.partner_id}`
+          : rateLimitClientKey(request),
+      );
       if (!rate.allowed) {
         return withHeaders(
           NextResponse.json(
@@ -94,8 +104,8 @@ export function createMcpRoute(
         request,
         parsedBody,
         environmentName,
-        accessMode === "pilot"
-          ? { clientClass: "pilot", partnerId: config.PILOT_PARTNER_ID }
+        pilotPartner
+          ? { clientClass: "pilot", partnerId: pilotPartner.partner_id }
           : undefined,
       );
     }
@@ -104,7 +114,10 @@ export function createMcpRoute(
       sessionIdGenerator: undefined,
       enableJsonResponse: true,
     });
-    const server = await createIsraelMcpServer(environmentName, { accessMode });
+    const server = await createIsraelMcpServer(environmentName, {
+      accessMode,
+      pilotPartner,
+    });
     await server.connect(transport);
     const response = await transport.handleRequest(request, { parsedBody });
     if (request.method === "POST") {
@@ -132,7 +145,6 @@ export function createMcpRoute(
         },
         { status: 405, headers: { allow: "POST, OPTIONS" } },
       ),
-      responseHeaders,
     );
   }
 
@@ -141,9 +153,6 @@ export function createMcpRoute(
     POST: handle,
     DELETE: methodNotAllowed,
     OPTIONS: async () =>
-      withHeaders(
-        new Response(null, { status: 204, headers: CORS_HEADERS }),
-        responseHeaders,
-      ),
+      withHeaders(new Response(null, { status: 204, headers: CORS_HEADERS })),
   };
 }
