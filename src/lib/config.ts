@@ -8,6 +8,17 @@ const defaultPayTo = "0xa0A3BB49eA4AC723Bcf4d2d1ecde2EE01BA03C82";
 export const CDP_FACILITATOR_URL =
   "https://api.cdp.coinbase.com/platform/v2/x402";
 
+const pilotKeySchema = z.object({
+  partner_id: z
+    .string()
+    .min(2)
+    .max(80)
+    .regex(/^[a-z0-9][a-z0-9._-]*$/i),
+  token_sha256: z.string().regex(/^[a-f0-9]{64}$/),
+  expires_at: z.iso.datetime(),
+  call_limit: z.number().int().min(1).max(100000).default(500),
+});
+
 const envSchema = z.object({
   COMPANY_REGISTRY_BASE_URL: z
     .url()
@@ -101,6 +112,42 @@ const envSchema = z.object({
     .min(1)
     .max(10000)
     .default(100),
+  // Multi-partner pilot keys: JSON array, one entry per partner. When set it
+  // replaces the single-partner PILOT_* variables above.
+  PILOT_KEYS: z
+    .string()
+    .optional()
+    .transform((value, ctx) => {
+      if (!value?.trim()) return undefined;
+      let parsed: unknown;
+      try {
+        parsed = JSON.parse(value);
+      } catch {
+        ctx.addIssue({
+          code: "custom",
+          message: "PILOT_KEYS must be a JSON array of partner key objects",
+        });
+        return z.NEVER;
+      }
+      const keys = z.array(pilotKeySchema).min(1).max(50).safeParse(parsed);
+      if (!keys.success) {
+        ctx.addIssue({
+          code: "custom",
+          message: `PILOT_KEYS is invalid: ${keys.error.message}`,
+        });
+        return z.NEVER;
+      }
+      const ids = new Set(keys.data.map((key) => key.partner_id.toLowerCase()));
+      if (ids.size !== keys.data.length) {
+        ctx.addIssue({
+          code: "custom",
+          message:
+            "PILOT_KEYS partner_id values must be unique (case-insensitive)",
+        });
+        return z.NEVER;
+      }
+      return keys.data;
+    }),
 });
 
 const parsedConfig = envSchema.parse(process.env);

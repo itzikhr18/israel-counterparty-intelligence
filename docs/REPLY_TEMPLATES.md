@@ -106,3 +106,41 @@ Only if they ask for a clearer brief for the other team:
 ## 6) EasyCount / HYP (if they reply)
 
 Reuse template **1** or **2**. Product fit = Israeli e-invoicing adjacent to PAY/HOLD/BLOCK.
+
+---
+
+## 7) Partner says yes → send pilot access (no crypto)
+
+Send from the Gmail **web UI** (it carries links). Issue the key first per [PILOT.md](./PILOT.md); paste the raw key **only** here, never in a doc.
+
+```
+Great — here is your partner access. No wallet or USDC needed.
+
+Key (keep it secret, do not paste it into tickets): {RAW_KEY}
+Valid until: {EXPIRES_AT} · Allowance: {CALL_LIMIT} calls · Metered per call, invoiced monthly in ₪ or $.
+
+REST (send the key as "Authorization: Bearer {RAW_KEY}"):
+• POST https://israel-counterparty-intelligence.vercel.app/v1/pilot/invoice-gate   → PAY / HOLD / BLOCK for an Israeli invoice
+• POST https://israel-counterparty-intelligence.vercel.app/v1/pilot/verify         → company verification with registry evidence
+• POST https://israel-counterparty-intelligence.vercel.app/v1/pilot/payment-risk   → PROCEED / REVIEW / BLOCK vendor triage
+• POST https://israel-counterparty-intelligence.vercel.app/v1/pilot/company-changes → recent registry changes
+Request/response schemas: https://israel-counterparty-intelligence.vercel.app/openapi.json (operations under /v1/pilot/*)
+
+MCP (Claude, Cursor, any Streamable HTTP client): POST https://israel-counterparty-intelligence.vercel.app/mcp/pilot with the same Authorization header. tools/list shows the four tools.
+
+Free previews stay free: https://israel-counterparty-intelligence.vercel.app/#invoice-preview
+
+Boundaries, so nobody is surprised: public Companies Registry evidence; buyer-attested allocation results are labeled, not independently authenticated; no bank-account ownership, sanctions/PEP/UBO, or legal advice.
+
+I can walk your engineer through it in 20 minutes whenever suits.
+```
+
+### HE short note
+
+```
+מצוין. הנה גישת השותפים, בלי ארנק ובלי USDC:
+מפתח (סודי): {RAW_KEY} · בתוקף עד {EXPIRES_AT} · מכסה: {CALL_LIMIT} קריאות · חיוב לפי שימוש, חשבונית חודשית בש"ח.
+REST: שולחים "Authorization: Bearer <מפתח>" ל־/v1/pilot/invoice-gate (שער חשבונית PAY/HOLD/BLOCK), /v1/pilot/verify, /v1/pilot/payment-risk, /v1/pilot/company-changes. סכמות ב־/openapi.json.
+MCP: אותו header על /mcp/pilot.
+גבולות: ראיות מרשם החברות בלבד, לא אימות מול רשות המסים, לא בעלות על חשבון בנק. אשמח ל־20 דקות עם המפתח/ת שלכם.
+```

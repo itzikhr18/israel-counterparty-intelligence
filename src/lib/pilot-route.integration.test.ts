@@ -5,11 +5,23 @@ import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 
 type RouteHandler = (request: NextRequest) => Promise<Response>;
 
-const testToken = "test-only-pilot-token";
-let mcpPost: RouteHandler;
-let restPost: RouteHandler;
+const digest = (token: string) =>
+  createHash("sha256").update(token).digest("hex");
+const morningKey = "test-only-morning-key";
+const icountKey = "test-only-icount-key";
+const expiredKey = "test-only-expired-key";
 
-function mcpRequest(token?: string) {
+let mcpPost: RouteHandler;
+let verifyPost: RouteHandler;
+let invoiceGatePost: RouteHandler;
+let paymentRiskPost: RouteHandler;
+let companyChangesPost: RouteHandler;
+
+function mcpRequest(
+  token?: string,
+  method = "tools/list",
+  params: Record<string, unknown> = {},
+) {
   return new NextRequest("http://localhost:3000/mcp/pilot", {
     method: "POST",
     headers: {
@@ -17,25 +29,64 @@ function mcpRequest(token?: string) {
       "content-type": "application/json",
       ...(token ? { authorization: `Bearer ${token}` } : {}),
     },
-    body: JSON.stringify({
-      jsonrpc: "2.0",
-      id: 1,
-      method: "tools/list",
-      params: {},
-    }),
+    body: JSON.stringify({ jsonrpc: "2.0", id: 1, method, params }),
   });
 }
+
+function restRequest(path: string, token?: string, body: unknown = {}) {
+  return new NextRequest(`http://localhost:3000${path}`, {
+    method: "POST",
+    headers: {
+      "content-type": "application/json",
+      ...(token ? { authorization: `Bearer ${token}` } : {}),
+    },
+    body: JSON.stringify(body),
+  });
+}
+
+const PILOT_TOOL_NAMES = [
+  "assess_israeli_vendor_payment_risk_paid",
+  "authorize_israeli_invoice_payment_paid",
+  "describe_service",
+  "get_israeli_company_changes_paid",
+  "get_sample_verification_report",
+  "get_schema",
+  "verify_company",
+  "verify_israeli_company_paid",
+];
 
 describe("invitation-only partner pilot", () => {
   beforeAll(async () => {
     vi.stubEnv(
-      "PILOT_TOKEN_SHA256",
-      createHash("sha256").update(testToken).digest("hex"),
+      "PILOT_KEYS",
+      JSON.stringify([
+        {
+          partner_id: "morning",
+          token_sha256: digest(morningKey),
+          expires_at: "2099-01-01T00:00:00.000Z",
+          call_limit: 250,
+        },
+        {
+          partner_id: "icount",
+          token_sha256: digest(icountKey),
+          expires_at: "2099-01-01T00:00:00.000Z",
+        },
+        {
+          partner_id: "expired-partner",
+          token_sha256: digest(expiredKey),
+          expires_at: "2020-01-01T00:00:00.000Z",
+          call_limit: 10,
+        },
+      ]),
     );
-    vi.stubEnv("PILOT_EXPIRES_AT", "2099-01-01T00:00:00.000Z");
-    vi.stubEnv("PILOT_PARTNER_ID", "integration-test-partner");
     ({ POST: mcpPost } = await import("@/app/mcp/pilot/route"));
-    ({ POST: restPost } = await import("@/app/v1/pilot/verify/route"));
+    ({ POST: verifyPost } = await import("@/app/v1/pilot/verify/route"));
+    ({ POST: invoiceGatePost } =
+      await import("@/app/v1/pilot/invoice-gate/route"));
+    ({ POST: paymentRiskPost } =
+      await import("@/app/v1/pilot/payment-risk/route"));
+    ({ POST: companyChangesPost } =
+      await import("@/app/v1/pilot/company-changes/route"));
   });
 
   afterAll(() => vi.unstubAllEnvs());
@@ -46,30 +97,95 @@ describe("invitation-only partner pilot", () => {
     expect(missing.status).toBe(401);
     expect(incorrect.status).toBe(401);
     expect(missing.headers.get("www-authenticate")).toContain("Bearer");
+    expect(missing.headers.get("x-pilot-partner")).toBeNull();
   });
 
-  it("exposes exactly the production tool set to an authorized pilot client", async () => {
-    const response = await mcpPost(mcpRequest(testToken));
+  it("closes an expired partner key with 410 and names the partner", async () => {
+    const response = await mcpPost(mcpRequest(expiredKey));
+    expect(response.status).toBe(410);
+    expect(response.headers.get("x-pilot-partner")).toBe("expired-partner");
+    const body = await response.json();
+    expect(body.error.code).toBe("PILOT_EXPIRED");
+  });
+
+  it("exposes the full product tool set to an authorized partner", async () => {
+    const response = await mcpPost(mcpRequest(morningKey));
     const body = await response.json();
     expect(response.status).toBe(200);
-    expect(response.headers.get("x-pilot-verification-limit")).toBe("100");
+    expect(response.headers.get("x-pilot-partner")).toBe("morning");
+    expect(response.headers.get("x-pilot-call-limit")).toBe("250");
+    expect(response.headers.get("x-pilot-expires-at")).toBe(
+      "2099-01-01T00:00:00.000Z",
+    );
     expect(
       body.result.tools.map((tool: { name: string }) => tool.name).sort(),
-    ).toEqual([
-      "describe_service",
-      "get_sample_verification_report",
-      "get_schema",
-      "verify_company",
-    ]);
+    ).toEqual(PILOT_TOOL_NAMES);
   });
 
-  it("protects the REST pilot before parsing or executing a verification", async () => {
-    const request = new NextRequest("http://localhost:3000/v1/pilot/verify", {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify({ company_number: "514744887", language: "en" }),
+  it("keeps partners separate and applies the default call limit", async () => {
+    const response = await mcpPost(mcpRequest(icountKey));
+    expect(response.status).toBe(200);
+    expect(response.headers.get("x-pilot-partner")).toBe("icount");
+    expect(response.headers.get("x-pilot-call-limit")).toBe("500");
+  });
+
+  it("describes waived pricing and pilot REST endpoints for the partner", async () => {
+    const response = await mcpPost(
+      mcpRequest(morningKey, "tools/call", {
+        name: "describe_service",
+        arguments: {},
+      }),
+    );
+    const body = await response.json();
+    expect(response.status).toBe(200);
+    const description = body.result.structuredContent;
+    expect(description.pilot).toMatchObject({
+      partner_id: "morning",
+      call_limit: 250,
+      tools: ["verify", "invoice_gate", "payment_risk", "company_changes"],
     });
-    const response = await restPost(request);
-    expect(response.status).toBe(401);
+    expect(description.invoice_payment_gate).toMatchObject({
+      price: "waived under the invitation-only partner pilot",
+      tool: "authorize_israeli_invoice_payment_paid",
+      decisions: ["PAY", "HOLD", "BLOCK"],
+    });
+    expect(description.invoice_payment_gate.rest_endpoint).toMatch(
+      /\/v1\/pilot\/invoice-gate$/,
+    );
+    expect(description.company_changes.rest_endpoint).toMatch(
+      /\/v1\/pilot\/company-changes$/,
+    );
+    expect(description.assess_payment_risk.rest_endpoint).toMatch(
+      /\/v1\/pilot\/payment-risk$/,
+    );
+  });
+
+  it("protects every REST pilot route before parsing or executing", async () => {
+    const routes: Array<[string, RouteHandler]> = [
+      ["/v1/pilot/verify", verifyPost],
+      ["/v1/pilot/invoice-gate", invoiceGatePost],
+      ["/v1/pilot/payment-risk", paymentRiskPost],
+      ["/v1/pilot/company-changes", companyChangesPost],
+    ];
+    for (const [path, handler] of routes) {
+      const response = await handler(
+        restRequest(path, undefined, {
+          company_number: "514744887",
+          language: "en",
+        }),
+      );
+      expect(response.status, path).toBe(401);
+    }
+  });
+
+  it("validates input for an authorized partner without a live lookup", async () => {
+    const response = await invoiceGatePost(
+      restRequest("/v1/pilot/invoice-gate", morningKey, {}),
+    );
+    const body = await response.json();
+    expect(response.status).toBe(400);
+    expect(body.error.code).toBe("INVALID_INPUT");
+    expect(response.headers.get("x-pilot-partner")).toBe("morning");
+    expect(response.headers.get("x-pilot-call-limit")).toBe("250");
   });
 });

@@ -4,7 +4,7 @@
 **Owner inbox:** `itzikhr18@gmail.com`  
 **Canonical status:** [PROJECT_STATUS.md](./PROJECT_STATUS.md) · **Reply kit:** [REPLY_TEMPLATES.md](./REPLY_TEMPLATES.md)
 
-**Goal now:** (1) Grow/Yaki call on Sunday 27.09 (learn + referral), (2) Israeli OEM channel: send the three Gmail drafts to Morning / iCount / Sumit from the **web UI** after pasting the partner link, (3) packaging: pilot token or API key + monthly plan so a partner can say yes without USDC. The second external settle is now a **passive** metric (owner has no external wallet; do not chase).  
+**Goal now:** (1) Grow/Yaki call on Sunday 27.09 (learn + referral), (2) Israeli OEM channel: send the three Gmail drafts to Morning / iCount / Sumit from the **web UI** after pasting the partner link, (3) packaging is **done**: a partner API key unlocks all four tools without USDC, onboard with [PILOT.md](./PILOT.md) the same day a partner says yes. The second external settle is now a **passive** metric (owner has no external wallet; do not chase).  
 **Do not spam today:** PayAPI, GoPlausible, Mesh, Dokka, Cardcom, Aerchain, Agent402 paid-canary asks.
 
 Status legend: `waiting` · `auto-ack` · `human` · `cooling` · `closed` · `blocked`
@@ -58,5 +58,5 @@ These are support inboxes (no partnerships address is published); each draft ask
 4. Second canary copy-paste:
    - `POST https://israel-counterparty-intelligence.vercel.app/v1/verify/mainnet`
    - body `{}` → HTTP 402 → **0.05 USDC** on Base.
-5. Pilot access for a design partner already exists in code: `POST /v1/pilot/verify` and `/mcp/pilot` with a bearer token whose SHA-256 sits in Vercel env `PILOT_TOKEN_SHA256` (plus `PILOT_PARTNER_ID`, `PILOT_EXPIRES_AT`, `PILOT_VERIFICATION_LIMIT`). Code default expiry is 2026-09-14, so **set a fresh expiry in Vercel before promising a pilot**. Covers company verification only; invoice gate stays on the paid path.
+5. Partner access without crypto is ready (2026-09-25): a bearer key unlocks `POST /v1/pilot/verify`, `/v1/pilot/invoice-gate`, `/v1/pilot/payment-risk`, `/v1/pilot/company-changes` and the same four tools on `/mcp/pilot`, payment waived, usage metered per partner by `pilot_call` events. One key per partner in Vercel env `PILOT_KEYS` (JSON array; the old single-partner `PILOT_*` variables are ignored when it is set). The code defaults carry an expiry in the past, so **nothing is open until you set `PILOT_KEYS`**. Runbook: [PILOT.md](./PILOT.md). Reply kit: [REPLY_TEMPLATES.md](./REPLY_TEMPLATES.md) §7.
 6. After any material reply or settle, update **this file** and [PROJECT_STATUS.md](./PROJECT_STATUS.md) the same day.

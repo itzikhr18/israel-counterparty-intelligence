@@ -1,26 +1,10 @@
-import { type NextRequest } from "next/server";
-
-import { config } from "@/lib/config";
 import { counterpartyQuerySchema } from "@/lib/domain";
-import { createJsonHandler } from "@/lib/http/handler";
-import {
-  authorizePilotRequest,
-  pilotResponseHeaders,
-  runPilotVerification,
-} from "@/lib/pilot";
+import { createPilotRoute } from "@/lib/pilot";
+import { counterpartyOrchestrator } from "@/lib/services/orchestrator";
 
-const handler = createJsonHandler(
+export const POST = createPilotRoute(
   "/v1/pilot/verify",
   counterpartyQuerySchema,
-  runPilotVerification,
-  {
-    clientClass: "pilot",
-    paymentStatus: "pilot_waived",
-    rateLimitKey: () => `pilot:${config.PILOT_PARTNER_ID}`,
-    responseHeaders: pilotResponseHeaders,
-  },
+  "verify",
+  (query) => counterpartyOrchestrator.verify(query),
 );
-
-export async function POST(request: NextRequest) {
-  return authorizePilotRequest(request) ?? handler(request);
-}

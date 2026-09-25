@@ -58,7 +58,12 @@ import {
   type InvoiceGateQuery,
 } from "@/lib/invoice-gate-schema";
 import { previewInvoiceGate } from "@/lib/services/invoice-gate";
-import { pilotMetadata, runPilotVerification } from "@/lib/pilot";
+import {
+  type PilotPartner,
+  type PilotTool,
+  pilotMetadata,
+  runPilotOperation,
+} from "@/lib/pilot";
 import {
   PAID_SERVICE_NOTICE,
   PAID_SERVICE_SUSPENDED,
@@ -101,7 +106,7 @@ const LIMITATIONS = [
 
 function serverInstructions(accessMode: "paid" | "pilot"): string {
   if (accessMode === "pilot") {
-    return "Use verify_company for invitation-only partner verification. Payment is waived only when this authenticated pilot endpoint is used. Use get_sample_verification_report to inspect the response shape without a live lookup.";
+    return `Invitation-only partner pilot: payment is waived on this authenticated endpoint and each successful call counts against the partner allowance. For an Israeli tax invoice use ${PAID_INVOICE_GATE_TOOL} for the PAY, HOLD, or BLOCK gate. Use ${PAID_VERIFY_TOOL} (alias verify_company) for full company verification, ${PAID_PAYMENT_RISK_TOOL} for vendor payment risk, and ${PAID_COMPANY_CHANGES_TOOL} for recent registry changes. Use get_sample_verification_report to inspect the response shape without a live lookup. This service does not call the Tax Authority; buyer-attested results are never presented as independently authenticated.`;
   }
   if (PAID_SERVICE_SUSPENDED) return PAID_SERVICE_NOTICE;
   return `For an Israeli tax invoice, start with ${FREE_INVOICE_GATE_PREVIEW_TOOL}, then use ${PAID_INVOICE_GATE_TOOL} for the PAY, HOLD, or BLOCK gate. This service does not call the Tax Authority; buyer-authorized TA access is required for official allocation verification and buyer-attested results are never presented as independently authenticated. For company intelligence, start with ${FREE_PREVIEW_TOOL}, then use ${PAID_VERIFY_TOOL}; recommended first paid inspect is company-changes at $0.01 USDC (cheapest path to External Paid Call #1), then full verification $0.05, vendor payment risk through ${PAID_PAYMENT_RISK_TOOL} costs $0.10, and the invoice gate $0.25 on Base Mainnet. Before signing an x402 payment, use ${AGENT_PAYMENT_TRUST_TOOL}. Buyer bridge: ${X402_BUYER_BRIDGE_URL}`;
@@ -441,8 +446,21 @@ function payerFromPayment(payment: PaymentPayload): string | undefined {
 function serviceDescription(
   environmentName: PaymentEnvironmentName,
   accessMode: "paid" | "pilot",
+  pilotPartner?: PilotPartner,
 ) {
   const environment = paymentEnvironments[environmentName];
+  const pilotOffer = (
+    tool: string,
+    restPath: string,
+    extra: Record<string, unknown> = {},
+  ) => ({
+    price: "waived under the invitation-only partner pilot",
+    authentication: "Bearer key",
+    endpoint: `${config.PUBLIC_BASE_URL}/mcp/pilot`,
+    rest_endpoint: `${config.PUBLIC_BASE_URL}${restPath}`,
+    tool,
+    ...extra,
+  });
   return {
     name: MCP_SERVER_NAME,
     description: DESCRIPTION,
@@ -475,14 +493,15 @@ function serviceDescription(
     does: "Gates Israeli invoices before payment and verifies Israeli companies with structured public-registry evidence.",
     does_not:
       "It does not provide Full Regulatory KYB, legal advice, sanctions/PEP/UBO certification, credit advice, or a guarantee that a counterparty is safe.",
+    pilot:
+      accessMode === "pilot" && pilotPartner
+        ? pilotMetadata(pilotPartner)
+        : undefined,
     verify_company:
       accessMode === "pilot"
-        ? {
-            price: "waived during the invitation-only pilot",
-            endpoint: `${config.PUBLIC_BASE_URL}/mcp/pilot`,
-            authentication: "Bearer token",
-            pilot: pilotMetadata,
-          }
+        ? pilotOffer(PAID_VERIFY_TOOL, "/v1/pilot/verify", {
+            alias: "verify_company",
+          })
         : {
             price: `${mcpPrice(environmentName).slice(1)} USDC`,
             network:
@@ -499,7 +518,9 @@ function serviceDescription(
           },
     assess_payment_risk:
       accessMode === "pilot"
-        ? undefined
+        ? pilotOffer(PAID_PAYMENT_RISK_TOOL, "/v1/pilot/payment-risk", {
+            decisions: ["PROCEED", "REVIEW", "BLOCK"],
+          })
         : {
             price: `${mcpPaymentRiskPrice(environmentName).slice(1)} USDC`,
             network:
@@ -522,7 +543,10 @@ function serviceDescription(
           },
     invoice_payment_gate:
       accessMode === "pilot"
-        ? undefined
+        ? pilotOffer(PAID_INVOICE_GATE_TOOL, "/v1/pilot/invoice-gate", {
+            decisions: ["PAY", "HOLD", "BLOCK"],
+            free_preview_tool: FREE_INVOICE_GATE_PREVIEW_TOOL,
+          })
         : {
             price: `${mcpInvoiceGatePrice(environmentName).slice(1)} USDC`,
             network:
@@ -543,7 +567,7 @@ function serviceDescription(
           },
     company_changes:
       accessMode === "pilot"
-        ? undefined
+        ? pilotOffer(PAID_COMPANY_CHANGES_TOOL, "/v1/pilot/company-changes")
         : {
             price: `${mcpCompanyChangesPrice(environmentName).slice(1)} USDC`,
             network:
@@ -888,9 +912,13 @@ function settlementTelemetry(
 
 export async function createIsraelMcpServer(
   environmentName: PaymentEnvironmentName,
-  options: { accessMode?: "paid" | "pilot" } = {},
+  options: { accessMode?: "paid" | "pilot"; pilotPartner?: PilotPartner } = {},
 ): Promise<McpServer> {
   const accessMode = options.accessMode ?? "paid";
+  const pilotPartner = options.pilotPartner;
+  if (accessMode === "pilot" && !pilotPartner) {
+    throw new Error("The pilot MCP server requires an authorized partner");
+  }
   const environment = paymentEnvironments[environmentName];
   const requirements = mcpPaymentRequirements(environmentName);
   const paymentRiskRequirements = mcpPaymentRiskRequirements(environmentName);
@@ -917,7 +945,7 @@ export async function createIsraelMcpServer(
     },
     async () =>
       textAndStructured({
-        ...serviceDescription(environmentName, accessMode),
+        ...serviceDescription(environmentName, accessMode, pilotPartner),
         paid_service: {
           suspended: PAID_SERVICE_SUSPENDED,
           notice: PAID_SERVICE_SUSPENDED ? PAID_SERVICE_NOTICE : undefined,
@@ -1029,45 +1057,105 @@ export async function createIsraelMcpServer(
       }),
   );
 
-  if (accessMode === "pilot") {
+  if (accessMode === "pilot" && pilotPartner) {
+    const partner = pilotPartner;
+    const pilotAnnotations = {
+      readOnlyHint: true,
+      destructiveHint: false,
+      idempotentHint: true,
+    };
+    const pilotSuffix =
+      " Payment is waived for this invitation-only partner pilot; each successful call counts against the partner allowance.";
+    const pilotResult = async (
+      tool: PilotTool,
+      run: () => Promise<Record<string, unknown>>,
+    ) => {
+      try {
+        const result = await runPilotOperation(partner, tool, run);
+        return textAndStructured({ request_id: randomUUID(), ...result });
+      } catch (error) {
+        const normalized =
+          error instanceof ApiError
+            ? error
+            : new ApiError(
+                500,
+                "INTERNAL_ERROR",
+                "An unexpected error occurred",
+              );
+        return {
+          content: [
+            {
+              type: "text" as const,
+              text: JSON.stringify({
+                error: { code: normalized.code, message: normalized.message },
+              }),
+            },
+          ],
+          isError: true,
+        };
+      }
+    };
+
     server.registerTool(
       "verify_company",
       {
         title: "Verify Israeli company - partner pilot",
-        description: `${DESCRIPTION} Payment is waived for this invitation-only pilot.`,
+        description: `${DESCRIPTION}${pilotSuffix}`,
         inputSchema: counterpartyQuerySchema,
-        annotations: {
-          readOnlyHint: true,
-          destructiveHint: false,
-          idempotentHint: true,
-        },
+        annotations: pilotAnnotations,
       },
-      async (args) => {
-        try {
-          const result = await runPilotVerification(args);
-          return textAndStructured({ request_id: randomUUID(), ...result });
-        } catch (error) {
-          const normalized =
-            error instanceof ApiError
-              ? error
-              : new ApiError(
-                  500,
-                  "INTERNAL_ERROR",
-                  "An unexpected error occurred",
-                );
-          return {
-            content: [
-              {
-                type: "text" as const,
-                text: JSON.stringify({
-                  error: { code: normalized.code, message: normalized.message },
-                }),
-              },
-            ],
-            isError: true,
-          };
-        }
+      async (args) =>
+        pilotResult("verify", () => counterpartyOrchestrator.verify(args)),
+    );
+    server.registerTool(
+      PAID_VERIFY_TOOL,
+      {
+        title: "Verify an Israeli company - full report (partner pilot)",
+        description: `${DESCRIPTION}${pilotSuffix}`,
+        inputSchema: counterpartyQuerySchema,
+        annotations: pilotAnnotations,
       },
+      async (args) =>
+        pilotResult("verify", () => counterpartyOrchestrator.verify(args)),
+    );
+    server.registerTool(
+      PAID_INVOICE_GATE_TOOL,
+      {
+        title: "Authorize an Israeli invoice payment (partner pilot)",
+        description: `Pre-payment gate for an Israeli tax invoice: checks VAT and totals, applies the allocation-number rules, resolves the supplier in the public company registry, combines vendor-fraud signals, and returns PAY, HOLD, or BLOCK with reason codes and evidence. Missing buyer context fails to HOLD.${pilotSuffix}`,
+        inputSchema: invoiceGateQuerySchema,
+        annotations: pilotAnnotations,
+      },
+      async (args) =>
+        pilotResult("invoice_gate", () =>
+          counterpartyOrchestrator.invoiceGate(args),
+        ),
+    );
+    server.registerTool(
+      PAID_PAYMENT_RISK_TOOL,
+      {
+        title: "Assess Israeli vendor payment risk (partner pilot)",
+        description: `Registry-backed pre-payment triage with invoice consistency checks and a PROCEED, REVIEW, or BLOCK result. Does not verify bank-account ownership.${pilotSuffix}`,
+        inputSchema: paymentRiskQuerySchema,
+        annotations: pilotAnnotations,
+      },
+      async (args) =>
+        pilotResult("payment_risk", () =>
+          counterpartyOrchestrator.paymentRisk(args),
+        ),
+    );
+    server.registerTool(
+      PAID_COMPANY_CHANGES_TOOL,
+      {
+        title: "Get recent Israeli company changes (partner pilot)",
+        description: `Recent official Israeli company filing and status-change events, newest first, with source evidence.${pilotSuffix}`,
+        inputSchema: companyChangesQuerySchema,
+        annotations: pilotAnnotations,
+      },
+      async (args) =>
+        pilotResult("company_changes", () =>
+          counterpartyOrchestrator.companyChanges(args),
+        ),
     );
     return server;
   }
