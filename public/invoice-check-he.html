@@ -1,0 +1,333 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>בדיקת חשבונית ספק חינם — Israel Counterparty Intelligence</title>
+    <meta
+      name="description"
+      content='בדיקה חינמית של חשבונית ספק ישראלית: חישוב מע"מ וסכומים, וחובת מספר הקצאה לפי הסף בתוקף בתאריך החשבונית. ללא הרשמה וללא ארנק.'
+    />
+    <link rel="icon" href="/icon.svg" type="image/svg+xml" />
+    <link
+      rel="canonical"
+      href="https://israel-counterparty-intelligence.vercel.app/invoice-check/he"
+    />
+    <style>
+      :root {
+        --bg: #fafafa;
+        --surface: #ffffff;
+        --ink: #0a0a0a;
+        --muted: #525252;
+        --line: #e5e5e5;
+        --accent: #1d4ed8;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        min-height: 100vh;
+        background: var(--bg);
+        color: var(--ink);
+        font:
+          16px/1.6 -apple-system,
+          BlinkMacSystemFont,
+          "Segoe UI",
+          system-ui,
+          Arial,
+          sans-serif;
+        -webkit-font-smoothing: antialiased;
+      }
+      main {
+        max-width: 40rem;
+        margin: 0 auto;
+        padding: 3.5rem 1rem 5rem;
+      }
+      .eyebrow {
+        margin: 0 0 0.75rem;
+        font-size: 0.8rem;
+        font-weight: 600;
+        color: var(--muted);
+      }
+      h1 {
+        margin: 0 0 0.5rem;
+        font-size: clamp(1.5rem, 3vw, 1.9rem);
+        font-weight: 700;
+        line-height: 1.25;
+      }
+      .lede {
+        margin: 0 0 1.5rem;
+        color: var(--muted);
+        max-width: 36rem;
+      }
+      form {
+        background: var(--surface);
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        padding: 1.35rem 1.4rem;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+        display: grid;
+        gap: 1rem;
+      }
+      .field {
+        display: grid;
+        gap: 0.3rem;
+      }
+      label {
+        font-weight: 600;
+        font-size: 0.95rem;
+      }
+      label small {
+        font-weight: 400;
+        color: var(--muted);
+      }
+      input,
+      select {
+        font: inherit;
+        padding: 0.6rem 0.75rem;
+        border: 1px solid #c9c9c9;
+        border-radius: 8px;
+        background: #fff;
+        color: var(--ink);
+        min-height: 44px;
+      }
+      input:focus,
+      select:focus {
+        outline: 2px solid var(--accent);
+        outline-offset: 1px;
+      }
+      .ltr {
+        direction: ltr;
+        text-align: left;
+      }
+      .hint {
+        margin: 0;
+        color: var(--muted);
+        font-size: 0.85rem;
+      }
+      .two {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+      }
+      .actions {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 0.75rem;
+        margin-top: 0.25rem;
+      }
+      .button {
+        display: inline-block;
+        padding: 0.65rem 1.1rem;
+        border: 1px solid var(--accent);
+        border-radius: 10px;
+        background: var(--accent);
+        color: #fff;
+        font: inherit;
+        font-weight: 600;
+        cursor: pointer;
+      }
+      .note {
+        margin: 1.25rem 0 0;
+        color: var(--muted);
+        font-size: 0.88rem;
+      }
+      a {
+        color: var(--ink);
+        text-underline-offset: 3px;
+      }
+      @media (max-width: 560px) {
+        .two {
+          grid-template-columns: 1fr;
+        }
+        main {
+          padding-top: 2.25rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <p class="eyebrow">
+        בדיקה חינמית · בלי הרשמה · <a href="/partner/he">דף שותפים</a> ·
+        <a href="/#invoice-preview">English</a>
+      </p>
+      <h1>לבדוק חשבונית ספק לפני שמשלמים</h1>
+      <p class="lede">
+        מכניסים את מספרי החשבונית ושתי תשובות של הקונה. אנחנו בודקים את חישוב
+        המע"מ והסה"כ, ואם לפי התאריך, הסכום ותנאי הקונה נדרש מספר הקצאה. התוצאה:
+        לשלם / לעכב / לחסום, עם הסבר. הבדיקה לא פונה לרשות המסים ואינה אישור
+        לתשלום.
+      </p>
+
+      <form action="/invoice-preview" method="post">
+        <input type="hidden" name="lang" value="he" />
+        <div class="field">
+          <label for="supplier-company-number"
+            >ח"פ או מספר עוסק של הספק <small>(9 ספרות)</small></label
+          >
+          <input
+            id="supplier-company-number"
+            class="ltr"
+            name="supplier_company_number"
+            type="text"
+            inputmode="numeric"
+            autocomplete="off"
+            pattern="[0-9]{9}"
+            minlength="9"
+            maxlength="9"
+            placeholder="514744887"
+            required
+          />
+        </div>
+        <div class="two">
+          <div class="field">
+            <label for="invoice-number">מספר חשבונית</label>
+            <input
+              id="invoice-number"
+              class="ltr"
+              name="invoice_number"
+              type="text"
+              autocomplete="off"
+              maxlength="100"
+              placeholder="INV-2026-001"
+              required
+            />
+          </div>
+          <div class="field">
+            <label for="invoice-date">תאריך החשבונית</label>
+            <input
+              id="invoice-date"
+              class="ltr"
+              name="invoice_date"
+              type="date"
+              min="2025-01-01"
+              required
+            />
+          </div>
+        </div>
+        <div class="field">
+          <label for="vat-rate">שיעור המע"מ הצפוי</label>
+          <select id="vat-rate" name="expected_vat_rate">
+            <option value="18" selected>18%</option>
+            <option value="0">0% — רק עסקה פטורה או בשיעור אפס</option>
+          </select>
+        </div>
+        <div class="two">
+          <div class="field">
+            <label for="buyer-authorized-dealer">הקונה הוא עוסק מורשה?</label>
+            <select
+              id="buyer-authorized-dealer"
+              name="buyer_is_authorized_dealer"
+              required
+            >
+              <option value="" selected disabled>בחרו תשובה</option>
+              <option value="true">כן</option>
+              <option value="false">לא</option>
+            </select>
+            <p class="hint">
+              הצהרת הקונה. נדרש כדי לקבוע אם חלה חובת מספר הקצאה.
+            </p>
+          </div>
+          <div class="field">
+            <label for="buyer-requested-allocation"
+              >הקונה ביקש מספר הקצאה?</label
+            >
+            <select
+              id="buyer-requested-allocation"
+              name="buyer_requested_allocation_number"
+              required
+            >
+              <option value="" selected disabled>בחרו תשובה</option>
+              <option value="true">כן</option>
+              <option value="false">לא</option>
+            </select>
+            <p class="hint">אפשר לבקש מספר הקצאה גם מתחת לסף, מרצון.</p>
+          </div>
+        </div>
+        <div class="two">
+          <div class="field">
+            <label for="amount-before-vat">סכום לפני מע"מ (₪)</label>
+            <input
+              id="amount-before-vat"
+              class="ltr"
+              name="amount_before_vat"
+              type="number"
+              inputmode="decimal"
+              min="0.01"
+              max="1000000000"
+              step="0.01"
+              placeholder="6000.00"
+              required
+            />
+          </div>
+          <div class="field">
+            <label for="vat-amount">סכום המע"מ (₪)</label>
+            <input
+              id="vat-amount"
+              class="ltr"
+              name="vat_amount"
+              type="number"
+              inputmode="decimal"
+              min="0"
+              max="1000000000"
+              step="0.01"
+              placeholder="1080.00"
+              required
+            />
+          </div>
+        </div>
+        <div class="two">
+          <div class="field">
+            <label for="total-amount">סה"כ לתשלום (₪)</label>
+            <input
+              id="total-amount"
+              class="ltr"
+              name="total_amount"
+              type="number"
+              inputmode="decimal"
+              min="0.01"
+              max="1000000000"
+              step="0.01"
+              placeholder="7080.00"
+              required
+            />
+          </div>
+          <div class="field">
+            <label for="allocation-number"
+              >מספר הקצאה <small>(אם מופיע על החשבונית)</small></label
+            >
+            <input
+              id="allocation-number"
+              class="ltr"
+              name="allocation_number"
+              type="text"
+              inputmode="numeric"
+              autocomplete="off"
+              pattern="[0-9]{9}"
+              minlength="9"
+              maxlength="9"
+              placeholder="123456789"
+            />
+          </div>
+        </div>
+        <div class="actions">
+          <button class="button" type="submit">לבדוק את החשבונית חינם</button>
+          <p class="hint">
+            תשובות הקונה נחשבות הצהרה. הבדיקה החינמית לא מאשרת תשלום ולא פונה
+            לרשות המסים.
+          </p>
+        </div>
+      </form>
+
+      <p class="note">
+        הסף לחובת מספר הקצאה: ₪10,000 לפני מע"מ לחשבוניות מתחילת 2026, ₪5,000
+        מ־1 ביוני 2026. השוואה של "גדול ממש" על הסכום לפני מע"מ. מקור: רשות
+        המסים. הבדיקה המלאה, עם זיהוי הספק ברשם החברות, זמינה לשותפים במפתח API
+        בלי קריפטו: <a href="/partner/he">דף השותפים</a>.
+      </p>
+    </main>
+  </body>
+</html>

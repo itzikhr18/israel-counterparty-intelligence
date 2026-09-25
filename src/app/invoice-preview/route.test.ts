@@ -114,6 +114,66 @@ describe("free browser invoice preview", () => {
     expect(html).not.toContain("Connect through MCP");
   });
 
+  it("renders the result in Hebrew, right to left, without the crypto purchase flow when the form says lang=he", async () => {
+    availability.suspended = false;
+    const response = await POST(
+      request({
+        lang: "he",
+        supplier_company_number: "514744887",
+        invoice_number: "INV-2026-003",
+        invoice_date: "2026-09-04",
+        amount_before_vat: "6000",
+        vat_amount: "1080",
+        total_amount: "7080",
+        buyer_is_authorized_dealer: "true",
+        buyer_requested_allocation_number: "true",
+        allocation_number: "123456789",
+        expected_vat_rate: "18",
+      }),
+    );
+    const html = await response.text();
+    expect(response.status).toBe(200);
+    expect(html).toContain('<html lang="he" dir="rtl">');
+    expect(html).toContain("תוצאת בדיקה חינמית · לעכב");
+    expect(html).toContain("לעכב לבדיקה הבאה");
+    expect(html).toContain("חובת מספר הקצאה");
+    expect(html).toContain("בדיקות שבוצעו");
+    expect(html).toContain(
+      "המספרים עברו. לפני התשלום נשארה בדיקת הספק ברשם החברות.",
+    );
+    expect(html).toContain('href="/partner/he"');
+    expect(html).toContain('href="/invoice-check/he"');
+    expect(html).not.toContain("USDC");
+    expect(html).not.toContain('name="invoice_request"');
+
+    const blocked = await POST(
+      request({
+        lang: "he",
+        supplier_company_number: "514744887",
+        invoice_number: "INV-2026-004",
+        invoice_date: "2026-09-04",
+        amount_before_vat: "6000",
+        vat_amount: "1080",
+        total_amount: "7080",
+        buyer_is_authorized_dealer: "true",
+        buyer_requested_allocation_number: "true",
+        expected_vat_rate: "18",
+      }),
+    );
+    const blockedHtml = await blocked.text();
+    expect(blockedHtml).toContain("תוצאת בדיקה חינמית · לחסום");
+    expect(blockedHtml).toContain("לא לשלם עדיין");
+    expect(blockedHtml).toContain("לתקן את החשבונית קודם");
+
+    const invalid = await POST(
+      request({ lang: "he", supplier_company_number: "12" }),
+    );
+    const invalidHtml = await invalid.text();
+    expect(invalid.status).toBe(400);
+    expect(invalidHtml).toContain("לא הצלחנו לבדוק את החשבונית");
+    expect(invalidHtml).toContain("תשע ספרות");
+  });
+
   it("rejects malformed form input", async () => {
     const response = await POST(
       request({

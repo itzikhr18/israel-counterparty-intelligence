@@ -11,6 +11,7 @@ import { invoiceGateQuerySchema } from "@/lib/invoice-gate-schema";
 import { logInvoiceFunnel } from "@/lib/invoice-funnel-telemetry";
 import {
   renderInvoicePreviewPage,
+  type InvoicePageLanguage,
   type InvoicePreviewPageResult,
 } from "@/lib/invoice-page";
 import { previewInvoiceGate } from "@/lib/services/invoice-gate";
@@ -57,6 +58,7 @@ export async function POST(request: NextRequest) {
   }
   try {
     const form = await readBoundedFormData(request);
+    const lang: InvoicePageLanguage = form.get("lang") === "he" ? "he" : "en";
     const walletHandoff = form.get("action") === "wallet-handoff";
     if (walletHandoff && PAID_SERVICE_SUSPENDED) {
       return paidServiceUnavailableResponse();
@@ -91,7 +93,7 @@ export async function POST(request: NextRequest) {
               optionalText(form, "expected_vat_rate") ?? 18,
             ),
             currency: "ILS",
-            language: "en",
+            language: lang,
           },
     );
 
@@ -100,8 +102,11 @@ export async function POST(request: NextRequest) {
       return html(
         renderInvoicePreviewPage({
           providerName: config.PROVIDER_NAME,
+          lang,
           error:
-            "Check that all required fields are complete, amounts are valid, and company and allocation numbers contain exactly nine digits.",
+            lang === "he"
+              ? "יש לוודא שכל שדות החובה מלאים, שהסכומים תקינים, ושמספר החברה ומספר ההקצאה מכילים בדיוק תשע ספרות."
+              : "Check that all required fields are complete, amounts are valid, and company and allocation numbers contain exactly nine digits.",
         }),
         400,
       );
@@ -219,6 +224,7 @@ export async function POST(request: NextRequest) {
     return html(
       renderInvoicePreviewPage({
         providerName: config.PROVIDER_NAME,
+        lang,
         result,
         invoiceRequest: parsed.data,
       }),
