@@ -22,18 +22,19 @@ Agent-native **Israeli supplier invoice gate**: before paying an Israeli counter
 
 ## 2. Live pointers
 
-| What                                 | URL                                                                              |
-| ------------------------------------ | -------------------------------------------------------------------------------- |
-| Production host                      | https://israel-counterparty-intelligence.vercel.app/                             |
-| Health (source of truth for settles) | https://israel-counterparty-intelligence.vercel.app/health                       |
-| Settlement proof page                | https://israel-counterparty-intelligence.vercel.app/proof                        |
-| 60-second buyer path                 | https://israel-counterparty-intelligence.vercel.app/buy                          |
-| Partner one-pager                    | https://israel-counterparty-intelligence.vercel.app/partner                      |
-| Public STATUS                        | https://israel-counterparty-intelligence.vercel.app/STATUS.md                    |
-| MCP (streamable HTTP)                | https://israel-counterparty-intelligence.vercel.app/mcp                          |
-| MCP metadata                         | https://israel-counterparty-intelligence.vercel.app/mcp.json                     |
-| Glama connector (owned)              | https://glama.ai/mcp/connectors/io.github.itzikhr18/israel-business-intelligence |
-| Repo                                 | https://github.com/itzikhr18/israel-counterparty-intelligence                    |
+| What                                   | URL                                                                              |
+| -------------------------------------- | -------------------------------------------------------------------------------- |
+| Production host                        | https://israel-counterparty-intelligence.vercel.app/                             |
+| Health (source of truth for settles)   | https://israel-counterparty-intelligence.vercel.app/health                       |
+| Settlement proof page                  | https://israel-counterparty-intelligence.vercel.app/proof                        |
+| 60-second buyer path                   | https://israel-counterparty-intelligence.vercel.app/buy                          |
+| Partner one-pager                      | https://israel-counterparty-intelligence.vercel.app/partner                      |
+| Partner page in Hebrew (for OEM mails) | https://israel-counterparty-intelligence.vercel.app/partner/he                   |
+| Public STATUS                          | https://israel-counterparty-intelligence.vercel.app/STATUS.md                    |
+| MCP (streamable HTTP)                  | https://israel-counterparty-intelligence.vercel.app/mcp                          |
+| MCP metadata                           | https://israel-counterparty-intelligence.vercel.app/mcp.json                     |
+| Glama connector (owned)                | https://glama.ai/mcp/connectors/io.github.itzikhr18/israel-business-intelligence |
+| Repo                                   | https://github.com/itzikhr18/israel-counterparty-intelligence                    |
 
 Start-here docs in-repo:
 
@@ -109,7 +110,7 @@ Reprioritized 2026-09-24 after [ICP_RESEARCH.md](./ICP_RESEARCH.md): paying segm
 ### P0 — business-moving
 
 1. **Grow/Yaki call, Sunday 27.09** (10:30 or 12:00 proposed; wait for his confirmation). Goal: learn + referral, not a deal. Prep is in the calendar event and in ICP_RESEARCH §5. One concrete thing to test: Grow's business account pays suppliers by instant transfer with no payee check — would they show a company-status check before the transfer? Do not lead with x402/USDC/agents (Yaki already said FX is irrelevant).
-2. **Send the three OEM drafts** (Morning, iCount, SUMIT) from the Gmail **web UI** after pasting `https://israel-counterparty-intelligence.vercel.app/partner` over the placeholder. See [OUTREACH_CRM.md](./OUTREACH_CRM.md).
+2. **Send the three OEM drafts** (Morning, iCount, SUMIT) from the Gmail **web UI** after pasting `https://israel-counterparty-intelligence.vercel.app/partner/he` (the Hebrew partner page) over the placeholder. See [OUTREACH_CRM.md](./OUTREACH_CRM.md).
 3. **Answer human replies within hours** using [REPLY_TEMPLATES.md](./REPLY_TEMPLATES.md); do not re-cold anyone who is cooling.
 
 ### P1 — packaging / durability / discovery

@@ -1,0 +1,359 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>
+      בדיקת ספק לפני תשלום חשבונית — Israel Counterparty Intelligence
+    </title>
+    <meta
+      name="description"
+      content="שירות לשותפים ישראליים: בדיקת חברה מול רשם החברות וחוקי מספר ההקצאה ברגע שנכנסת חשבונית ספק, עם החלטה לשלם, לעכב או לחסום. גישה במפתח API, בלי קריפטו."
+    />
+    <link rel="icon" href="/icon.svg" type="image/svg+xml" />
+    <link
+      rel="canonical"
+      href="https://israel-counterparty-intelligence.vercel.app/partner/he"
+    />
+    <link
+      rel="alternate"
+      hreflang="en"
+      href="https://israel-counterparty-intelligence.vercel.app/partner"
+    />
+    <style>
+      :root {
+        --bg: #fafafa;
+        --surface: #ffffff;
+        --ink: #0a0a0a;
+        --muted: #525252;
+        --line: #e5e5e5;
+        --accent: #1d4ed8;
+        --code-bg: #f5f5f5;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        min-height: 100vh;
+        background: var(--bg);
+        color: var(--ink);
+        font:
+          16px/1.65 -apple-system,
+          BlinkMacSystemFont,
+          "Segoe UI",
+          system-ui,
+          Arial,
+          sans-serif;
+        -webkit-font-smoothing: antialiased;
+      }
+      main {
+        max-width: 40rem;
+        margin: 0 auto;
+        padding: 4rem 1rem 5rem;
+      }
+      .eyebrow {
+        margin: 0 0 0.75rem;
+        font-size: 0.8rem;
+        font-weight: 600;
+        color: var(--muted);
+      }
+      h1 {
+        margin: 0 0 0.5rem;
+        font-size: clamp(1.6rem, 3vw, 2rem);
+        font-weight: 700;
+        line-height: 1.25;
+      }
+      h2 {
+        margin: 0 0 0.65rem;
+        font-size: 1.1rem;
+        font-weight: 700;
+      }
+      .lede {
+        margin: 0 0 1.5rem;
+        color: var(--muted);
+        font-size: 1.02rem;
+        max-width: 36rem;
+      }
+      .actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.6rem;
+        margin: 0 0 2rem;
+      }
+      .button {
+        display: inline-block;
+        padding: 0.55rem 0.95rem;
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        background: var(--surface);
+        color: var(--ink);
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 0.95rem;
+      }
+      .button.primary {
+        background: var(--accent);
+        border-color: var(--accent);
+        color: #fff;
+      }
+      .card {
+        background: var(--surface);
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        padding: 1.35rem 1.4rem;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+        margin-bottom: 1rem;
+      }
+      .list {
+        margin: 0;
+        padding: 0;
+        list-style: none;
+      }
+      .list li {
+        padding: 0.6rem 0;
+        border-top: 1px solid var(--line);
+      }
+      .list li:first-child {
+        border-top: 0;
+        padding-top: 0;
+      }
+      .list li:last-child {
+        padding-bottom: 0;
+      }
+      .list strong {
+        display: block;
+        margin-bottom: 0.1rem;
+      }
+      .list p {
+        margin: 0;
+        color: var(--muted);
+        font-size: 0.93rem;
+      }
+      .mono {
+        font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+        font-size: 0.85rem;
+        direction: ltr;
+        unicode-bidi: isolate;
+        display: inline-block;
+      }
+      pre {
+        margin: 0.75rem 0 0;
+        padding: 0.85rem 1rem;
+        background: var(--code-bg);
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        overflow-x: auto;
+        direction: ltr;
+        text-align: left;
+        font-size: 0.82rem;
+        line-height: 1.5;
+      }
+      a {
+        color: var(--ink);
+        text-underline-offset: 3px;
+      }
+      a:hover {
+        opacity: 0.72;
+      }
+      .note {
+        margin: 1.35rem 0 0;
+        color: var(--muted);
+        font-size: 0.88rem;
+      }
+      footer {
+        margin-top: 2rem;
+        color: var(--muted);
+        font-size: 0.82rem;
+      }
+      footer a {
+        color: var(--muted);
+      }
+      @media (max-width: 560px) {
+        main {
+          padding-top: 2.5rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <p class="eyebrow">דף שותפים · עברית · <a href="/partner">English</a></p>
+      <h1>לבדוק את הספק לפני שהכסף יוצא</h1>
+      <p class="lede">
+        Israel Counterparty Intelligence בודק חברה ישראלית מול רשם החברות וחוקי
+        מספר ההקצאה ברגע שנכנסת חשבונית ספק, ומחזיר החלטה:
+        <strong>לשלם / לעכב / לחסום</strong>, עם נימוקים וראיות. עובד מתוך
+        תוכנה, אוטומציה או סוכן AI. לשותפים: מפתח API רגיל,
+        <strong>בלי קריפטו</strong>.
+      </p>
+      <div class="actions">
+        <a
+          class="button primary"
+          href="mailto:itzikhr18@gmail.com?subject=%D7%A4%D7%99%D7%99%D7%9C%D7%95%D7%98%20%D7%91%D7%93%D7%99%D7%A7%D7%AA%20%D7%A1%D7%A4%D7%A7"
+          >לתאם שיחה של 20 דקות</a
+        >
+        <a class="button" href="/#invoice-preview">לבדוק חשבונית חינם</a>
+        <a class="button" href="/#free-preview">לבדוק חברה חינם</a>
+      </div>
+
+      <section class="card" aria-labelledby="what-title">
+        <h2 id="what-title">מה זה עושה</h2>
+        <ul class="list">
+          <li>
+            <strong>מזהה את הספק ברשם החברות</strong>
+            <p>
+              לפי ח"פ או שם, ובודק סטטוס: פעילה, בהליכי מחיקה, בפירוק, הפרות
+              חוק, מועד ההתאגדות ודוח שנתי אחרון. כל שדה מגיע עם מקור.
+            </p>
+          </li>
+          <li>
+            <strong>בודק את החשבונית עצמה</strong>
+            <p>
+              חישוב מע"מ וסכום, וחובת מספר הקצאה לפי הסף שבתוקף בתאריך החשבונית:
+              ₪10,000 מתחילת 2026 ו־₪5,000 מ־1 ביוני 2026. חסר מידע מצד הקונה?
+              התשובה היא "לעכב", לא "לשלם".
+            </p>
+          </li>
+          <li>
+            <strong>מחזיר החלטה שאפשר לחבר לזרימת העבודה</strong>
+            <p>
+              לשלם / לעכב / לחסום, עם קודי סיבה. מתאים לדגל במסך קליטת ההוצאה,
+              לחסימת תשלום אוטומטי, או לבדיקה של סוכן AI לפני שהוא משלם.
+            </p>
+          </li>
+          <li>
+            <strong>כלים נלווים באותו מפתח</strong>
+            <p>
+              אימות חברה מלא עם ראיות, שינויים אחרונים בחברה (סטטוס, שם, כתובת),
+              וסיכון ספק לפני תשלום עם החלטת PROCEED / REVIEW / BLOCK.
+            </p>
+          </li>
+        </ul>
+      </section>
+
+      <section class="card" aria-labelledby="why-title">
+        <h2 id="why-title">למה זה רלוונטי עכשיו</h2>
+        <ul class="list">
+          <li>
+            <strong>מספר הקצאה הפך למיינסטרים</strong>
+            <p>
+              מ־1 ביוני 2026 כל חשבונית מעל ₪5,000 חייבת מספר הקצאה, ובלעדיו
+              הקונה לא מקזז מע"מ. על חשבונית של ₪5,000 זה ₪900 שעומדים על הכף.
+              הבדיקה מזהה מתי החובה חלה ומה חסר, לפני התשלום.
+            </p>
+          </li>
+          <li>
+            <strong>תשלומים יוצאים בלי בדיקת נמען</strong>
+            <p>
+              העברות מיידיות, תשלום מתוך מערכת הנהלת החשבונות, ובקרוב גם סוכני
+              AI שמשלמים ספקים. שער שבודק את החברה לפני התשלום הוא הבקרה שחסרה
+              בנקודה הזאת.
+            </p>
+          </li>
+          <li>
+            <strong>נסח חברה ידני לא מתאים לכל חשבונית</strong>
+            <p>
+              נסח רשמי עולה ₪12 ודורש אדם שיפתח ויקרא. כאן הבדיקה אוטומטית,
+              נמשכת שניות, ומחזירה תשובה מובנית לתוכנה.
+            </p>
+          </li>
+        </ul>
+      </section>
+
+      <section class="card" aria-labelledby="how-title">
+        <h2 id="how-title">איך שותף מתחבר, בלי קריפטו</h2>
+        <ul class="list">
+          <li>
+            <strong>מפתח API אחד לכל ארבעת הכלים</strong>
+            <p>
+              מפתח Bearer שאנחנו מנפיקים, ב־REST או ב־MCP. אותם חוזי קלט ופלט
+              כמו בממשק הציבורי, ותיעוד מלא ב־<a href="/openapi.json"
+                ><span class="mono">/openapi.json</span></a
+              >. פיילוט טכני נמשך אחר צהריים אחד של מפתח.
+            </p>
+            <pre>
+POST /v1/pilot/invoice-gate
+Authorization: Bearer &lt;key&gt;
+Content-Type: application/json</pre>
+          </li>
+          <li>
+            <strong>פיילוט חינם, בלי התחייבות</strong>
+            <p>
+              60 יום עד 500 בדיקות, מפתח נפרד לכל שותף, שימוש נמדד לכל קריאה.
+              אפשר להפסיק בכל רגע.
+            </p>
+          </li>
+          <li>
+            <strong>ואחרי הפיילוט</strong>
+            <p>
+              מסלול חודשי בשקלים עם חשבונית, לפי שימוש או במנוי. המחירון נסגר
+              בשיחה. הממשק הציבורי לסוכני AI ממשיך לעבוד בתשלום לקריאה במקביל,
+              בלי קשר לשותפים.
+            </p>
+          </li>
+        </ul>
+      </section>
+
+      <section class="card" aria-labelledby="not-title">
+        <h2 id="not-title">מה זה לא, בשקיפות</h2>
+        <ul class="list">
+          <li>
+            <strong>לא מאמת מול רשות המסים</strong>
+            <p>
+              בדיקת מספר ההקצאה מבוססת על הכללים הפומביים ועל מה שהקונה מדווח,
+              ותוצאה כזאת מסומנת ככזאת. גישה רשמית לרשות המסים דורשת הרשאה של
+              הקונה.
+            </p>
+          </li>
+          <li>
+            <strong>לא בודק בעלות על חשבון בנק</strong>
+            <p>
+              וגם לא סנקציות, PEP או בעלי שליטה, ולא נותן ייעוץ משפטי או דירוג
+              אשראי. הראיות הן ממקורות פומביים של רשם החברות.
+            </p>
+          </li>
+          <li>
+            <strong>אין עדיין לקוחות מוצגים</strong>
+            <p>
+              השירות חי בפרודקשן, והתשלום החיצוני הראשון מתועד בדף
+              <a href="/proof"><span class="mono">/proof</span></a
+              >. אנחנו מחפשים את השותפים הראשונים, ואומרים זאת במפורש.
+            </p>
+          </li>
+        </ul>
+      </section>
+
+      <section class="card" aria-labelledby="next-title">
+        <h2 id="next-title">הצעד הבא</h2>
+        <p style="margin: 0 0 0.75rem">
+          שיחה של 20 דקות עם מי שמטפל אצלכם במוצר, בשותפויות או באינטגרציות. אם
+          זה מתאים, מפתח פיילוט יוצא באותו יום.
+        </p>
+        <p style="margin: 0">
+          יצחק הרוש ·
+          <a href="mailto:itzikhr18@gmail.com">itzikhr18@gmail.com</a>
+        </p>
+      </section>
+
+      <p class="note">
+        גרסה טכנית באנגלית עם סטטוס חי, הוכחת תשלום וכתובות API:
+        <a href="/partner"><span class="mono">/partner</span></a
+        >. קוד פתוח:
+        <a
+          href="https://github.com/itzikhr18/israel-counterparty-intelligence"
+          rel="noopener noreferrer"
+          target="_blank"
+          ><span class="mono"
+            >github.com/itzikhr18/israel-counterparty-intelligence</span
+          ></a
+        >.
+      </p>
+
+      <footer>
+        Israel Counterparty Intelligence · ראיות ממקורות פומביים, לא אימות רשמי
+        מול רשות המסים · <a href="/">דף הבית</a>
+      </footer>
+    </main>
+  </body>
+</html>
