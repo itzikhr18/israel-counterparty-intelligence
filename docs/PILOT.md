@@ -75,6 +75,7 @@ MCP: the same key as `Authorization: Bearer …` on `POST /mcp/pilot`; `tools/li
 ## 4. What to send the partner
 
 - Base URL, their raw key (once), the expiry, and the call allowance.
+- The engineer's guide: `https://israel-counterparty-intelligence.vercel.app/partner-integration.md` (curl, Node, Python, decision wiring, errors, go-live checklist).
 - REST: `/openapi.json` → the `/v1/pilot/*` operations. Invoice gate sample body: see `/v1/invoice-gate/preview` docs in the README.
 - MCP client config (Claude Desktop, Cursor, any Streamable HTTP client):
 
