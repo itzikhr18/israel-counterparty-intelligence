@@ -125,6 +125,7 @@ REST (send the key as "Authorization: Bearer {RAW_KEY}"):
 • POST https://israel-counterparty-intelligence.vercel.app/v1/pilot/payment-risk   → PROCEED / REVIEW / BLOCK vendor triage
 • POST https://israel-counterparty-intelligence.vercel.app/v1/pilot/company-changes → recent registry changes
 Integration guide for your engineer (curl, Node, Python, how to wire PAY/HOLD/BLOCK): https://israel-counterparty-intelligence.vercel.app/partner-integration.md
+Pilot terms on one page (what is kept, boundaries, how it ends): https://israel-counterparty-intelligence.vercel.app/pilot-terms.md
 Request/response schemas: https://israel-counterparty-intelligence.vercel.app/openapi.json (operations under /v1/pilot/*)
 
 MCP (Claude, Cursor, any Streamable HTTP client): POST https://israel-counterparty-intelligence.vercel.app/mcp/pilot with the same Authorization header. tools/list shows the four tools.
@@ -143,5 +144,6 @@ I can walk your engineer through it in 20 minutes whenever suits.
 מפתח (סודי): {RAW_KEY} · בתוקף עד {EXPIRES_AT} · מכסה: {CALL_LIMIT} קריאות · חיוב לפי שימוש, חשבונית חודשית בש"ח.
 REST: שולחים "Authorization: Bearer <מפתח>" ל־/v1/pilot/invoice-gate (שער חשבונית PAY/HOLD/BLOCK), /v1/pilot/verify, /v1/pilot/payment-risk, /v1/pilot/company-changes. סכמות ב־/openapi.json.
 MCP: אותו header על /mcp/pilot.
+תנאי הפיילוט בעמוד אחד (מה נשמר, גבולות, סיום): israel-counterparty-intelligence.vercel.app/pilot-terms.md
 גבולות: ראיות מרשם החברות בלבד, לא אימות מול רשות המסים, לא בעלות על חשבון בנק. אשמח ל־20 דקות עם המפתח/ת שלכם.
 ```
