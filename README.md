@@ -256,9 +256,11 @@ Contracts match the paid Mainnet routes; pilot responses add a `pilot` block and
 headers. Keys live in the `PILOT_KEYS` environment variable as a JSON array, one entry per partner
 with its own SHA-256 digest, expiry, and call allowance; the raw key never enters the repository.
 Each successful call emits a `pilot_call` event with the partner identifier and tool and no raw
-token or raw IP address. The in-process counter is a safety cap, not a globally durable billing
-ledger: the authoritative total is the centralized count of successful `pilot_call` events, so
-connect a log drain before the first billable month. See [the pilot runbook](docs/PILOT.md) for
+token or raw IP address. With `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN` set, usage is
+also counted durably per partner (pilot-period and calendar-month hashes) and enforced against the
+allowance; `GET /v1/pilot/usage` returns it to the partner, or to the operator for every partner.
+Without Upstash the in-process counter is only a safety cap and the authoritative total is the
+centralized count of successful `pilot_call` events. See [the pilot runbook](docs/PILOT.md) for
 key issuance, activation, verification, metering, and revocation.
 
 ## Smoke tests

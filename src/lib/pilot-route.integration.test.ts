@@ -12,6 +12,7 @@ const icountKey = "test-only-icount-key";
 const expiredKey = "test-only-expired-key";
 
 let mcpPost: RouteHandler;
+let usageGet: RouteHandler;
 let verifyPost: RouteHandler;
 let invoiceGatePost: RouteHandler;
 let paymentRiskPost: RouteHandler;
@@ -79,7 +80,9 @@ describe("invitation-only partner pilot", () => {
         },
       ]),
     );
+    vi.stubEnv("INTERNAL_TEST_TOKEN", "operator-token-for-tests");
     ({ POST: mcpPost } = await import("@/app/mcp/pilot/route"));
+    ({ GET: usageGet } = await import("@/app/v1/pilot/usage/route"));
     ({ POST: verifyPost } = await import("@/app/v1/pilot/verify/route"));
     ({ POST: invoiceGatePost } =
       await import("@/app/v1/pilot/invoice-gate/route"));
@@ -176,6 +179,49 @@ describe("invitation-only partner pilot", () => {
       );
       expect(response.status, path).toBe(401);
     }
+  });
+
+  it("reports usage to the partner and lists every partner for the operator", async () => {
+    const unauthorized = await usageGet(
+      new NextRequest("http://localhost:3000/v1/pilot/usage"),
+    );
+    expect(unauthorized.status).toBe(401);
+
+    const partnerView = await usageGet(
+      new NextRequest("http://localhost:3000/v1/pilot/usage", {
+        headers: { authorization: `Bearer ${morningKey}` },
+      }),
+    );
+    const partnerBody = await partnerView.json();
+    expect(partnerView.status).toBe(200);
+    expect(partnerView.headers.get("x-pilot-partner")).toBe("morning");
+    expect(partnerBody).toMatchObject({
+      partner_id: "morning",
+      call_limit: 250,
+      usage: { durable: false, period_total: 0 },
+    });
+    expect(partnerBody.usage.note).toContain("UPSTASH_REDIS_REST_URL");
+
+    const operatorView = await usageGet(
+      new NextRequest("http://localhost:3000/v1/pilot/usage", {
+        headers: { "x-internal-test-token": "operator-token-for-tests" },
+      }),
+    );
+    const operatorBody = await operatorView.json();
+    expect(operatorView.status).toBe(200);
+    expect(operatorBody.operator_view).toBe(true);
+    expect(
+      operatorBody.partners.map(
+        (entry: { partner_id: string }) => entry.partner_id,
+      ),
+    ).toEqual(["morning", "icount", "expired-partner"]);
+
+    const wrongOperator = await usageGet(
+      new NextRequest("http://localhost:3000/v1/pilot/usage", {
+        headers: { "x-internal-test-token": "wrong" },
+      }),
+    );
+    expect(wrongOperator.status).toBe(401);
   });
 
   it("validates input for an authorized partner without a live lookup", async () => {

@@ -183,7 +183,7 @@ function envConfiguredFirstPaidCall(): FirstExternalPaidCallRecord | null {
   };
 }
 
-function upstashConfigured(): { url: string; token: string } | null {
+export function upstashConfigured(): { url: string; token: string } | null {
   const url = process.env.UPSTASH_REDIS_REST_URL?.trim();
   const token = process.env.UPSTASH_REDIS_REST_TOKEN?.trim();
   if (!url || !token) return null;

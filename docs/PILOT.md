@@ -13,7 +13,7 @@
 | Vendor payment risk               | `/v1/pilot/payment-risk`    | `assess_israeli_vendor_payment_risk_paid`              |
 | Company changes                   | `/v1/pilot/company-changes` | `get_israeli_company_changes_paid`                     |
 
-Request and response contracts are identical to the paid Mainnet routes, so a partner that later moves to x402 changes only the URL. Pilot responses add a `pilot` block (`partner_id`, `expires_at`, `call_limit`, `tools`) and the headers `x-pilot-partner`, `x-pilot-expires-at`, `x-pilot-call-limit`. The free tools (`describe_service`, `get_schema`, `get_sample_verification_report`) are also available on `/mcp/pilot`. `/openapi.json` documents the four REST routes under the `pilotBearer` security scheme.
+Request and response contracts are identical to the paid Mainnet routes, so a partner that later moves to x402 changes only the URL. `GET /v1/pilot/usage` with the same key returns the partner's allowance and metered usage. Pilot responses add a `pilot` block (`partner_id`, `expires_at`, `call_limit`, `tools`) and the headers `x-pilot-partner`, `x-pilot-expires-at`, `x-pilot-call-limit`. The free tools (`describe_service`, `get_schema`, `get_sample_verification_report`) are also available on `/mcp/pilot`. `/openapi.json` documents the four REST routes under the `pilotBearer` security scheme.
 
 ## 1. Issue a key (two minutes)
 
@@ -94,7 +94,20 @@ MCP: the same key as `Authorization: Bearer …` on `POST /mcp/pilot`; `tools/li
 
 ## 5. Meter and invoice
 
-Every call logs one JSON line:
+**Durable count (recommended, 5 minutes, free):** create a free Redis database at Upstash (console → Create Database → Global, free tier), copy its **REST URL** and **REST token**, and set them in Vercel as `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN` (Production), then redeploy. From that moment every pilot call reserves two counters atomically before it runs, and releases them if it fails or exceeds the allowance:
+
+| Key                                      | Fields                           | Used for                               |
+| ---------------------------------------- | -------------------------------- | -------------------------------------- |
+| `ici:pilot:usage:<partner_id>`           | `total`, plus one field per tool | the partner's `call_limit` enforcement |
+| `ici:pilot:usage:<partner_id>:<YYYY-MM>` | `total`, plus one field per tool | the calendar-month invoice (UTC month) |
+
+The same variables also make the first-settle record on `/health` durable, so one setup serves both.
+
+**Reading the numbers:**
+
+- The partner, with its key: `GET /v1/pilot/usage` → allowance, expiry, period total, month total, by tool, and `durable: true`.
+- The operator, for all partners at month end: `GET /v1/pilot/usage` with the header `x-internal-test-token: <INTERNAL_TEST_TOKEN>` → `partners[]` with the same shape. Copy `month_by_tool` per partner into the invoice against the agreed price card.
+- Every call also logs one JSON line, which remains the audit trail:
 
 ```json
 {
@@ -104,13 +117,18 @@ Every call logs one JSON line:
   "status": "success",
   "local_sequence": 12,
   "call_limit": 500,
+  "durable": true,
+  "period_total": 12,
+  "month": "2026-10",
   "duration_ms": 840
 }
 ```
 
-`status: "failed"` calls do not count and do not consume the allowance. The in-process counter is a safety cap per serverless instance; the **authoritative monthly total is the number of `pilot_call` success events per `partner_id` in centralized logs**. Vercel retains runtime logs only briefly, so before the first billable month connect a Log Drain (Project → Settings → Log Drains) to a store you control, or export the count at least weekly. At month end: count `status=success` by `partner_id` and `tool`, apply the agreed price card, issue the invoice.
+`status: "failed"` and `status: "rejected"` calls never count. Each pilot response carries the same figures under `pilot.usage`.
 
-Price card for the invoice is the owner's decision. Starting points for the conversation are in [OEM_PARTNER_ONEPAGER.md](./OEM_PARTNER_ONEPAGER.md); the public USDC prices ($0.01 / $0.05 / $0.10 / $0.25) are the floor.
+**Without Upstash:** the in-process counter is a safety cap for one serverless instance only, `pilot.usage.durable` is `false`, and the authoritative total is the number of `pilot_call` success events per `partner_id` in centralized logs. Vercel keeps runtime logs briefly, so in that mode export the count at least weekly or connect a Log Drain. Set Upstash before the first billable month; it is the difference between an invoice you can defend and one you cannot.
+
+Price card for the invoice is the owner's decision. The sourced proposal is [PRICING_PROPOSAL.md](./PRICING_PROPOSAL.md); the public USDC prices ($0.01 / $0.05 / $0.10 / $0.25) are the floor.
 
 ## 6. Rotate, extend, revoke
 
