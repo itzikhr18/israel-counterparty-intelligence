@@ -115,6 +115,7 @@ Reprioritized 2026-09-24 after [ICP_RESEARCH.md](./ICP_RESEARCH.md): paying segm
 1. **Grow/Yaki call, Sunday 27.09** (10:30 or 12:00 proposed; wait for his confirmation). Goal: learn + referral, not a deal. Prep is in the calendar event and in ICP_RESEARCH §5. One concrete thing to test: Grow's business account pays suppliers by instant transfer with no payee check — would they show a company-status check before the transfer? Do not lead with x402/USDC/agents (Yaki already said FX is irrelevant).
 2. **Send the three OEM drafts** (Morning, iCount, SUMIT) from the Gmail **web UI** after pasting `https://israel-counterparty-intelligence.vercel.app/partner/he` (the Hebrew partner page) over the placeholder. See [OUTREACH_CRM.md](./OUTREACH_CRM.md).
 3. **Answer human replies within hours** using [REPLY_TEMPLATES.md](./REPLY_TEMPLATES.md); do not re-cold anyone who is cooling.
+4. **LinkedIn, after the holidays:** three Hebrew posts are ready to paste in [LINKEDIN_POSTS.md](./LINKEDIN_POSTS.md) (the ₪1,080 on a ₪6,000 invoice, how a non-developer shipped this, three checks before money leaves). Post 1 on Sunday 4.10 at 07:30, links in the first comment, no prices. The only distribution channel that needs no cold email and no partner.
 
 ### P1 — packaging / durability / discovery
 
