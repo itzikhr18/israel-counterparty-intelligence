@@ -22,19 +22,21 @@ Agent-native **Israeli supplier invoice gate**: before paying an Israeli counter
 
 ## 2. Live pointers
 
-| What                                   | URL                                                                              |
-| -------------------------------------- | -------------------------------------------------------------------------------- |
-| Production host                        | https://israel-counterparty-intelligence.vercel.app/                             |
-| Health (source of truth for settles)   | https://israel-counterparty-intelligence.vercel.app/health                       |
-| Settlement proof page                  | https://israel-counterparty-intelligence.vercel.app/proof                        |
-| 60-second buyer path                   | https://israel-counterparty-intelligence.vercel.app/buy                          |
-| Partner one-pager                      | https://israel-counterparty-intelligence.vercel.app/partner                      |
-| Partner page in Hebrew (for OEM mails) | https://israel-counterparty-intelligence.vercel.app/partner/he                   |
-| Public STATUS                          | https://israel-counterparty-intelligence.vercel.app/STATUS.md                    |
-| MCP (streamable HTTP)                  | https://israel-counterparty-intelligence.vercel.app/mcp                          |
-| MCP metadata                           | https://israel-counterparty-intelligence.vercel.app/mcp.json                     |
-| Glama connector (owned)                | https://glama.ai/mcp/connectors/io.github.itzikhr18/israel-business-intelligence |
-| Repo                                   | https://github.com/itzikhr18/israel-counterparty-intelligence                    |
+| What                                                                      | URL                                                                              |
+| ------------------------------------------------------------------------- | -------------------------------------------------------------------------------- |
+| Production host                                                           | https://israel-counterparty-intelligence.vercel.app/                             |
+| Health (source of truth for settles)                                      | https://israel-counterparty-intelligence.vercel.app/health                       |
+| Settlement proof page                                                     | https://israel-counterparty-intelligence.vercel.app/proof                        |
+| 60-second buyer path                                                      | https://israel-counterparty-intelligence.vercel.app/buy                          |
+| Partner one-pager                                                         | https://israel-counterparty-intelligence.vercel.app/partner                      |
+| Partner page in Hebrew (for OEM mails)                                    | https://israel-counterparty-intelligence.vercel.app/partner/he                   |
+| Free invoice check in Hebrew (the demo for calls; two one-click examples) | https://israel-counterparty-intelligence.vercel.app/invoice-check/he             |
+| Partner integration guide (for the partner's engineer)                    | https://israel-counterparty-intelligence.vercel.app/partner-integration.md       |
+| Public STATUS                                                             | https://israel-counterparty-intelligence.vercel.app/STATUS.md                    |
+| MCP (streamable HTTP)                                                     | https://israel-counterparty-intelligence.vercel.app/mcp                          |
+| MCP metadata                                                              | https://israel-counterparty-intelligence.vercel.app/mcp.json                     |
+| Glama connector (owned)                                                   | https://glama.ai/mcp/connectors/io.github.itzikhr18/israel-business-intelligence |
+| Repo                                                                      | https://github.com/itzikhr18/israel-counterparty-intelligence                    |
 
 Start-here docs in-repo:
 

@@ -134,6 +134,28 @@
         color: var(--muted);
         font-size: 0.88rem;
       }
+      .examples {
+        margin-top: 2rem;
+        padding-top: 1.25rem;
+        border-top: 1px solid var(--line);
+      }
+      .examples h2 {
+        margin: 0 0 0.35rem;
+        font-size: 1.1rem;
+      }
+      .examples form {
+        display: block;
+        margin: 0;
+        padding: 0;
+        border: 0;
+        border-radius: 0;
+        background: none;
+        box-shadow: none;
+      }
+      .button.secondary {
+        background: var(--surface);
+        color: var(--accent);
+      }
       a {
         color: var(--ink);
         text-underline-offset: 3px;
@@ -321,6 +343,76 @@
           </p>
         </div>
       </form>
+
+      <section class="examples" aria-labelledby="examples-title">
+        <h2 id="examples-title">אין חשבונית ביד? לראות תוצאה לדוגמה</h2>
+        <p class="hint">
+          לחיצה אחת שולחת חשבונית לדוגמה לאותה בדיקה בדיוק. הסכומים והתאריך
+          מומצאים; מספר החברה הוא דוגמה ציבורית. דוגמה 1 אמורה לצאת "לעכב":
+          החישוב תקין, וזיהוי הספק ברשם החברות הוא השלב הבא, בגישת שותפים. דוגמה
+          2 אמורה לצאת "לחסום": ₪6,000 לפני מע"מ אחרי 1 ביוני 2026, הקונה ביקש
+          מספר הקצאה, ואין כזה על החשבונית.
+        </p>
+        <div class="actions">
+          <form action="/invoice-preview" method="post">
+            <input type="hidden" name="lang" value="he" />
+            <input type="hidden" name="sample" value="1" />
+            <input
+              type="hidden"
+              name="supplier_company_number"
+              value="514744887"
+            />
+            <input type="hidden" name="invoice_number" value="INV-2026-001" />
+            <input type="hidden" name="invoice_date" value="2026-09-04" />
+            <input type="hidden" name="expected_vat_rate" value="18" />
+            <input
+              type="hidden"
+              name="buyer_is_authorized_dealer"
+              value="true"
+            />
+            <input
+              type="hidden"
+              name="buyer_requested_allocation_number"
+              value="true"
+            />
+            <input type="hidden" name="amount_before_vat" value="6000.00" />
+            <input type="hidden" name="vat_amount" value="1080.00" />
+            <input type="hidden" name="total_amount" value="7080.00" />
+            <input type="hidden" name="allocation_number" value="123456789" />
+            <button class="button secondary" type="submit">
+              דוגמה 1: חשבונית תקינה עם מספר הקצאה
+            </button>
+          </form>
+          <form action="/invoice-preview" method="post">
+            <input type="hidden" name="lang" value="he" />
+            <input type="hidden" name="sample" value="1" />
+            <input
+              type="hidden"
+              name="supplier_company_number"
+              value="514744887"
+            />
+            <input type="hidden" name="invoice_number" value="INV-2026-001" />
+            <input type="hidden" name="invoice_date" value="2026-09-04" />
+            <input type="hidden" name="expected_vat_rate" value="18" />
+            <input
+              type="hidden"
+              name="buyer_is_authorized_dealer"
+              value="true"
+            />
+            <input
+              type="hidden"
+              name="buyer_requested_allocation_number"
+              value="true"
+            />
+            <input type="hidden" name="amount_before_vat" value="6000.00" />
+            <input type="hidden" name="vat_amount" value="1080.00" />
+            <input type="hidden" name="total_amount" value="7080.00" />
+            <button class="button secondary" type="submit">
+              דוגמה 2: ₪6,000 בלי מספר הקצאה
+            </button>
+          </form>
+        </div>
+      </section>
 
       <p class="note">
         הסף לחובת מספר הקצאה: ₪10,000 לפני מע"מ לחשבוניות מתחילת 2026, ₪5,000

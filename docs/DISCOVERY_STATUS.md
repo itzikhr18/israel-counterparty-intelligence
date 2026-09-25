@@ -4,12 +4,13 @@ Canonical ops snapshot: [PROJECT_STATUS.md](./PROJECT_STATUS.md)
 
 ## Live surfaces (verified)
 
-| Path                                     | Status                  |
-| ---------------------------------------- | ----------------------- |
-| `/` `/buy` `/proof` `/partner` `/health` | 200                     |
-| `/mcp` `/mcp.json` `/.well-known/x402`   | 200                     |
-| `/.well-known/glama.json`                | 200 (Glama claim token) |
-| `/STATUS.md` `/llms.txt` `/agents.md`    | 200                     |
+| Path                                                        | Status                                                                                                              |
+| ----------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------- |
+| `/` `/buy` `/proof` `/partner` `/health`                    | 200                                                                                                                 |
+| `/mcp` `/mcp.json` `/.well-known/x402`                      | 200                                                                                                                 |
+| `/.well-known/glama.json`                                   | 200 (Glama claim token)                                                                                             |
+| `/STATUS.md` `/llms.txt` `/agents.md`                       | 200                                                                                                                 |
+| `/partner/he` `/invoice-check/he` `/partner-integration.md` | deployed 25.09 (PRs #23, #26, #28); not re-fetched from the agent environment, where the production host is blocked |
 
 `/health`: `first_external_paid_call` durable; `second_external_paid_call` **null**.
 

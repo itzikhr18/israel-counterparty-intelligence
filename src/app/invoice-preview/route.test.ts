@@ -174,6 +174,44 @@ describe("free browser invoice preview", () => {
     expect(invalidHtml).toContain("תשע ספרות");
   });
 
+  it("flags one-click sample submissions so demo clicks are not counted as real invoices", async () => {
+    const log = vi.spyOn(console, "info").mockImplementation(() => {});
+    const response = await POST(
+      request({
+        lang: "he",
+        sample: "1",
+        supplier_company_number: "514744887",
+        invoice_number: "INV-2026-001",
+        invoice_date: "2026-09-04",
+        amount_before_vat: "6000.00",
+        vat_amount: "1080.00",
+        total_amount: "7080.00",
+        buyer_is_authorized_dealer: "true",
+        buyer_requested_allocation_number: "true",
+        expected_vat_rate: "18",
+      }),
+    );
+    expect(response.status).toBe(200);
+    await expect(response.text()).resolves.toContain(
+      "תוצאת בדיקה חינמית · לחסום",
+    );
+    const events = log.mock.calls.flatMap(([line]) => {
+      try {
+        return [JSON.parse(String(line))];
+      } catch {
+        return [];
+      }
+    });
+    expect(events).toContainEqual(
+      expect.objectContaining({
+        event: "invoice_preview_delivered",
+        decision: "BLOCK",
+        sample: true,
+        language: "he",
+      }),
+    );
+  });
+
   it("rejects malformed form input", async () => {
     const response = await POST(
       request({

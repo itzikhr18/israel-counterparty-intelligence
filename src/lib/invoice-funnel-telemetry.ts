@@ -15,6 +15,8 @@ export function logInvoiceFunnel(
     action: "PAY" | "HOLD" | "BLOCK";
     allocationApplicability: "REQUIRED" | "NOT_REQUIRED" | "UNKNOWN";
   },
+  /** `sample`: a one-click example from a demo page, not a real invoice. */
+  flags?: { sample?: boolean; language?: "en" | "he" },
 ) {
   console.info(
     JSON.stringify({
@@ -28,7 +30,9 @@ export function logInvoiceFunnel(
       transport: "browser_form",
       decision: outcome?.action ?? null,
       allocation_applicability: outcome?.allocationApplicability ?? null,
-      telemetry_version: "1.5",
+      sample: flags?.sample === true,
+      language: flags?.language ?? "en",
+      telemetry_version: "1.6",
     }),
   );
 }
