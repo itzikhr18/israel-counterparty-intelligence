@@ -97,18 +97,25 @@ describe("durable pilot usage on Upstash", () => {
     vi.stubEnv("UPSTASH_REDIS_REST_TOKEN", "");
     const fetchMock = vi.fn();
     vi.stubGlobal("fetch", fetchMock);
-    const { readPilotUsage, reservePilotUsage } =
+    const { readPilotUsage, reservePilotUsage, usageMonth } =
       await import("@/lib/pilot-usage");
     expect(await reservePilotUsage(partner, "verify")).toEqual({
       durable: false,
     });
-    const usage = await readPilotUsage(partner, 3, "2026-09");
+    const usage = await readPilotUsage(partner, 3, usageMonth());
     expect(usage).toMatchObject({
       durable: false,
       period_total: 3,
       month_total: 3,
     });
     expect(usage.note).toContain("UPSTASH_REDIS_REST_URL");
+    const pastMonth = await readPilotUsage(partner, 3, "2020-01");
+    expect(pastMonth).toMatchObject({
+      durable: false,
+      period_total: 3,
+      month: "2020-01",
+      month_total: 0,
+    });
     expect(fetchMock).not.toHaveBeenCalled();
   });
 

@@ -107,7 +107,17 @@ The same variables also make the first-settle record on `/health` durable, so on
 **Reading the numbers:**
 
 - The partner, with its key: `GET /v1/pilot/usage` → allowance, expiry, period total, month total, by tool, and `durable: true`.
-- The operator, for all partners at month end: `GET /v1/pilot/usage` with the header `x-internal-test-token: <INTERNAL_TEST_TOKEN>` → `partners[]` with the same shape. Copy `month_by_tool` per partner into the invoice against the agreed price card.
+- The operator, for all partners at month end: `GET /v1/pilot/usage?month=YYYY-MM` with the header `x-internal-test-token: <INTERNAL_TEST_TOKEN>` → `partners[]` with the same shape for that calendar month.
+- **Month-end in one command** (from the linked clone, with `INTERNAL_TEST_TOKEN` in the shell):
+
+```bash
+npm run pilot:invoice -- --month 2026-10 --plan morning=starter,icount=payg
+# add --format csv for a spreadsheet, --price invoice_gate=1.5,verify=0.6 to override the card,
+# or --usage saved.json to work from a saved response instead of the live endpoint
+```
+
+It prints one block per partner: lines by tool (included plan calls allocated to the most expensive tools first), subtotal, 18 % VAT, total, and the expected net after the 5 % collection commission. It refuses to be quiet about a non-durable count. Paste the lines into the Atzmai invoice.
+
 - Every call also logs one JSON line, which remains the audit trail:
 
 ```json

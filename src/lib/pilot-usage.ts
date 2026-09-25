@@ -172,7 +172,7 @@ export async function readPilotUsage(
       period_total: localCount,
       by_tool: {},
       month,
-      month_total: localCount,
+      month_total: month === usageMonth() ? localCount : 0,
       month_by_tool: {},
       note: "In-process count for this instance only. Configure UPSTASH_REDIS_REST_URL and UPSTASH_REDIS_REST_TOKEN for a durable, invoice-grade count.",
     };

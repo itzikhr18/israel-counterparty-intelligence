@@ -216,6 +216,23 @@ describe("invitation-only partner pilot", () => {
       ),
     ).toEqual(["morning", "icount", "expired-partner"]);
 
+    const pastMonth = await usageGet(
+      new NextRequest("http://localhost:3000/v1/pilot/usage?month=2026-08", {
+        headers: { "x-internal-test-token": "operator-token-for-tests" },
+      }),
+    );
+    const pastMonthBody = await pastMonth.json();
+    expect(pastMonth.status).toBe(200);
+    expect(pastMonthBody.month).toBe("2026-08");
+    expect(pastMonthBody.partners[0].usage.month).toBe("2026-08");
+
+    const badMonth = await usageGet(
+      new NextRequest("http://localhost:3000/v1/pilot/usage?month=8-2026", {
+        headers: { authorization: `Bearer ${morningKey}` },
+      }),
+    );
+    expect(badMonth.status).toBe(400);
+
     const wrongOperator = await usageGet(
       new NextRequest("http://localhost:3000/v1/pilot/usage", {
         headers: { "x-internal-test-token": "wrong" },

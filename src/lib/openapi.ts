@@ -329,6 +329,16 @@ export const openApiDocument = {
           "Invitation-only partner pilot. With a partner bearer key: that partner's allowance, expiry, and metered usage (pilot-period and calendar-month totals, by tool). Counts are durable and invoice-grade when the operator has configured Upstash; otherwise the response says `durable: false` and reports the in-process count for one instance only.",
         operationId: "pilot_read_usage",
         security: [{ pilotBearer: [] }],
+        parameters: [
+          {
+            name: "month",
+            in: "query",
+            required: false,
+            description:
+              "Calendar month to report as YYYY-MM (UTC). Defaults to the current month.",
+            schema: { type: "string", pattern: "^\\d{4}-(0[1-9]|1[0-2])$" },
+          },
+        ],
         responses: {
           "200": {
             description: "Allowance and usage for the authenticated partner",
