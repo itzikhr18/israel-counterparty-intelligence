@@ -158,7 +158,7 @@ export function renderLandingPage(options: LandingPageOptions): string {
 
     <section aria-labelledby="why-number-one">
       <h2 id="why-number-one">One Israel-specific toolchain, from identity to payment</h2>
-      <p class="section-copy">${PAID_SERVICE_SUSPENDED ? "Start with a free invoice or registry preview. Full reports are currently suspended; listed prices are reference information only." : `Start with a free invoice or registry preview. Run the full invoice payment gate for ${invoiceGatePrice} USDC, recent company changes for ${companyChangesPrice}, full verification for ${mcpPrice}, or vendor-risk triage for ${paymentRiskPrice}. No subscription and no API key.`}</p>
+      <p class="section-copy">${PAID_SERVICE_SUSPENDED ? "Start with a free invoice or registry preview. Full reports are currently suspended; listed prices are reference information only." : `Start with a free invoice or registry preview. Run the full invoice payment gate for ${invoiceGatePrice} USDC, recent company changes for ${companyChangesPrice}, full verification for ${mcpPrice}, or vendor-risk triage for ${paymentRiskPrice}. No subscription and no API key.`} Teams that need an API key and a monthly invoice in ₪ or $ instead of a wallet: <a href="/partner" style="color: var(--accent)">partner access</a>.</p>
     </section>
 
     <section id="first-paid-call" aria-labelledby="first-paid-call-title">

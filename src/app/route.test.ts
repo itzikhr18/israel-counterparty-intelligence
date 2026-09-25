@@ -84,6 +84,7 @@ describe("service root", () => {
     expect(html).toContain("Pay in 60 seconds");
     expect(html).toContain('href="/partner"');
     expect(html).toContain(">Partner<");
+    expect(html).toContain("partner access</a>");
     expect(html).toContain('action="/invoice-preview"');
     expect(html).toContain('name="supplier_company_number"');
     expect(html).toContain('name="allocation_number"');

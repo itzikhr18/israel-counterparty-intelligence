@@ -44,6 +44,7 @@ Start-here docs in-repo:
 5. [docs/SYSTEM_MAP.md](./SYSTEM_MAP.md) — routes / deploy
 6. [docs/ICP_RESEARCH.md](./ICP_RESEARCH.md) — who would actually pay, and why the x402 rail filters them out
 7. [docs/PILOT.md](./PILOT.md) — partner API-key onboarding (no crypto): issue a key, set `PILOT_KEYS`, verify, meter, revoke
+8. [docs/PRICING_PROPOSAL.md](./PRICING_PROPOSAL.md) — sourced ₪ price card for partner keys, awaiting the owner's decision
 
 ---
 
@@ -114,7 +115,7 @@ Reprioritized 2026-09-24 after [ICP_RESEARCH.md](./ICP_RESEARCH.md): paying segm
 ### P1 — packaging / durability / discovery
 
 4. ~~Fix the settle date in Vercel~~ **Done 2026-09-24** (env corrected, production redeployed, `/health` verified; `public/proof.html` fallback fixed).
-5. ~~Packaging so a partner can say yes without USDC~~ **Done 2026-09-25.** A partner key now unlocks the whole product: `POST /v1/pilot/{invoice-gate,verify,payment-risk,company-changes}` and all four tools on `/mcp/pilot`, payment waived, one key per partner in Vercel env `PILOT_KEYS` (JSON), usage metered by `pilot_call` events. Runbook: [PILOT.md](./PILOT.md). **Owner actions when a partner says yes:** issue a key (2 min), set `PILOT_KEYS`, redeploy. **Before the first billable month:** decide the ₪ price card and connect a Vercel Log Drain so the monthly count is durable.
+5. ~~Packaging so a partner can say yes without USDC~~ **Done 2026-09-25.** A partner key now unlocks the whole product: `POST /v1/pilot/{invoice-gate,verify,payment-risk,company-changes}` and all four tools on `/mcp/pilot`, payment waived, one key per partner in Vercel env `PILOT_KEYS` (JSON), usage metered by `pilot_call` events. Runbook: [PILOT.md](./PILOT.md). **Owner actions when a partner says yes:** issue a key (2 min), set `PILOT_KEYS`, redeploy. **Before the first billable month:** approve the ₪ price card in [PRICING_PROPOSAL.md](./PRICING_PROPOSAL.md) (proposal ready 2026-09-25), pick the ₪ collection rail, and connect a Vercel Log Drain so the monthly count is durable.
 6. If credentials arrive: connect **Upstash** so the next settle auto-durables without env paste.
 7. Confirm Glama listing refresh after Frank’s pass.
 8. Optional: one post in the Coinbase Developer Platform / x402 Discord asking for a $0.05 test call (draft in chat history 2026-09-24); Smithery browser submit. ~~mcpservers.org~~ **approved 2026-09-25**, listing live. **Owner action:** send the Gmail draft (reply on the approval thread) asking them to remove or merge the older duplicate entry.
