@@ -46,7 +46,7 @@ Terms to propose: net-30; ₪ or $ at the Bank of Israel representative rate on 
 ## 3. What the numbers need to be true
 
 - The monthly count comes from the durable per-partner counters once the free Upstash database is set (PILOT.md §5): `GET /v1/pilot/usage` with the operator token lists every partner's month total by tool. Without Upstash, only the `pilot_call` log events count, and Vercel keeps them briefly.
-- Collection rail in ₪: Morning (invoice + payment page), a Grow payment link (Grow does not process foreign currency, which is irrelevant for ₪ collection; a concrete thing to ask Yaki on Sunday), or Stripe with ILS. Pick one before the first invoice.
+- Collection rail in ₪: **Atzmai (עצמאי שכיר בע"מ), chosen 2026-09-25.** The owner already holds an account. It is an umbrella company: the tax invoice to the partner is issued by Atzmai, the partner pays Atzmai by bank transfer or card, Atzmai keeps 5 % (VAT included) of the invoice amount and remits VAT, tax and National Insurance, and pays the rest to the owner as salary. Funds arrive about 2 business days after a bank transfer and up to 10 after a card payment (their FAQ). Price the 5 % in. **Two checks still open with Atzmai before the first invoice above ₪5,000:** that they issue an Israel Invoices allocation number on the invoice (mandatory for the partner's VAT deduction), and whether they invoice a foreign customer in USD or EUR. If either is a no, fall back to a Grow payment link or Stripe with ILS for that case.
 - Public pages keep the x402 spot prices as published; partner prices stay in the proposal and in the signed order until the owner decides to publish them.
 
 ## 4. Decision requested

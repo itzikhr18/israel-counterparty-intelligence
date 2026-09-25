@@ -128,7 +128,7 @@ The same variables also make the first-settle record on `/health` durable, so on
 
 **Without Upstash:** the in-process counter is a safety cap for one serverless instance only, `pilot.usage.durable` is `false`, and the authoritative total is the number of `pilot_call` success events per `partner_id` in centralized logs. Vercel keeps runtime logs briefly, so in that mode export the count at least weekly or connect a Log Drain. Set Upstash before the first billable month; it is the difference between an invoice you can defend and one you cannot.
 
-Price card for the invoice is the owner's decision. The sourced proposal is [PRICING_PROPOSAL.md](./PRICING_PROPOSAL.md); the public USDC prices ($0.01 / $0.05 / $0.10 / $0.25) are the floor.
+Price card for the invoice is the owner's decision. The sourced proposal is [PRICING_PROPOSAL.md](./PRICING_PROPOSAL.md); the public USDC prices ($0.01 / $0.05 / $0.10 / $0.25) are the floor. The ₪ invoice itself goes out through Atzmai (umbrella company, 5 % commission, see PRICING_PROPOSAL §3); confirm allocation-number support with them before any invoice above ₪5,000.
 
 ## 6. Rotate, extend, revoke
 
