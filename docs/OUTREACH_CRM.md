@@ -1,6 +1,6 @@
 # Outreach CRM
 
-**Updated:** 2026-09-24 ~15:15 Asia/Jerusalem  
+**Updated:** 2026-09-25 early morning Asia/Jerusalem  
 **Owner inbox:** `itzikhr18@gmail.com`  
 **Canonical status:** [PROJECT_STATUS.md](./PROJECT_STATUS.md) · **Reply kit:** [REPLY_TEMPLATES.md](./REPLY_TEMPLATES.md)
 
@@ -18,11 +18,12 @@ Status legend: `waiting` · `auto-ack` · `human` · `cooling` · `closed` · `b
 
 ## Drafted, not yet sent (owner action: open draft in Gmail web UI, replace `[קישור לדף השותפים]` with `https://israel-counterparty-intelligence.vercel.app/partner`, send)
 
-| Party   | Email                 | Drafted    | Status    | Ask                                                            |
-| ------- | --------------------- | ---------- | --------- | -------------------------------------------------------------- |
-| Morning | support@morning.co.il | 2026-09-24 | **draft** | 20-min product/partnerships call + free pilot token, no crypto |
-| iCount  | support@icount.co.il  | 2026-09-24 | **draft** | Same                                                           |
-| SUMIT   | support@sumit.co.il   | 2026-09-24 | **draft** | Same                                                           |
+| Party          | Email                  | Drafted    | Status    | Ask                                                                                                                                                                                    |
+| -------------- | ---------------------- | ---------- | --------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Morning        | support@morning.co.il  | 2026-09-24 | **draft** | 20-min product/partnerships call + free pilot token, no crypto                                                                                                                         |
+| iCount         | support@icount.co.il   | 2026-09-24 | **draft** | Same                                                                                                                                                                                   |
+| SUMIT          | support@sumit.co.il    | 2026-09-24 | **draft** | Same                                                                                                                                                                                   |
+| mcpservers.org | contact@mcpservers.org | 2026-09-25 | **draft** | Reply on the approval thread asking to remove or merge the older auto-crawled duplicate entry (stale “suspended” copy). Link-free on purpose; nothing to replace, just review and send |
 
 These are support inboxes (no partnerships address is published); each draft asks to be forwarded. Drafts contain **no URL on purpose**: the Claude Gmail connector wraps even a bare hostname (verified again 2026-09-24 on a throwaway draft, deleted).
 

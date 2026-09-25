@@ -14,7 +14,7 @@ Honest claim to use everywhere: **Mainnet live · first external paid call confi
 
 ## 1) mcpservers.org (form — human submit)
 
-**Done — approved 2026-09-25 01:02 (Asia/Jerusalem).** Approval email from `contact@mcpservers.org`; listing live at https://mcpservers.org/servers/itzikhr18/israel-counterparty-intelligence under the name “Israel Counterparty Intelligence”. Badge added to the repo README. The email also offered paid sponsorship (mcpservers.org + awesome-mcp-servers); not taken. Steps below are kept for reference.
+**Done — approved 2026-09-25 01:02 (Asia/Jerusalem).** Approval email from `contact@mcpservers.org`; listing live at https://mcpservers.org/servers/itzikhr18/israel-counterparty-intelligence under the name “Israel Counterparty Intelligence”. Badge added to the repo README. The email also offered paid sponsorship (mcpservers.org + awesome-mcp-servers); not taken. Steps below are kept for reference. Duplicate: the directory also carries an older auto-crawled entry (“Israel Business Intelligence MCP Server”, slug `israel-counterparty-intelligence-vercel-app-readme-md`) whose copy still says paid services are suspended (confirmed via web search 2026-09-25; the page itself is not reachable from the agent environment). A removal/merge request is drafted in Gmail as a reply on the approval thread; **owner sends it from the Gmail web UI**.
 
 1. Open https://mcpservers.org/submit on your phone or laptop.
 2. Fill:
