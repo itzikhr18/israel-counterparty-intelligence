@@ -321,6 +321,62 @@ export const openApiDocument = {
         ),
       },
     },
+    "/v1/pilot/usage": {
+      get: {
+        tags: ["counterparty"],
+        summary: "Read partner pilot usage",
+        description:
+          "Invitation-only partner pilot. With a partner bearer key: that partner's allowance, expiry, and metered usage (pilot-period and calendar-month totals, by tool). Counts are durable and invoice-grade when the operator has configured Upstash; otherwise the response says `durable: false` and reports the in-process count for one instance only.",
+        operationId: "pilot_read_usage",
+        security: [{ pilotBearer: [] }],
+        responses: {
+          "200": {
+            description: "Allowance and usage for the authenticated partner",
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  required: ["partner_id", "call_limit", "expires_at", "usage"],
+                  properties: {
+                    partner_id: { type: "string" },
+                    expires_at: { type: "string", format: "date-time" },
+                    call_limit: { type: "integer" },
+                    tools: { type: "array", items: { type: "string" } },
+                    usage: {
+                      type: "object",
+                      required: [
+                        "durable",
+                        "period_total",
+                        "month",
+                        "month_total",
+                      ],
+                      properties: {
+                        durable: { type: "boolean" },
+                        period_total: { type: "integer" },
+                        by_tool: {
+                          type: "object",
+                          additionalProperties: { type: "integer" },
+                        },
+                        month: { type: "string", pattern: "^\\d{4}-\\d{2}$" },
+                        month_total: { type: "integer" },
+                        month_by_tool: {
+                          type: "object",
+                          additionalProperties: { type: "integer" },
+                        },
+                        note: { type: "string" },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+          "401": { description: "Missing or invalid pilot bearer key" },
+          "410": { description: "Pilot access period has ended" },
+          "429": { description: "Rate limited" },
+        },
+      },
+    },
     "/v1/agent-payment-trust": {
       post: {
         tags: ["agent-payments"],

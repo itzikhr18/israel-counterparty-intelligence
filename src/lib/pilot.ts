@@ -6,6 +6,11 @@ import type { ZodType } from "zod";
 import { config } from "@/lib/config";
 import { ApiError } from "@/lib/domain";
 import { createJsonHandler } from "@/lib/http/handler";
+import {
+  releasePilotUsage,
+  reservePilotUsage,
+  usageMonth,
+} from "@/lib/pilot-usage";
 
 /**
  * Invitation-only partner pilot.
@@ -143,31 +148,60 @@ export function pilotResponseHeaders(
 
 const localUsage = new Map<string, number>();
 
+/** In-process count for one partner on this instance (safety cap, not a ledger). */
+export function localPilotUsage(partnerId: string): number {
+  return localUsage.get(partnerId) ?? 0;
+}
+
+const quotaExhausted = () =>
+  new ApiError(
+    429,
+    "PILOT_QUOTA_EXHAUSTED",
+    "The pilot call allowance for this partner has been reached",
+  );
+
+export type PilotUsageSummary =
+  | { durable: true; period_total: number; month: string; month_total: number }
+  | { durable: false; period_total: number; month: string; note: string };
+
 /**
  * Runs one pilot operation under the partner's call allowance.
  *
- * The in-process counter is a safety cap for a single serverless instance; the
- * authoritative usage total is the centralized count of successful `pilot_call`
- * events. Failed operations do not consume the allowance.
+ * With Upstash configured the durable per-partner counters are reserved before
+ * the operation and released if it fails or exceeds the allowance, so the
+ * count survives cold starts and is invoice-grade. Without Upstash the
+ * in-process counter is only a safety cap for a single serverless instance and
+ * the authoritative total is the centralized count of successful `pilot_call`
+ * events. Failed operations never consume the allowance.
  */
 export async function runPilotOperation<T extends Record<string, unknown>>(
   partner: PilotPartner,
   tool: PilotTool,
   operation: () => Promise<T>,
-): Promise<T & { pilot: ReturnType<typeof pilotMetadata> }> {
+): Promise<
+  T & { pilot: ReturnType<typeof pilotMetadata> & { usage: PilotUsageSummary } }
+> {
   const previous = localUsage.get(partner.partner_id) ?? 0;
-  if (previous >= partner.call_limit) {
-    throw new ApiError(
-      429,
-      "PILOT_QUOTA_EXHAUSTED",
-      "The pilot call allowance for this partner has been reached",
-    );
-  }
+  if (previous >= partner.call_limit) throw quotaExhausted();
 
   const localSequence = previous + 1;
   localUsage.set(partner.partner_id, localSequence);
   const startedAt = performance.now();
-  const log = (status: "success" | "failed") =>
+  const reservation = await reservePilotUsage(partner, tool);
+  const usage: PilotUsageSummary = reservation.durable
+    ? {
+        durable: true,
+        period_total: reservation.period_total,
+        month: reservation.month,
+        month_total: reservation.month_total,
+      }
+    : {
+        durable: false,
+        period_total: localSequence,
+        month: usageMonth(),
+        note: "In-process safety cap on this instance; configure UPSTASH_REDIS_REST_* for a durable count.",
+      };
+  const log = (status: "success" | "failed" | "rejected") =>
     console.info(
       JSON.stringify({
         event: "pilot_call",
@@ -177,16 +211,31 @@ export async function runPilotOperation<T extends Record<string, unknown>>(
         status,
         local_sequence: localSequence,
         call_limit: partner.call_limit,
+        durable: reservation.durable,
+        period_total: usage.period_total,
+        month: usage.month,
         duration_ms: Math.round(performance.now() - startedAt),
       }),
     );
+  const release = async () => {
+    localUsage.set(partner.partner_id, previous);
+    if (reservation.durable) {
+      await releasePilotUsage(partner, tool, reservation.month);
+    }
+  };
+
+  if (reservation.durable && reservation.period_total > partner.call_limit) {
+    await release();
+    log("rejected");
+    throw quotaExhausted();
+  }
 
   try {
     const result = await operation();
     log("success");
-    return { ...result, pilot: pilotMetadata(partner) };
+    return { ...result, pilot: { ...pilotMetadata(partner), usage } };
   } catch (error) {
-    localUsage.set(partner.partner_id, previous);
+    await release();
     log("failed");
     throw error;
   }

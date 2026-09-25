@@ -7,6 +7,7 @@ describe("partner pilot metering and configuration", () => {
   beforeEach(() => {
     vi.resetModules();
     vi.unstubAllEnvs();
+    vi.unstubAllGlobals();
   });
 
   it("meters calls per partner, stops at the allowance, and does not charge failures", async () => {
@@ -72,6 +73,74 @@ describe("partner pilot metering and configuration", () => {
       call_limit: 2,
     });
     info.mockRestore();
+  });
+
+  it("enforces the allowance on the durable total and releases the reservation", async () => {
+    vi.stubEnv(
+      "PILOT_KEYS",
+      JSON.stringify([
+        {
+          partner_id: "gamma",
+          token_sha256: hex("f"),
+          expires_at: farFuture,
+          call_limit: 100,
+        },
+      ]),
+    );
+    vi.stubEnv("UPSTASH_REDIS_REST_URL", "https://example.upstash.io");
+    vi.stubEnv("UPSTASH_REDIS_REST_TOKEN", "test-token");
+    const bodies: unknown[] = [];
+    let periodTotal = 100;
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async (_input: RequestInfo | URL, init?: RequestInit) => {
+        const body = JSON.parse(String(init?.body)) as Array<Array<unknown>>;
+        bodies.push(body);
+        const delta = Number(body[0]?.[3] ?? 0);
+        periodTotal += delta;
+        return new Response(
+          JSON.stringify([
+            { result: periodTotal },
+            { result: 1 },
+            { result: periodTotal },
+            { result: 1 },
+          ]),
+          { status: 200 },
+        );
+      }),
+    );
+    vi.spyOn(console, "info").mockImplementation(() => {});
+    const { pilotPartners, runPilotOperation } = await import("@/lib/pilot");
+    const [gamma] = pilotPartners;
+    if (!gamma) throw new Error("expected a configured partner");
+
+    // Durable total is already at the allowance: the 101st call is rejected
+    // and its reservation is released, so the in-process cap does not matter.
+    const operation = vi.fn(async () => ({ ok: true }));
+    await expect(
+      runPilotOperation(gamma, "invoice_gate", operation),
+    ).rejects.toMatchObject({ status: 429, code: "PILOT_QUOTA_EXHAUSTED" });
+    expect(operation).not.toHaveBeenCalled();
+    expect(bodies).toHaveLength(2);
+    expect((bodies[1] as Array<Array<unknown>>)[0]).toEqual([
+      "HINCRBY",
+      "ici:pilot:usage:gamma",
+      "total",
+      -1,
+    ]);
+    expect(periodTotal).toBe(100);
+
+    // Below the allowance the call succeeds and reports the durable totals.
+    periodTotal = 10;
+    await expect(
+      runPilotOperation(gamma, "verify", async () => ({ ok: 1 })),
+    ).resolves.toMatchObject({
+      ok: 1,
+      pilot: {
+        partner_id: "gamma",
+        usage: { durable: true, period_total: 11 },
+      },
+    });
   });
 
   it("falls back to the single-partner PILOT_* variables when PILOT_KEYS is unset", async () => {

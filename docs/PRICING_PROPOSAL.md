@@ -45,7 +45,7 @@ Terms to propose: net-30; ₪ or $ at the Bank of Israel representative rate on 
 
 ## 3. What the numbers need to be true
 
-- The monthly count is the number of `pilot_call` success events per `partner_id` in centralized logs (PILOT.md §5). Connect a Vercel Log Drain before the first billable month; without it the count is not durable.
+- The monthly count comes from the durable per-partner counters once the free Upstash database is set (PILOT.md §5): `GET /v1/pilot/usage` with the operator token lists every partner's month total by tool. Without Upstash, only the `pilot_call` log events count, and Vercel keeps them briefly.
 - Collection rail in ₪: Morning (invoice + payment page), a Grow payment link (Grow does not process foreign currency, which is irrelevant for ₪ collection; a concrete thing to ask Yaki on Sunday), or Stripe with ILS. Pick one before the first invoice.
 - Public pages keep the x402 spot prices as published; partner prices stay in the proposal and in the signed order until the owner decides to publish them.
 
