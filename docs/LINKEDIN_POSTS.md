@@ -12,6 +12,12 @@
 
 If the Grow call on 27.09 produces a referral or a lesson worth telling, move it into post 2.
 
+**Published:**
+
+| Post | Published (Asia/Jerusalem)                            | Where                                                                     | Notes                                                                                                                                                           |
+| ---- | ----------------------------------------------------- | ------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1    | 2026-09-25 13:19, Chol HaMoed, at the owner's request | https://www.linkedin.com/feed/update/urn:li:activity:7509197931024003072/ | Posted through the LinkedIn API (Composio connection, `w_member_social`); first comment with the link added at 13:19. Posts 2 and 3 stay on the schedule above. |
+
 **Rules (same honesty rules as everywhere else):**
 
 - Links go in the **first comment**, not in the post body (LinkedIn deprioritizes link posts). The post says "הקישור בתגובה הראשונה".
