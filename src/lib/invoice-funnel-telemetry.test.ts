@@ -20,12 +20,16 @@ describe("invoice funnel telemetry", () => {
       event: "invoice_preview_delivered",
       client_class: "internal_test",
       decision: "HOLD",
+      sample: false,
+      language: "en",
     });
     expect(Object.keys(event).sort()).toEqual([
       "allocation_applicability",
       "client_class",
       "decision",
       "event",
+      "language",
+      "sample",
       "telemetry_version",
       "timestamp",
       "transport",

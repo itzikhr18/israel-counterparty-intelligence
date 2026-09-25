@@ -59,6 +59,8 @@ export async function POST(request: NextRequest) {
   try {
     const form = await readBoundedFormData(request);
     const lang: InvoicePageLanguage = form.get("lang") === "he" ? "he" : "en";
+    // One-click examples on /invoice-check/he; logged apart from real invoices.
+    const flags = { sample: form.get("sample") === "1", language: lang };
     const walletHandoff = form.get("action") === "wallet-handoff";
     if (walletHandoff && PAID_SERVICE_SUSPENDED) {
       return paidServiceUnavailableResponse();
@@ -98,7 +100,7 @@ export async function POST(request: NextRequest) {
     );
 
     if (!parsed.success) {
-      logInvoiceFunnel(request, "invoice_preview_invalid");
+      logInvoiceFunnel(request, "invoice_preview_invalid", undefined, flags);
       return html(
         renderInvoicePreviewPage({
           providerName: config.PROVIDER_NAME,
@@ -198,7 +200,7 @@ export async function POST(request: NextRequest) {
         },
       });
     }
-    logInvoiceFunnel(request, "invoice_preview_delivered", outcome);
+    logInvoiceFunnel(request, "invoice_preview_delivered", outcome, flags);
     const result: InvoicePreviewPageResult = {
       action: preview.decision.action,
       score: preview.decision.score,

@@ -28,5 +28,11 @@ describe("GET /invoice-check/he", () => {
     }
     expect(html).toContain('href="/partner/he"');
     expect(html).not.toContain("USDC");
+    // Two one-click examples post the same fields, flagged as samples.
+    expect(html.match(/action="\/invoice-preview"/g)).toHaveLength(3);
+    expect(html.match(/name="sample" value="1"/g)).toHaveLength(2);
+    expect(html).toContain('name="allocation_number" value="123456789"');
+    expect(html).toContain("דוגמה 1");
+    expect(html).toContain("דוגמה 2");
   });
 });

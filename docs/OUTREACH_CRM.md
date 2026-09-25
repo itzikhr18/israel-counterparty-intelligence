@@ -4,7 +4,7 @@
 **Owner inbox:** `itzikhr18@gmail.com`  
 **Canonical status:** [PROJECT_STATUS.md](./PROJECT_STATUS.md) · **Reply kit:** [REPLY_TEMPLATES.md](./REPLY_TEMPLATES.md)
 
-**Goal now:** (1) Grow/Yaki call on Sunday 27.09 (learn + referral), (2) Israeli OEM channel: send the three Gmail drafts to Morning / iCount / Sumit from the **web UI** after pasting the partner link, (3) packaging is **done**: a partner API key unlocks all four tools without USDC, onboard with [PILOT.md](./PILOT.md) the same day a partner says yes. The second external settle is now a **passive** metric (owner has no external wallet; do not chase).  
+**Goal now:** (1) Grow/Yaki call on Sunday 27.09 (learn + referral), (2) Israeli OEM channel: send the three Gmail drafts to Morning / iCount / Sumit from the **web UI** after pasting the partner link, (3) packaging is **done**: a partner API key unlocks all four tools without USDC, onboard with [PILOT.md](./PILOT.md) the same day a partner says yes, (4) the demo for any call or mail is the Hebrew free check at `/invoice-check/he`: two one-click examples (valid invoice → HOLD, missing allocation number → BLOCK), no typing. The second external settle is now a **passive** metric (owner has no external wallet; do not chase).  
 **Do not spam today:** PayAPI, GoPlausible, Mesh, Dokka, Cardcom, Aerchain, Agent402 paid-canary asks.
 
 Status legend: `waiting` · `auto-ack` · `human` · `cooling` · `closed` · `blocked`
