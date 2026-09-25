@@ -21,6 +21,11 @@
     <priority>0.95</priority>
   </url>
   <url>
+    <loc>https://israel-counterparty-intelligence.vercel.app/partner/he</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.95</priority>
+  </url>
+  <url>
     <loc>https://israel-counterparty-intelligence.vercel.app/README.md</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
