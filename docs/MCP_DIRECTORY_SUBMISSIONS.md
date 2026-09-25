@@ -14,6 +14,8 @@ Honest claim to use everywhere: **Mainnet live · first external paid call confi
 
 ## 1) mcpservers.org (form — human submit)
 
+**Done — approved 2026-09-25 01:02 (Asia/Jerusalem).** Approval email from `contact@mcpservers.org`; listing live at https://mcpservers.org/servers/itzikhr18/israel-counterparty-intelligence under the name “Israel Counterparty Intelligence”. Badge added to the repo README. The email also offered paid sponsorship (mcpservers.org + awesome-mcp-servers); not taken. Steps below are kept for reference.
+
 1. Open https://mcpservers.org/submit on your phone or laptop.
 2. Fill:
    - **Server Name:** `Israel Business Intelligence MCP`
@@ -88,9 +90,9 @@ Israel-specific counterparty intelligence over MCP + x402. Invoice PAY/HOLD/BLOC
 
 Update this table when done (date in Asia/Jerusalem):
 
-| Directory       | Submitted?         | Listing URL                                                                      | Notes                                        |
-| --------------- | ------------------ | -------------------------------------------------------------------------------- | -------------------------------------------- |
-| mcpservers.org  |                    |                                                                                  | human form still open                        |
-| Smithery        |                    |                                                                                  | browser/OAuth                                |
-| Glama server    | n/a                |                                                                                  | using connector path                         |
-| Glama connector | **YES** 2026-09-23 | https://glama.ai/mcp/connectors/io.github.itzikhr18/israel-business-intelligence | Ownership verified; Frank pinged for refresh |
+| Directory       | Submitted?                    | Listing URL                                                                      | Notes                                                                                                                      |
+| --------------- | ----------------------------- | -------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
+| mcpservers.org  | **YES** — approved 2026-09-25 | https://mcpservers.org/servers/itzikhr18/israel-counterparty-intelligence        | Approval email 25.09 01:02 IDT; listed as “Israel Counterparty Intelligence”; badge in README; sponsorship offer not taken |
+| Smithery        |                               |                                                                                  | browser/OAuth                                                                                                              |
+| Glama server    | n/a                           |                                                                                  | using connector path                                                                                                       |
+| Glama connector | **YES** 2026-09-23            | https://glama.ai/mcp/connectors/io.github.itzikhr18/israel-business-intelligence | Ownership verified; Frank pinged for refresh                                                                               |
