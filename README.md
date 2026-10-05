@@ -1,5 +1,7 @@
 # Israel Invoice Payment Gate and Counterparty Intelligence
 
+> **Status (2026-10-05): frozen.** The service stays live and callable, but active development and outreach have stopped. See [docs/PROJECT_STATUS.md](docs/PROJECT_STATUS.md) §0.
+
 One agent-native gate to check an Israeli supplier invoice before payment, with public-registry counterparty evidence.
 
 Public source: <https://github.com/itzikhr18/israel-counterparty-intelligence>
