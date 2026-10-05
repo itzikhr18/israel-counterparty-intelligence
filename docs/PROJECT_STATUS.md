@@ -1,10 +1,34 @@
 # Project status — Israel Counterparty Intelligence (ICI)
 
-**Updated:** 2026-09-25 late morning Asia/Jerusalem  
+**Updated:** 2026-10-05 Asia/Jerusalem  
 **Audience:** any engineer, partner, or agent picking up this repo  
 **Owner:** Itzik Harush (`itzikhr18@gmail.com`) · GitHub `itzikhr18`
 
 This is the **canonical ops snapshot**. Prefer it over chat history. Re-check live `/health` and `/proof` before acting.
+
+---
+
+## 0. FROZEN — 2026-10-05 (owner decision)
+
+**The project is frozen.** It stays live as-is; no new development, outreach, or directory work. Do not start new work on it unless the owner explicitly unfreezes it.
+
+**Why (checked 2026-10-05):**
+
+- The core checks are already free in Israel: allocation-number verification is free for any authorized dealer in the Tax Authority personal area, and SUMIT checks allocation numbers in-product; free company lookups by ח.פ exist on at least six sites (yeshinvoice, cap, taagidim, tovea, roeahesbon, hamahon).
+- No international demand: four Israel Companies Registry actors on the Apify Store show 2–3 total users each and at most one monthly active user.
+- The x402 rail produced one external payment (0.01 USDC, 2026-09-23) since charging went live; no second payment as of 2026-10-05.
+- The fallback of selling MCP-building services is saturated (2,416 MCP gigs on Fiverr, from $100).
+- Grow/Yaki: closed by the owner — nothing to offer. Cardcom closed their tickets on 2026-10-04.
+
+**What "frozen" means in practice:**
+
+- Keep production, `/health`, `/proof`, MCP Registry / Glama / mcpservers.org listings up. No cost beyond the current plan.
+- Unsent Gmail drafts (Morning, iCount, SUMIT, mcpservers.org, Atzmai) stay unsent unless the owner decides otherwise.
+- If an inbound partner reply or an external settle arrives, report it to the owner; do not act on it alone.
+- **Before any real commercial revenue:** if the project is on Vercel Hobby, its terms allow non-commercial personal use only — upgrade to Pro first.
+- The project is reused as a portfolio case study for Itzik Digital (automation / AI integrations).
+
+Sections 1–8 below are the last active snapshot (2026-09-25), kept for reference.
 
 ---
 
