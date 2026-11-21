@@ -48,9 +48,24 @@ function paidPost(
     type: "object",
     required: ["request_id", "evidence", "checked_at"],
   },
+  mainnet = true,
 ) {
   return {
     summary,
+    // x402scan / OpenAPI discovery contract: decimal USD amount, x402 protocol.
+    // Testnet (Base Sepolia) routes are intentionally not advertised as paid.
+    ...(mainnet
+      ? {
+          "x-payment-info": {
+            price: {
+              mode: "fixed",
+              currency: "USD",
+              amount: Number(price.replace("$", "")).toFixed(6),
+            },
+            protocols: [{ x402: {} }],
+          },
+        }
+      : {}),
     description: `${PAID_SERVICE_SUSPENDED ? `${PAID_SERVICE_NOTICE} ` : ""}${description} Reference price: ${price} per successful call through x402 when available.`,
     "x-paid-service-suspended": PAID_SERVICE_SUSPENDED,
     operationId: summary.toLocaleLowerCase("en").replace(/[^a-z0-9]+/g, "_"),
@@ -149,6 +164,8 @@ export const openApiDocument = {
     version: API_VERSION,
     description:
       "Agent-native Israeli invoice payment gate, supplier-registry intelligence, and x402 pre-sign payment firewall. Allocation applicability uses date, amount, VAT component, and buyer-attested conditions; missing context fails safely. Output is not official Tax Authority authentication, legal, credit, or payment advice.",
+    "x-guidance":
+      'Paid routes settle in USDC on Base Mainnet over x402 v2: POST without payment to get the 402 PAYMENT-REQUIRED terms, sign, and retry the identical request. Cheapest first call: POST /v1/company-changes/mainnet with {"company_number":"<nine digits>"} ($0.01). Full company verification: POST /v1/verify/mainnet ($0.05). Vendor payment risk: POST /v1/payment-risk/mainnet ($0.10). Invoice PAY/HOLD/BLOCK gate: POST /v1/invoice-gate/mainnet ($0.25). Free: POST /v1/invoice-gate/preview and POST /v1/agent-payment-trust. MCP: /mcp.',
   },
   servers: [{ url: config.PUBLIC_BASE_URL }],
   components: {
@@ -185,6 +202,9 @@ export const openApiDocument = {
           "Verify Israeli company",
           paidRouteConfig.verify.description,
           paidRouteConfig.verify.price,
+          undefined,
+          undefined,
+          false,
         ),
       },
     },
@@ -205,6 +225,9 @@ export const openApiDocument = {
           "Government footprint",
           paidRouteConfig["government-footprint"].description,
           paidRouteConfig["government-footprint"].price,
+          undefined,
+          undefined,
+          false,
         ),
       },
     },
@@ -215,6 +238,9 @@ export const openApiDocument = {
           "Counterparty risk",
           paidRouteConfig["counterparty-risk"].description,
           paidRouteConfig["counterparty-risk"].price,
+          undefined,
+          undefined,
+          false,
         ),
       },
     },
